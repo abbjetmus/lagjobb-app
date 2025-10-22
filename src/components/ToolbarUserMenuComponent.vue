@@ -1,5 +1,5 @@
 <template>
-  <q-btn-dropdown flat color="white" :label="user.name || 'Meny'">
+  <q-btn-dropdown outline color="secondary" :label="user.name || 'Meny'">
     <q-list>
       <q-item clickable v-close-popup @click="goToMyGroups">
         <q-item-section>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useAuth } from 'src/stores/auth';
-import { User } from 'src/models/User';
+import type { User } from 'src/models/User';
 
 defineProps<{
   user: User;
@@ -69,4 +69,3 @@ const logout = async () => {
   router.push('/');
 };
 </script>
-

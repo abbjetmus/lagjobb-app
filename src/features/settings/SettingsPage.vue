@@ -112,12 +112,7 @@
     <q-card>
       <q-card-section>
         <div class="text-h6 q-mb-md text-negative">Farlig zon</div>
-        <q-btn
-          color="negative"
-          label="Ta bort konto"
-          @click="confirmDeleteAccount"
-          outline
-        />
+        <q-btn color="negative" label="Ta bort konto" @click="confirmDeleteAccount" outline />
       </q-card-section>
     </q-card>
 
@@ -128,22 +123,12 @@
         </q-card-section>
 
         <q-card-section>
-          <q-input
-            v-model="editValue"
-            :label="editDialogTitle"
-            outlined
-          />
+          <q-input v-model="editValue" :label="editDialogTitle" outlined />
         </q-card-section>
 
         <q-card-actions align="right">
           <q-btn flat label="Avbryt" color="primary" v-close-popup />
-          <q-btn
-            flat
-            label="Spara"
-            color="primary"
-            @click="saveEdit"
-            :loading="saving"
-          />
+          <q-btn flat label="Spara" color="primary" @click="saveEdit" :loading="saving" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -152,10 +137,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import { useSettings } from 'src/stores/settings';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
+import { UsersRecord } from 'app/pocketbase-types';
 
 const authStore = useAuth();
 const settingsStore = useSettings();
@@ -193,22 +179,8 @@ const editPhone = () => {
 
 const saveEdit = async () => {
   saving.value = true;
-  try {
-    await authStore.updateUser({ [editField.value]: editValue.value });
-    $q.notify({
-      type: 'positive',
-      message: 'Uppdaterat!',
-    });
-    showEditDialog.value = false;
-  } catch (error) {
-    console.error('Update error:', error);
-    $q.notify({
-      type: 'negative',
-      message: 'Kunde inte uppdatera.',
-    });
-  } finally {
-    saving.value = false;
-  }
+  await authStore.updateUser({ [editField.value as keyof UsersRecord]: editValue.value as string } as unknown as UsersRecord);
+  showEditDialog.value = false;
 };
 
 const saveSettings = async () => {
@@ -246,4 +218,3 @@ onMounted(async () => {
   }
 });
 </script>
-

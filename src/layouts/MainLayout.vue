@@ -1,24 +1,25 @@
 <template>
   <q-layout view="hHh lpR fff">
-    <q-header class="bg-blue-5 text-white">
-      <q-toolbar>
-        <q-toolbar-title>
-          <router-link to="/" class="text-white row items-center no-wrap" style="text-decoration: none; gap: 8px;">
-            <q-avatar size="32px">
-              <img src="../assets/team.svg" />
-            </q-avatar>
-            <span>LagJobb</span>
+    <q-header class="bg-primary text-white">
+      <q-toolbar class="row justify-around">
+        <q-toolbar-title class="col-auto">
+          <router-link to="/" class="text-secondary row items-center no-wrap" style="text-decoration: none; gap: 8px;">
+
+            <span>Lag <q-avatar size="32px">
+                <img src="../assets/team.svg" />
+              </q-avatar> Jobb</span>
           </router-link>
         </q-toolbar-title>
 
-        <div class="row q-gutter-sm items-center">
-          <q-btn flat label="Skapa uppdrag" icon="add_circle" @click="goToNewUppdrag()" class="gt-sm" />
+        <div class="col-auto row q-gutter-lg items-center">
+          <q-btn unelevated label="Skapa uppdrag" icon="add_circle" @click="goToNewUppdrag()" class="gt-sm"
+            color="secondary" />
 
-          <q-btn flat icon="add_circle" @click="goToNewUppdrag()" class="lt-md" />
+          <q-btn flat color="secondary" icon="add_circle" @click="goToNewUppdrag()" class="lt-md" />
 
-          <q-btn flat icon="search" to="/sok-uppdrag" />
+          <q-btn flat color="secondary" stack icon="search" label="Sök" to="/sok-uppdrag" />
 
-          <toolbar-user-menu v-if="isAuthenticated && currentUser" :user="currentUser" />
+          <toolbar-user-menu color="secondary" v-if="isAuthenticated && currentUser" :user="currentUser" />
 
           <q-btn v-else flat @click="showSignInSignUpDialog()">
             <span class="gt-xs">Logga in / Skapa konto</span>
@@ -32,7 +33,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="bg-blue-5 text-white">
+    <q-footer class="bg-primary text-white">
       <div class="q-pa-md">
         <footer-component />
       </div>

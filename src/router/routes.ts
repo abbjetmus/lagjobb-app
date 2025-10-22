@@ -5,16 +5,15 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/IndexPage.vue'), meta: { requiresAuth: false } },
+      { path: '', component: () => import('src/features/main/IndexPage.vue'), meta: { requiresAuth: false } },
       {
-        path: 'glomt-losenord',
-        component: () => import('src/features/auth/ForgotPasswordPage.vue'),
+        path: 'glomt-losenord', component: () => import('src/features/auth/ForgotPasswordPage.vue'),
       },
       {
         path: 'register',
         component: () => import('src/features/auth/RegisterPage.vue'),
       },
-      { name: 'search', path: '/sok-uppdrag', component: () => import('pages/SearchUppdragPage.vue'), meta: { requiresAuth: false } },
+      { name: 'search', path: '/sok-uppdrag', component: () => import('src/features/main/SearchJobsPage.vue'), meta: { requiresAuth: false } },
       { path: '/uppdrags-info/:id', component: () => import('src/features/jobs/Job2DetailsPage.vue'), meta: { requiresAuth: false } },
       { path: '/kontakta-oss', component: () => import('pages/ContactUsPage.vue'), meta: { requiresAuth: false } },
       { path: '/annonsera', component: () => import('pages/AdvertisePage.vue'), meta: { requiresAuth: false } },
@@ -31,7 +30,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/sparade-uppdrag', component: () => import('src/features/jobs/SavedJobsPage.vue'), meta: { requiresAuth: true } },
       { path: '/mina-grupper-lista', component: () => import('src/features/groups/MyGroupsListPage.vue'), meta: { requiresAuth: true } },
       { path: '/mina-grupper/:id', component: () => import('src/features/groups/MyGroupDetailsPage.vue'), meta: { requiresAuth: true } },
-      { path: '/installningar', component: () => import('pages/SettingsPage.vue'), meta: { requiresAuth: true } },
+      { path: '/installningar', component: () => import('src/features/settings/SettingsPage.vue'), meta: { requiresAuth: true } },
       { path: '/skapa-uppdrag', component: () => import('src/features/jobs/CreateJobPage.vue'), meta: { requiresAuth: true } },
       { path: '/skapa-grupp', component: () => import('src/features/groups/CreateNewGroupPage.vue'), meta: { requiresAuth: true } },
       { path: '/redigera-uppdrag/:id', component: () => import('src/features/jobs/EditJobPage.vue'), meta: { requiresAuth: true } },

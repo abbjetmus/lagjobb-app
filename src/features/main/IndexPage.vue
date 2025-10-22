@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="bg-image window-height">
+    <div class="bg-image">
       <q-page class="flex flex-center q-pa-sm">
         <div class="text-grey-3">
           <div class="row items-center">
@@ -48,9 +48,10 @@
                   </template>
                 </q-select>
 
-                <q-btn color="blue-5" icon="search" @click="search()" class="col-12 col-md-1 q-mt-sm q-mb-xs" square />
+                <q-btn color="secondary" icon="search" @click="search()" class="col-12 col-md-1 q-mt-sm q-mb-xs"
+                  square />
 
-                <q-btn label="visa alla uppdrag" color="blue-5" @click="searchAll()"
+                <q-btn label="visa alla uppdrag" color="secondary" @click="searchAll()"
                   class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px;" square />
               </div>
             </div>
@@ -60,7 +61,7 @@
       </q-page>
     </div>
 
-    <div class="bg-grey-1 text-center q-py-xl q-px-md">
+    <div class="bg-grey-2 text-center q-py-xl q-px-md">
       <span class="text-grey-9 block text-h5 text-md-h4">
         250 registrerade lag, klasser och föreningar redo att hjälpa dig
       </span>
@@ -69,13 +70,13 @@
       </span>
       <div class="row justify-center">
         <div class="col-xs-12 col-md-8 col-lg-6 row justify-around q-gutter-md">
-          <q-btn style="width: 140px;" label="Lag" color="white" text-color="blue"
+          <q-btn unelevated style="width: 140px;" label="Lag" color="secondary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 1 } }" square />
-          <q-btn style="width: 140px;" label="Klasser" color="white" text-color="blue"
+          <q-btn unelevated style="width: 140px;" label="Klasser" color="secondary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 2 } }" square />
-          <q-btn style="width: 140px;" label="Föreningar" color="white" text-color="blue"
+          <q-btn unelevated style="width: 140px;" label="Föreningar" color="secondary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 3 } }" square />
-          <q-btn style="width: 140px;" label="Organisationer" color="white" text-color="blue"
+          <q-btn unelevated style="width: 140px;" label="Organisationer" color="secondary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 4 } }" square />
         </div>
       </div>
@@ -210,15 +211,11 @@ const filterJobsFn = (val: string, update: (fn: () => void) => void) => {
 
 <style scoped>
 .bg-image {
-  background: url("../assets/soccer-team.jpg") no-repeat center center fixed;
+  background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
   background-size: cover;
   height: 100%;
   overflow: hidden;
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url("../assets/soccer-team.jpg");
-}
-
-.window-height {
-  min-height: 100vh;
+    url("../../assets/soccer-team.jpg");
 }
 </style>
