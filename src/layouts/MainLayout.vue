@@ -1,102 +1,93 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fff">
+    <q-header class="bg-blue-5 text-white">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
         <q-toolbar-title>
-          Quasar App
+          <router-link to="/" class="text-white row items-center no-wrap" style="text-decoration: none; gap: 8px;">
+            <q-avatar size="32px">
+              <img src="../assets/team.svg" />
+            </q-avatar>
+            <span>LagJobb</span>
+          </router-link>
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div class="row q-gutter-sm items-center">
+          <q-btn flat label="Skapa uppdrag" icon="add_circle" @click="goToNewUppdrag()" class="gt-sm" />
+
+          <q-btn flat icon="add_circle" @click="goToNewUppdrag()" class="lt-md" />
+
+          <q-btn flat icon="search" to="/sok-uppdrag" />
+
+          <toolbar-user-menu v-if="isAuthenticated && currentUser" :user="currentUser" />
+
+          <q-btn v-else flat @click="showSignInSignUpDialog()">
+            <span class="gt-xs">Logga in / Skapa konto</span>
+            <span class="lt-sm">Logga in</span>
+          </q-btn>
+        </div>
       </q-toolbar>
     </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
 
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer class="bg-blue-5 text-white">
+      <div class="q-pa-md">
+        <footer-component />
+      </div>
+    </q-footer>
+
+    <SignInSignUpDialog v-model="signInSignUpDialog" :is-sign-in="toReturnAfterCancel === 'create'"
+      :name="currentUser?.name" to-return-after-cancel="toReturnAfterCancel" @return-after-cancel="afterDialogCancel" />
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuth } from 'src/stores/auth';
+import ToolbarUserMenu from 'src/components/ToolbarUserMenuComponent.vue';
+import FooterComponent from 'src/components/FooterComponent.vue';
+import SignInSignUpDialog from 'src/features/auth/components/SignInSignUpDialog.vue';
+import { useJobs } from 'src/features/jobs/jobsStore';
+const router = useRouter();
+const authStore = useAuth();
+const jobsStore = useJobs();
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+const signInSignUpDialog = ref(false);
+const toReturnAfterCancel = ref('');
+
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const currentUser = computed(() => authStore.currentUser);
+
+const showSignInSignUpDialog = () => {
+  signInSignUpDialog.value = true;
+};
+
+const goToNewUppdrag = () => {
+  if (isAuthenticated.value) {
+    router.push('/skapa-uppdrag').catch(() => { });
+  } else {
+    toReturnAfterCancel.value = 'create';
+    signInSignUpDialog.value = true;
   }
-];
+};
 
-const leftDrawerOpen = ref(false);
+const afterDialogCancel = (value: string) => {
+  if (value === 'create') {
+    toReturnAfterCancel.value = '';
+    if (isAuthenticated.value) {
+      router.push('/skapa-uppdrag').catch(() => { });
+    }
+  }
+};
 
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+onMounted(async () => {
+  await Promise.all([
+    jobsStore.getAllJobs(),
+    jobsStore.getAllJobCategories(),
+    jobsStore.getAllCounties(),
+  ]);
+});
 </script>
