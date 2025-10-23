@@ -1,77 +1,76 @@
 <template>
-  <q-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-    <q-card style="min-width: 350px">
-      <q-card-section>
-        <div class="text-h6">{{ isSignIn ? 'Logga in' : 'Skapa konto' }}</div>
-      </q-card-section>
+  <q-dialog ref="dialogRef" padding>
+    <q-card class="row no-wrap" style="min-width: 600px; max-width: 800px">
+      <!-- Image section -->
+      <div class="col-4">
+        <img src="src/assets/apples.jpg" alt="Apples" class="full-height full-width"
+          style="object-fit: cover; border-radius: 4px 0 0 4px;" />
+      </div>
 
-      <q-card-section>
-        <q-input v-if="!isSignIn" v-model="name" label="Namn" outlined class="q-mb-md"
-          :error="r$.name.$errors.length > 0" :error-message="r$.name.$errors[0]" />
+      <!-- Form section -->
+      <div class="col-8">
+        <q-card-section class="bg-secondary text-white shadow-0">
+          <div class="text-h6 text-center">Logga in</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <q-form ref="form" @submit.prevent="onSubmit" class="full-width">
+            <q-input v-model="email" label="E-post" type="email" outlined class="q-mb-md"
+              :error="r$.email.$errors.length > 0" :error-message="r$.email.$errors[0]" no-error-icon />
 
-        <q-input v-model="email" label="E-post" type="email" outlined class="q-mb-md"
-          :error="r$.email.$errors.length > 0" :error-message="r$.email.$errors[0]" />
+            <q-input v-model="password" label="Lösenord" type="password" outlined no-error-icon
+              :error="r$.password.$errors.length > 0" :error-message="r$.password.$errors[0]" />
 
-        <q-input v-model="password" label="Lösenord" :type="isPwd ? 'password' : 'text'" outlined class="q-mb-md"
-          :error="r$.password.$errors.length > 0" :error-message="r$.password.$errors[0]">
-          <template v-slot:append>
-            <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
-          </template>
-        </q-input>
+            <div v-if="error" class="text-negative q-mb-md">{{ error }}</div>
 
-        <div v-if="error" class="text-negative q-mb-md">{{ error }}</div>
-      </q-card-section>
+            <div class="row justify-between q-my-md">
+              <q-btn color="primary" type="submit" :loading="loading">
+                Logga in
+              </q-btn>
+              <q-btn color="secondary" flat @click="cancel">
+                Avbryt
+              </q-btn>
+            </div>
+          </q-form>
+        </q-card-section>
 
-      <q-card-actions align="right">
-        <q-btn flat label="Avbryt" color="primary" v-close-popup />
-        <q-btn flat :label="isSignIn ? 'Logga in' : 'Skapa konto'" color="primary" @click="submit" :loading="loading" />
-      </q-card-actions>
-
-      <q-card-section class="q-pt-none">
-        <q-btn flat no-caps color="primary" label="Skapa konto istället" @click="goToRegister" />
-      </q-card-section>
+        <q-separator />
+        <q-card-section class="q-pt-none text-center q-mt-lg">
+          <div class="column q-gutter-y-md">
+            <q-btn flat no-caps color="green-8" label="Har du inget konto? Skapa konto" @click="goToRegister" />
+            <q-btn flat no-caps color="grey-7" label="Glömt lösenord?" @click="goToForgotPassword" />
+          </div>
+        </q-card-section>
+      </div>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { useAuth } from 'src/features/auth/authStore';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 import { useRegle } from '@regle/core';
-import { required, email as emailRule } from '@regle/rules';
+import { required } from '@regle/rules';
+import { useDialogPluginComponent } from 'quasar';
 
-defineProps<{
-  modelValue: boolean;
-  toReturnAfterCancel?: string;
-}>();
-
-const emit = defineEmits<{
-  'update:modelValue': [value: boolean];
-  'returnAfterCancel': [value: string];
-}>();
+const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
 const $q = useQuasar();
 const authStore = useAuth();
 const router = useRouter();
 
-const isSignIn = ref(true);
-const name = ref('');
 const email = ref('');
 const password = ref('');
-const isPwd = ref(true);
 const loading = ref(false);
 const error = ref('');
 
 // Validation rules
 const rules = {
-  name: {
-    required: required,
-  },
   email: {
     required: required,
-    email: emailRule,
+    email: email,
   },
   password: {
     required: required,
@@ -79,17 +78,25 @@ const rules = {
 };
 
 const { r$ } = useRegle({
-  name,
   email,
   password
 }, rules);
 
-const goToRegister = () => {
-  emit('update:modelValue', false);
-  router.push('/register');
+const goToRegister = async () => {
+  onDialogCancel();
+  await router.push('/register');
 };
 
-const submit = async () => {
+const goToForgotPassword = async () => {
+  onDialogCancel();
+  await router.push('/auth/forgot-password');
+};
+
+const cancel = () => {
+  onDialogCancel();
+};
+
+const onSubmit = async () => {
   // Validate form
   const result = await r$.$validate();
   if (!result.valid) {
@@ -100,22 +107,15 @@ const submit = async () => {
   error.value = '';
 
   try {
-    if (isSignIn.value) {
-      const success = await authStore.signIn(email.value, password.value);
-      if (success) {
-        $q.notify({
-          type: 'positive',
-          message: 'Inloggad!',
-        });
-        emit('update:modelValue', false);
-        emit('returnAfterCancel', '');
-      } else {
-        error.value = 'Felaktiga inloggningsuppgifter. Kontrollera dina uppgifter och försök igen.';
-      }
+    const success = await authStore.signIn(email.value, password.value);
+    if (success) {
+      $q.notify({
+        type: 'positive',
+        message: 'Inloggad!',
+      });
+      onDialogOK();
     } else {
-      // Redirect to register page instead of handling signup here
-      emit('update:modelValue', false);
-      router.push('/auth/register');
+      error.value = 'Felaktiga inloggningsuppgifter. Kontrollera dina uppgifter och försök igen.';
     }
   } catch (err: unknown) {
     error.value = 'Ett fel uppstod. Kontrollera dina uppgifter och försök igen.';

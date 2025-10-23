@@ -48,10 +48,9 @@
                   </template>
                 </q-select>
 
-                <q-btn color="secondary" icon="search" @click="search()" class="col-12 col-md-1 q-mt-sm q-mb-xs"
-                  square />
+                <q-btn color="primary" icon="search" @click="search()" class="col-12 col-md-1 q-mt-sm q-mb-xs" square />
 
-                <q-btn label="visa alla uppdrag" color="secondary" @click="searchAll()"
+                <q-btn label="visa alla uppdrag" color="primary" @click="searchAll()"
                   class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px;" square />
               </div>
             </div>
@@ -70,13 +69,13 @@
       </span>
       <div class="row justify-center">
         <div class="col-xs-12 col-md-8 col-lg-6 row justify-around q-gutter-md">
-          <q-btn unelevated style="width: 140px;" label="Lag" color="secondary"
+          <q-btn unelevated style="width: 140px;" label="Lag" color="primary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 1 } }" square />
-          <q-btn unelevated style="width: 140px;" label="Klasser" color="secondary"
+          <q-btn unelevated style="width: 140px;" label="Klasser" color="primary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 2 } }" square />
-          <q-btn unelevated style="width: 140px;" label="Föreningar" color="secondary"
+          <q-btn unelevated style="width: 140px;" label="Föreningar" color="primary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 3 } }" square />
-          <q-btn unelevated style="width: 140px;" label="Organisationer" color="secondary"
+          <q-btn unelevated style="width: 140px;" label="Organisationer" color="primary"
             :to="{ name: 'AllaLag', params: { groupTypeId: 4 } }" square />
         </div>
       </div>

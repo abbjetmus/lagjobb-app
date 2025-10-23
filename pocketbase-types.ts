@@ -118,17 +118,21 @@ export type CountiesRecord = {
 }
 
 export enum GroupsGroupTypeOptions {
-	"Skolklass" = "Skolklass",
-	"Sportförening" = "Sportförening",
+	"Lag" = "Lag",
+	"Klass" = "Klass",
+	"Förening" = "Förening",
+	"Organisation" = "Organisation",
 }
 export type GroupsRecord = {
-	assignments?: RecordIdString
 	created?: IsoDateString
-	creator?: RecordIdString
+	createdBy?: RecordIdString
+	description?: string
 	groupType?: GroupsGroupTypeOptions
 	id: string
-	name?: string
+	jobs?: RecordIdString
+	name: string
 	updated?: IsoDateString
+	verified?: boolean
 }
 
 export type JobCategoriesRecord = {
@@ -182,7 +186,7 @@ export type JobsRecord = {
 	updated?: IsoDateString
 }
 
-export enum UsersUserTypeOptions {
+export enum UsersUserAccountTypeOptions {
 	"Uppdragsgivare" = "Uppdragsgivare",
 	"Uppdragsutförare" = "Uppdragsutförare",
 }
@@ -192,12 +196,12 @@ export type UsersRecord = {
 	email: string
 	emailVisibility?: boolean
 	id: string
-	name?: string
+	name: string
 	password: string
 	phone?: string
 	tokenKey: string
 	updated?: IsoDateString
-	userType?: UsersUserTypeOptions
+	userAccountType: UsersUserAccountTypeOptions
 	verified?: boolean
 }
 

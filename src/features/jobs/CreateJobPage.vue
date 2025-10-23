@@ -55,7 +55,7 @@
 
       <q-card-actions align="right" class="q-pa-md">
         <q-btn flat label="Avbryt" @click="router.back()" />
-        <q-btn type="submit" color="primary" label="Skapa uppdrag" :loading="loading" />
+        <q-btn type="submit" color="secondary" label="Skapa uppdrag" :loading="loading" />
       </q-card-actions>
     </q-form>
   </q-page>

@@ -4,6 +4,7 @@ import {
 } from 'src/boot/pocketbase';
 import type {
   UsersRecord,
+  UsersUserAccountTypeOptions,
 } from 'app/pocketbase-types';
 import {
   Collections
@@ -30,7 +31,7 @@ export const useAuth = defineStore('auth-module', {
   getters: {
     isAuthenticated(): boolean {
       return pb.authStore.isValid
-    },
+    }
   },
   actions: {
     async createUser(user: UsersRecord): Promise<boolean> {

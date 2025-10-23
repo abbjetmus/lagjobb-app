@@ -3,43 +3,19 @@
     <div class="text-h4 q-mb-md">Sök Uppdrag</div>
 
     <div class="row q-gutter-md q-mb-lg">
-      <q-select
-        v-model="selectedTypes"
-        :options="uppdragTypes"
-        label="Uppdragstyper"
-        multiple
-        outlined
-        use-chips
-        style="min-width: 250px"
-      />
+      <q-select v-model="selectedTypes" :options="uppdragTypes" label="Uppdragstyper" multiple outlined use-chips
+        style="min-width: 250px" />
 
-      <q-select
-        v-model="selectedCities"
-        :options="cities"
-        label="Städer"
-        multiple
-        outlined
-        use-chips
-        style="min-width: 250px"
-      />
+      <q-select v-model="selectedCities" :options="cities" label="Städer" multiple outlined use-chips
+        style="min-width: 250px" />
 
-      <q-btn
-        color="primary"
-        label="Sök"
-        @click="searchUppdrag"
-        class="q-ml-md"
-      />
+      <q-btn color="secondary" label="Sök" @click="searchUppdrag" class="q-ml-md" />
 
-      <q-btn
-        color="secondary"
-        label="Rensa"
-        outline
-        @click="clearFilters"
-      />
+      <q-btn color="secondary" label="Rensa" outline @click="clearFilters" />
     </div>
 
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="uppdrag.length === 0" class="text-center q-pa-xl">
@@ -48,11 +24,7 @@
     </div>
 
     <div v-else class="row q-col-gutter-md">
-      <div
-        v-for="item in uppdrag"
-        :key="item.id"
-        class="col-xs-12 col-sm-6 col-md-4"
-      >
+      <div v-for="item in uppdrag" :key="item.id" class="col-xs-12 col-sm-6 col-md-4">
         <q-card @click="goToUppdrag(item.id)" class="cursor-pointer">
           <q-card-section>
             <div class="text-h6">{{ item.title }}</div>
@@ -67,7 +39,7 @@
           </q-card-section>
 
           <q-card-actions>
-            <q-btn flat color="primary" label="Läs mer" />
+            <q-btn flat color="secondary" label="Läs mer" />
           </q-card-actions>
         </q-card>
       </div>
@@ -80,7 +52,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
 import { useData } from 'src/stores/data';
-import { Uppdrag } from 'src/models/Uppdrag';
+import type { Uppdrag } from 'src/models/Uppdrag';
 
 const router = useRouter();
 const route = useRoute();
@@ -91,11 +63,11 @@ const loading = ref(false);
 const selectedTypes = ref<string[]>([]);
 const selectedCities = ref<string[]>([]);
 
-const uppdragTypes = computed(() => 
+const uppdragTypes = computed(() =>
   dataStore.uppdragTypes.map(t => ({ label: t.name, value: t.id }))
 );
 
-const cities = computed(() => 
+const cities = computed(() =>
   dataStore.cities.map(c => ({ label: c.name, value: c.id }))
 );
 
@@ -108,7 +80,7 @@ const searchUppdrag = async () => {
   loading.value = true;
   try {
     let filter = '';
-    
+
     if (selectedTypes.value.length > 0) {
       const typeFilters = selectedTypes.value.map(t => `types ~ "${t}"`).join(' || ');
       filter += `(${typeFilters})`;
@@ -141,4 +113,3 @@ onMounted(() => {
   searchUppdrag();
 });
 </script>
-

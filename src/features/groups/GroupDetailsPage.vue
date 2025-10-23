@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="group">
@@ -58,7 +58,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import { Group } from 'src/models/Group';
+import type { Group } from 'src/models/Group';
 
 const router = useRouter();
 const route = useRoute();
@@ -85,4 +85,3 @@ onMounted(() => {
   loadGroup();
 });
 </script>
-

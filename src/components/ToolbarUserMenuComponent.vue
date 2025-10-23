@@ -1,27 +1,36 @@
 <template>
-  <q-btn-dropdown outline color="secondary" :label="user.name || 'Meny'">
+  <q-btn-dropdown outline color="secondary" :label="currentUser?.name || 'Meny'">
     <q-list>
-      <q-item clickable v-close-popup @click="goToMyGroups">
+      <q-item v-if="currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
+        v-close-popup @click="goToMyGroups">
         <q-item-section>
           <q-item-label>Mina grupper</q-item-label>
         </q-item-section>
       </q-item>
 
-      <q-item clickable v-close-popup @click="goToMyUppdrag">
+      <q-item v-if="currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
+        v-close-popup @click="goToMyUppdrag">
         <q-item-section>
           <q-item-label>Mina uppdrag</q-item-label>
         </q-item-section>
       </q-item>
 
-      <q-item clickable v-close-popup @click="goToJobbUppdrag">
+      <q-item v-if="currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsgivare" clickable v-close-popup
+        @click="goToJobbUppdrag">
         <q-item-section>
-          <q-item-label>Jobb uppdrag</q-item-label>
+          <q-item-label>Mina uppdrag</q-item-label>
         </q-item-section>
       </q-item>
 
       <q-item clickable v-close-popup @click="goToSettings">
         <q-item-section>
           <q-item-label>Inställningar</q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-item clickable v-close-popup @click="goToLeafletMapTest">
+        <q-item-section>
+          <q-item-label>Leaflet Map Test</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -39,33 +48,42 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useAuth } from 'src/stores/auth';
-import type { User } from 'src/models/User';
-
-defineProps<{
-  user: User;
-}>();
+import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
+import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 
 const router = useRouter();
 const authStore = useAuth();
 
-const goToMyGroups = () => {
-  router.push('/mina-grupper-lista');
+const { currentUser } = storeToRefs(authStore);
+
+const goToMyGroups = async () => {
+  await router.push('/mina-grupper-lista');
 };
 
-const goToMyUppdrag = () => {
-  router.push('/skapade-uppdrag');
+const goToMyUppdrag = async () => {
+  await router.push('/skapade-uppdrag');
 };
 
-const goToJobbUppdrag = () => {
-  router.push('/jobb-uppdrag');
+const goToJobbUppdrag = async () => {
+  await router.push('/jobb-uppdrag');
 };
 
-const goToSettings = () => {
-  router.push('/installningar');
+const goToSettings = async () => {
+  await router.push('/installningar');
+};
+
+const goToLeafletMapTest = async () => {
+  await router.push('/leaflet-map-test');
 };
 
 const logout = async () => {
-  await authStore.signOut();
-  router.push('/');
+  authStore.signOut();
+  await router.push('/');
 };
+
+onMounted(() => {
+  console.log('🔵 [ToolbarUserMenuComponent] currentUser:', currentUser.value);
+  console.log('🔵 [ToolbarUserMenuComponent] currentUser.userAccountType:', currentUser.value?.userAccountType);
+});
 </script>

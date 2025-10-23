@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="group">
@@ -26,18 +26,8 @@
 
         <q-card-section>
           <div class="text-h6 q-mb-md">Åtgärder</div>
-          <q-btn
-            color="primary"
-            label="Redigera"
-            :to="`/redigera-grupp/${group.id}`"
-            class="q-mr-sm"
-          />
-          <q-btn
-            color="negative"
-            label="Ta bort"
-            @click="confirmDelete"
-            outline
-          />
+          <q-btn color="primary" label="Redigera" :to="`/redigera-grupp/${group.id}`" class="q-mr-sm" />
+          <q-btn color="negative" label="Ta bort" @click="confirmDelete" outline />
         </q-card-section>
       </q-card>
     </div>
@@ -48,7 +38,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import { Group } from 'src/models/Group';
+import type { Group } from 'src/models/Group';
 import { useQuasar } from 'quasar';
 
 const router = useRouter();
@@ -99,4 +89,3 @@ onMounted(() => {
   loadGroup();
 });
 </script>
-

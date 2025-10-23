@@ -7,17 +7,10 @@
       <div class="text-h6 q-mt-md text-grey">
         Redigeringsfunktion kommer snart!
       </div>
-      <q-btn
-        flat
-        label="Tillbaka"
-        color="primary"
-        @click="$router.back()"
-        class="q-mt-md"
-      />
+      <q-btn flat label="Tillbaka" color="secondary" @click="$router.back()" class="q-mt-md" />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 </script>
-

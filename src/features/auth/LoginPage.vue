@@ -25,7 +25,7 @@
                   style="max-width: 500px; width: 100%">
                   <span v-if="authError" class="block text-center text-red">{{
                     authErrorMessage
-                  }}</span>
+                    }}</span>
 
                   <div class="column q-gutter-y-sm">
                     <span v-if="!validInputs" class="text-red text-center">E-post eller användarnamn eller lösenord
@@ -46,7 +46,7 @@
                     </q-input>
 
                     <div class="q-mt-sm row justify-between">
-                      <q-btn type="submit" color="primary" label="Logga in" no-caps unelevated class="full-width"
+                      <q-btn type="submit" color="secondary" label="Logga in" no-caps unelevated class="full-width"
                         :loading="loading" square />
                     </div>
                   </div>
@@ -66,7 +66,7 @@
                   style="max-width: 500px; width: 100%">
                   <span v-if="authError" class="block text-center text-red">{{
                     authErrorMessage
-                  }}</span>
+                    }}</span>
 
                   <div class="column q-gutter-y-sm">
                     <span v-if="!validInputs" class="text-red text-center">E-post eller användarnamn eller lösenord
@@ -101,7 +101,7 @@
                     </q-input>
 
                     <div class="q-mt-sm row justify-between">
-                      <q-btn type="submit" color="primary" label="Registrera" no-caps unelevated class="full-width"
+                      <q-btn type="submit" color="secondary" label="Registrera" no-caps unelevated class="full-width"
                         :loading="loading" square />
                     </div>
                   </div>

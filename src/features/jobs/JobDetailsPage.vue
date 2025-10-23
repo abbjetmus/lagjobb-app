@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="uppdrag">
@@ -56,7 +56,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import { Uppdrag } from 'src/models/Uppdrag';
+import type { Uppdrag } from 'src/models/Uppdrag';
 
 const router = useRouter();
 const route = useRoute();
@@ -83,4 +83,3 @@ onMounted(() => {
   loadUppdrag();
 });
 </script>
-

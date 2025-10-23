@@ -127,8 +127,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Avbryt" color="primary" v-close-popup />
-          <q-btn flat label="Spara" color="primary" @click="saveEdit" :loading="saving" />
+          <q-btn flat label="Avbryt" color="secondary" v-close-popup />
+          <q-btn flat label="Spara" color="secondary" @click="saveEdit" :loading="saving" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -141,7 +141,7 @@ import { useAuth } from 'src/features/auth/authStore';
 import { useSettings } from 'src/stores/settings';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
-import { UsersRecord } from 'app/pocketbase-types';
+import type { UsersRecord } from 'app/pocketbase-types';
 
 const authStore = useAuth();
 const settingsStore = useSettings();
@@ -179,7 +179,7 @@ const editPhone = () => {
 
 const saveEdit = async () => {
   saving.value = true;
-  await authStore.updateUser({ [editField.value as keyof UsersRecord]: editValue.value as string } as unknown as UsersRecord);
+  await authStore.updateUser({ [editField.value as keyof UsersRecord]: editValue.value } as unknown as UsersRecord);
   showEditDialog.value = false;
 };
 

@@ -3,26 +3,17 @@
     <div class="text-h4 q-mb-md">Mina uppdrag</div>
 
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="uppdrag.length === 0" class="text-center q-pa-xl">
       <q-icon name="assignment" size="5em" color="grey" />
       <div class="text-h6 q-mt-md text-grey">Du har inga skapade uppdrag</div>
-      <q-btn
-        color="primary"
-        label="Skapa uppdrag"
-        to="/skapa-uppdrag"
-        class="q-mt-md"
-      />
+      <q-btn color="secondary" label="Skapa uppdrag" to="/skapa-uppdrag" class="q-mt-md" />
     </div>
 
     <div v-else class="row q-col-gutter-md">
-      <div
-        v-for="item in uppdrag"
-        :key="item.id"
-        class="col-xs-12 col-sm-6 col-md-4"
-      >
+      <div v-for="item in uppdrag" :key="item.id" class="col-xs-12 col-sm-6 col-md-4">
         <q-card>
           <q-card-section>
             <div class="text-h6">{{ item.title }}</div>
@@ -37,8 +28,8 @@
           </q-card-section>
 
           <q-card-actions>
-            <q-btn flat color="primary" label="Visa" :to="`/mina-uppdrag/${item.id}`" />
-            <q-btn flat color="secondary" label="Redigera" :to="`/redigera-uppdrag/${item.id}`" />
+            <q-btn flat color="secondary" label="Visa" :to="`/mina-uppdrag/${item.id}`" />
+            <q-btn flat color="primary" label="Redigera" :to="`/redigera-uppdrag/${item.id}`" />
             <q-space />
             <q-btn flat color="negative" icon="delete" @click="confirmDelete(item.id)" />
           </q-card-actions>
@@ -52,7 +43,7 @@
 import { ref, onMounted } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import { useAuth } from 'src/stores/auth';
-import { Uppdrag } from 'src/models/Uppdrag';
+import type { Uppdrag } from 'src/models/Uppdrag';
 import { useQuasar } from 'quasar';
 
 const authStore = useAuth();
@@ -115,4 +106,3 @@ onMounted(() => {
   loadUppdrag();
 });
 </script>
-

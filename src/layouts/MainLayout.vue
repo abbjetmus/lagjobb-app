@@ -1,9 +1,9 @@
 <template>
   <q-layout view="hHh lpR fff">
-    <q-header class="bg-primary text-white">
+    <q-header class="bg-secondary">
       <q-toolbar class="row justify-around">
         <q-toolbar-title class="col-auto">
-          <router-link to="/" class="text-secondary row items-center no-wrap" style="text-decoration: none; gap: 8px;">
+          <router-link to="/" class="text-primary row items-center no-wrap" style="text-decoration: none; gap: 8px;">
 
             <span>Lag <q-avatar size="32px">
                 <img src="../assets/team.svg" />
@@ -12,16 +12,17 @@
         </q-toolbar-title>
 
         <div class="col-auto row q-gutter-lg items-center">
-          <q-btn unelevated label="Skapa uppdrag" icon="add_circle" @click="goToNewUppdrag()" class="gt-sm"
-            color="secondary" />
+          <q-btn v-if="!isUppdragsutforare" unelevated label="Skapa uppdrag" icon="add_circle" @click="goToNewUppdrag()"
+            class="gt-sm" color="primary" />
 
-          <q-btn flat color="secondary" icon="add_circle" @click="goToNewUppdrag()" class="lt-md" />
+          <q-btn v-if="!isUppdragsutforare" flat color="primary" icon="add_circle" @click="goToNewUppdrag()"
+            class="lt-md" />
 
-          <q-btn flat color="secondary" stack icon="search" label="Sök" to="/sok-uppdrag" />
+          <q-btn flat color="primary" stack icon="search" label="Sök" to="/sok-uppdrag" />
 
-          <toolbar-user-menu color="secondary" v-if="isAuthenticated && currentUser" :user="currentUser" />
+          <toolbar-user-menu color="primary" v-if="isAuthenticated && currentUser" />
 
-          <q-btn v-else flat @click="showSignInSignUpDialog()">
+          <q-btn v-else outline @click="showSignInSignUpDialog()" color="secondary">
             <span class="gt-xs">Logga in / Skapa konto</span>
             <span class="lt-sm">Logga in</span>
           </q-btn>
@@ -33,14 +34,10 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="bg-primary text-white">
-      <div class="q-pa-md">
-        <footer-component />
-      </div>
+    <q-footer class="bg-secondary text-primary q-pa-lg">
+      <footer-component />
     </q-footer>
 
-    <SignInSignUpDialog v-model="signInSignUpDialog" :is-sign-in="toReturnAfterCancel === 'create'"
-      :name="currentUser?.name" to-return-after-cancel="toReturnAfterCancel" @return-after-cancel="afterDialogCancel" />
   </q-layout>
 </template>
 
@@ -48,22 +45,31 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from 'src/stores/auth';
+import { useQuasar } from 'quasar';
 import ToolbarUserMenu from 'src/components/ToolbarUserMenuComponent.vue';
 import FooterComponent from 'src/components/FooterComponent.vue';
 import SignInSignUpDialog from 'src/features/auth/components/SignInSignUpDialog.vue';
 import { useJobs } from 'src/features/jobs/jobsStore';
+import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
+
 const router = useRouter();
 const authStore = useAuth();
 const jobsStore = useJobs();
+const $q = useQuasar();
 
-const signInSignUpDialog = ref(false);
 const toReturnAfterCancel = ref('');
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const currentUser = computed(() => authStore.currentUser);
-
+const isUppdragsutforare = computed(() => currentUser.value?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare);
 const showSignInSignUpDialog = () => {
-  signInSignUpDialog.value = true;
+  $q.dialog({
+    component: SignInSignUpDialog,
+    persistent: true,
+  }).onOk(() => {
+    // Handle successful login
+    console.log('User logged in successfully');
+  });
 };
 
 const goToNewUppdrag = () => {
@@ -71,16 +77,7 @@ const goToNewUppdrag = () => {
     router.push('/skapa-uppdrag').catch(() => { });
   } else {
     toReturnAfterCancel.value = 'create';
-    signInSignUpDialog.value = true;
-  }
-};
-
-const afterDialogCancel = (value: string) => {
-  if (value === 'create') {
-    toReturnAfterCancel.value = '';
-    if (isAuthenticated.value) {
-      router.push('/skapa-uppdrag').catch(() => { });
-    }
+    showSignInSignUpDialog();
   }
 };
 

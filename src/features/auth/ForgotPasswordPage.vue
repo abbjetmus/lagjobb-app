@@ -9,7 +9,7 @@
               placeholder="E-post" />
 
             <div class="q-mt-sm row justify-between">
-              <q-btn type="submit" color="primary" label="Skicka återställningsmejl" no-caps unelevated
+              <q-btn type="submit" color="secondary" label="Skicka återställningsmejl" no-caps unelevated
                 class="full-width" :loading="loading" />
             </div>
           </div>

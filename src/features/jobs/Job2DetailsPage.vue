@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="job">
@@ -72,7 +72,7 @@
             </q-card-section>
 
             <q-card-actions v-if="authStore.isAuthenticated">
-              <q-btn color="primary" label="Visa intresse" @click="showInterestDialog = true" class="full-width" />
+              <q-btn color="secondary" label="Visa intresse" @click="showInterestDialog = true" class="full-width" />
             </q-card-actions>
           </q-card>
         </div>
@@ -90,8 +90,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Avbryt" color="primary" v-close-popup />
-          <q-btn flat label="Skicka" color="primary" @click="sendInterest" :loading="sendingInterest" />
+          <q-btn flat label="Avbryt" color="secondary" v-close-popup />
+          <q-btn flat label="Skicka" color="secondary" @click="sendInterest" :loading="sendingInterest" />
         </q-card-actions>
       </q-card>
     </q-dialog>

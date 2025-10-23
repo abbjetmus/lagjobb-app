@@ -15,12 +15,7 @@
             </p>
 
             <div class="q-mt-md">
-              <q-btn
-                color="primary"
-                label="Kontakta oss"
-                to="/kontakta-oss"
-                size="lg"
-              />
+              <q-btn color="secondary" label="Kontakta oss" to="/kontakta-oss" size="lg" />
             </div>
           </q-card-section>
         </q-card>
@@ -31,4 +26,3 @@
 
 <script setup lang="ts">
 </script>
-

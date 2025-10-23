@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
     <div class="text-h4 q-mb-md">Alla grupper</div>
 
-    <q-tabs v-model="activeTab" dense class="text-grey q-mb-md" active-color="primary" indicator-color="primary"
+    <q-tabs v-model="activeTab" dense class="text-grey q-mb-md" active-color="secondary" indicator-color="secondary"
       align="left">
       <q-tab name="all" label="Alla" />
       <q-tab name="1" label="Lag" />
@@ -12,7 +12,7 @@
     </q-tabs>
 
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="groups.length === 0" class="text-center q-pa-xl">
@@ -35,7 +35,7 @@
           </q-card-section>
 
           <q-card-actions>
-            <q-btn flat color="primary" label="Läs mer" />
+            <q-btn flat color="secondary" label="Läs mer" />
           </q-card-actions>
         </q-card>
       </div>
@@ -47,7 +47,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import { Group } from 'src/models/Group';
+import type { Group } from 'src/models/Group';
 
 const router = useRouter();
 const route = useRoute();

@@ -44,7 +44,6 @@ export default defineConfig((/* ctx */) => {
 
       env: {
         PB_URL: process.env.PB_URL || 'http://localhost:8090',
-        GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || '',
       },
       // ignorePublicFolder: true,
       // minify: false,

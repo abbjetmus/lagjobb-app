@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="uppdrag">
@@ -55,20 +55,10 @@
             <q-card-section>
               <div class="text-h6 q-mb-md">Åtgärder</div>
 
-              <q-btn
-                color="primary"
-                label="Redigera"
-                :to="`/redigera-uppdrag/${uppdrag.id}`"
-                class="full-width q-mb-sm"
-              />
+              <q-btn color="secondary" label="Redigera" :to="`/redigera-uppdrag/${uppdrag.id}`"
+                class="full-width q-mb-sm" />
 
-              <q-btn
-                color="negative"
-                label="Ta bort"
-                @click="confirmDelete"
-                class="full-width"
-                outline
-              />
+              <q-btn color="negative" label="Ta bort" @click="confirmDelete" class="full-width" outline />
             </q-card-section>
           </q-card>
         </div>
@@ -81,7 +71,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import { Uppdrag, InterestMessage } from 'src/models/Uppdrag';
+import type { Uppdrag, InterestMessage } from 'src/models/Uppdrag';
 import { useQuasar } from 'quasar';
 
 const router = useRouter();
@@ -143,4 +133,3 @@ onMounted(() => {
   loadUppdrag();
 });
 </script>
-
