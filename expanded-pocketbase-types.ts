@@ -1,8 +1,9 @@
 import type { WithId } from "src/models/withIdType";
-import type { UsersRecord, JobLocationsRecord, JobSubcategoriesRecord, CitiesRecord } from "./pocketbase-types";
+import type { UsersRecord, JobSubcategoriesRecord, CitiesRecord } from "./pocketbase-types";
 
 export interface JobsExpand {
-  locations: WithId<JobLocationsRecord>[];
+  jobSubcategories: WithId<JobSubcategoriesRecord>[];
+  city: WithId<CitiesRecord>;
   createdBy: WithId<UsersRecord>;
 }
 

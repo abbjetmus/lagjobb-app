@@ -4,7 +4,6 @@ import {
 } from 'src/boot/pocketbase';
 import type {
   UsersRecord,
-  UsersUserAccountTypeOptions,
 } from 'app/pocketbase-types';
 import {
   Collections

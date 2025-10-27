@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fff">
-    <q-header class="bg-secondary">
+    <q-header class="bg-secondary" style="border-bottom: 2px solid var(--q-primary)">
       <q-toolbar class="row justify-around">
         <q-toolbar-title class="col-auto">
           <router-link to="/" class="text-primary row items-center no-wrap" style="text-decoration: none; gap: 8px;">
@@ -22,7 +22,7 @@
 
           <toolbar-user-menu color="primary" v-if="isAuthenticated && currentUser" />
 
-          <q-btn v-else outline @click="showSignInSignUpDialog()" color="secondary">
+          <q-btn v-else outline @click="showSignInSignUpDialog()" color="primary">
             <span class="gt-xs">Logga in / Skapa konto</span>
             <span class="lt-sm">Logga in</span>
           </q-btn>
@@ -34,10 +34,6 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="bg-secondary text-primary q-pa-lg">
-      <footer-component />
-    </q-footer>
-
   </q-layout>
 </template>
 
@@ -47,7 +43,6 @@ import { useRouter } from 'vue-router';
 import { useAuth } from 'src/stores/auth';
 import { useQuasar } from 'quasar';
 import ToolbarUserMenu from 'src/components/ToolbarUserMenuComponent.vue';
-import FooterComponent from 'src/components/FooterComponent.vue';
 import SignInSignUpDialog from 'src/features/auth/components/SignInSignUpDialog.vue';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
@@ -83,7 +78,6 @@ const goToNewUppdrag = () => {
 
 onMounted(async () => {
   await Promise.all([
-    jobsStore.getAllJobs(),
     jobsStore.getAllJobCategories(),
     jobsStore.getAllCounties(),
   ]);

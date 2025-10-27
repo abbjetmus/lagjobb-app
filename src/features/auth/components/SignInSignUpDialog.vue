@@ -9,17 +9,17 @@
 
       <!-- Form section -->
       <div class="col-8">
-        <q-card-section class="bg-secondary text-white shadow-0">
-          <div class="text-h6 text-center">Logga in</div>
+        <q-card-section class="bg-primary text-white shadow-0">
+          <div class="text-h6 text-center">Inloggning</div>
         </q-card-section>
         <q-separator />
         <q-card-section>
           <q-form ref="form" @submit.prevent="onSubmit" class="full-width">
-            <q-input v-model="email" label="E-post" type="email" outlined class="q-mb-md"
-              :error="r$.email.$errors.length > 0" :error-message="r$.email.$errors[0]" no-error-icon />
+            <q-input v-model="email" label="E-post" type="email" outlined class="q-mb-md" :error="r$.email.$error"
+              error-message="Måste vara en giltig e-postadress" no-error-icon />
 
             <q-input v-model="password" label="Lösenord" type="password" outlined no-error-icon
-              :error="r$.password.$errors.length > 0" :error-message="r$.password.$errors[0]" />
+              :error="r$.password.$error" error-message="Måste vara minst 6 tecken långt" />
 
             <div v-if="error" class="text-negative q-mb-md">{{ error }}</div>
 
@@ -52,7 +52,7 @@ import { useAuth } from 'src/features/auth/authStore';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 import { useRegle } from '@regle/core';
-import { required } from '@regle/rules';
+import { required, email as emailRule } from '@regle/rules';
 import { useDialogPluginComponent } from 'quasar';
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
@@ -66,11 +66,11 @@ const password = ref('');
 const loading = ref(false);
 const error = ref('');
 
-// Validation rules
+// Validation rules with per-field modifiers
 const rules = {
   email: {
     required: required,
-    email: email,
+    email: emailRule
   },
   password: {
     required: required,
@@ -80,7 +80,9 @@ const rules = {
 const { r$ } = useRegle({
   email,
   password
-}, rules);
+}, rules, {
+  silent: true
+});
 
 const goToRegister = async () => {
   onDialogCancel();
@@ -97,7 +99,6 @@ const cancel = () => {
 };
 
 const onSubmit = async () => {
-  // Validate form
   const result = await r$.$validate();
   if (!result.valid) {
     return;

@@ -1,0 +1,119 @@
+<template>
+  <div class="row q-col-gutter-md">
+    <div class="col-xs-12 col-md-8">
+      <q-card flat>
+        <q-card-section>
+          <div class="text-h4">{{ job.title }}</div>
+          <div class="text-caption text-grey q-mt-sm">
+            Publicerad: {{ formatDateTime(new Date(job.created ?? '')) }}
+          </div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section>
+          <div class="text-h6 q-mb-sm">Beskrivning</div>
+          <div class="text-body1" style="white-space: pre-wrap">{{ job.description }}</div>
+        </q-card-section>
+
+        <q-card-section v-if="job.price">
+          <div class="text-h6 q-mb-sm">Pris</div>
+          <div class="text-h5 text-green">{{ job.price }} kr</div>
+        </q-card-section>
+
+        <q-card-section v-if="job.desiredAt || job.desiredNumberOfPeople || job.expand?.jobSubcategories?.length">
+          <div class="text-h6 q-mb-sm">Detaljer</div>
+          <div v-if="job.desiredAt" class="q-mb-sm">
+            <q-icon name="event" /> Önskat datum: {{ formatDateTime(new Date(job.desiredAt)) }}
+          </div>
+          <div v-if="job.desiredNumberOfPeople" class="q-mb-sm">
+            <q-icon name="people" /> Antal personer: {{ job.desiredNumberOfPeople }}
+          </div>
+          <div v-if="job.estimatedHours" class="q-mb-sm">
+            <q-icon name="schedule" /> Beräknad tid: {{ job.estimatedHours }} timmar
+          </div>
+          <div v-if="job.expand?.jobSubcategories?.length" class="q-mb-sm">
+            <q-icon name="category" class="q-mr-sm" />
+            <span class="q-mr-sm">Uppdragstyper:</span>
+            <q-badge v-for="subcategory in job.expand.jobSubcategories" :key="subcategory.id" :label="subcategory.title"
+              color="primary" class="q-mr-xs q-mb-xs" />
+          </div>
+        </q-card-section>
+
+        <q-card-section v-if="job.images && job.images.length > 0">
+          <div class="text-h6 q-mb-sm">Bilder</div>
+          <image-gallery :images="imageUrls" />
+        </q-card-section>
+      </q-card>
+    </div>
+
+    <div class="column col-xs-12 col-md-4 q-gutter-md">
+      <q-card class="col-auto" flat>
+        <q-card-section>
+          <div class="text-h6 q-mb-sm">Kontakt</div>
+          <div class="q-mb-sm">
+            <q-icon name="person" /> {{ job.expand?.createdBy?.name }}
+          </div>
+          <div class="q-mb-sm">
+            <q-icon name="email" /> {{ job.expand?.createdBy?.email }}
+          </div>
+          <div v-if="!job.hidePhone && job.expand?.createdBy?.phone" class="q-mb-sm">
+            <q-icon name="phone" /> {{ job.expand?.createdBy?.phone }}
+          </div>
+          <div v-if="job.contactHours" class="q-mb-sm text-caption">
+            Kontakttider: {{ job.contactHours }}
+          </div>
+        </q-card-section>
+
+        <q-card-actions v-if="authStore.isAuthenticated">
+          <q-btn unelevated color="green-6" label="Skicka förfrågan" @click="showSendInterestDialog"
+            class="full-width" />
+        </q-card-actions>
+      </q-card>
+
+      <q-card flat class="col">
+        <q-card-section>
+          <div class="text-h6">Plats</div>
+          <div>{{ job.street }}, {{ job.zipcode }} {{ job.expand?.city?.title }}</div>
+          <leaflet-map :lat="job.latitude" :lng="job.longitude" :zoom="15"
+            :markers="[{ lat: job.latitude, lng: job.longitude, title: job.title || 'Jobb' }]" />
+        </q-card-section>
+      </q-card>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import { pb } from 'src/boot/pocketbase';
+import { useAuth } from 'src/stores/auth';
+import type { JobsRecord } from 'app/pocketbase-types';
+import { useQuasar } from 'quasar';
+import type { WithId } from 'src/models/withIdType';
+import type { JobsExpand } from 'app/expanded-pocketbase-types';
+import ImageGallery from 'src/components/ImageGallery.vue';
+import LeafletMap from 'src/components/LeafletMap.vue';
+import { formatDateTime } from 'src/utils/dateUtils';
+import SendInterestDialog from './SendInterestDialog.vue';
+
+const authStore = useAuth();
+const $q = useQuasar();
+
+const props = defineProps<{
+  job: WithId<JobsRecord> & { expand?: JobsExpand };
+}>();
+
+const imageUrls = computed(() => {
+  if (!props.job.images || props.job.images.length === 0) return [];
+  return props.job.images.map(imageName => pb.files.getURL(props.job, imageName));
+});
+
+const showSendInterestDialog = () => {
+  $q.dialog({
+    component: SendInterestDialog,
+    componentProps: {
+      job: props.job,
+    },
+  });
+};
+</script>

@@ -15,7 +15,6 @@ export enum Collections {
 	Counties = "counties",
 	Groups = "groups",
 	JobCategories = "jobCategories",
-	JobLocations = "jobLocations",
 	JobSubcategories = "jobSubcategories",
 	Jobs = "jobs",
 	Users = "users",
@@ -144,18 +143,6 @@ export type JobCategoriesRecord = {
 	updated?: IsoDateString
 }
 
-export type JobLocationsRecord = {
-	address?: string
-	assignment?: RecordIdString
-	city?: string
-	county?: string
-	created?: IsoDateString
-	id: string
-	latitude?: number
-	longitude?: number
-	updated?: IsoDateString
-}
-
 export type JobSubcategoriesRecord = {
 	category: RecordIdString
 	created?: IsoDateString
@@ -166,10 +153,14 @@ export type JobSubcategoriesRecord = {
 }
 
 export enum JobsStatusOptions {
-	"Klar" = "Klar",
+	"Granskning" = "Granskning",
+	"Godkänd" = "Godkänd",
+	"Publicerad" = "Publicerad",
+	"Genomförd" = "Genomförd",
 }
 export type JobsRecord = {
 	assignedGroup?: RecordIdString
+	city: RecordIdString
 	contactHours?: string
 	created?: IsoDateString
 	createdBy?: RecordIdString
@@ -180,10 +171,15 @@ export type JobsRecord = {
 	hidePhone?: boolean
 	id: string
 	images?: string[]
+	jobSubcategories?: RecordIdString[]
+	latitude?: number
+	longitude?: number
 	price?: number
 	status?: JobsStatusOptions
+	street: string
 	title?: string
 	updated?: IsoDateString
+	zipcode?: string
 }
 
 export enum UsersUserAccountTypeOptions {
@@ -215,7 +211,6 @@ export type CitiesResponse<Texpand = unknown> = Required<CitiesRecord> & BaseSys
 export type CountiesResponse<Texpand = unknown> = Required<CountiesRecord> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type JobCategoriesResponse<Texpand = unknown> = Required<JobCategoriesRecord> & BaseSystemFields<Texpand>
-export type JobLocationsResponse<Texpand = unknown> = Required<JobLocationsRecord> & BaseSystemFields<Texpand>
 export type JobSubcategoriesResponse<Texpand = unknown> = Required<JobSubcategoriesRecord> & BaseSystemFields<Texpand>
 export type JobsResponse<Texpand = unknown> = Required<JobsRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -232,7 +227,6 @@ export type CollectionRecords = {
 	counties: CountiesRecord
 	groups: GroupsRecord
 	jobCategories: JobCategoriesRecord
-	jobLocations: JobLocationsRecord
 	jobSubcategories: JobSubcategoriesRecord
 	jobs: JobsRecord
 	users: UsersRecord
@@ -248,7 +242,6 @@ export type CollectionResponses = {
 	counties: CountiesResponse
 	groups: GroupsResponse
 	jobCategories: JobCategoriesResponse
-	jobLocations: JobLocationsResponse
 	jobSubcategories: JobSubcategoriesResponse
 	jobs: JobsResponse
 	users: UsersResponse
@@ -267,7 +260,6 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'counties'): RecordService<CountiesResponse>
 	collection(idOrName: 'groups'): RecordService<GroupsResponse>
 	collection(idOrName: 'jobCategories'): RecordService<JobCategoriesResponse>
-	collection(idOrName: 'jobLocations'): RecordService<JobLocationsResponse>
 	collection(idOrName: 'jobSubcategories'): RecordService<JobSubcategoriesResponse>
 	collection(idOrName: 'jobs'): RecordService<JobsResponse>
 	collection(idOrName: 'users'): RecordService<UsersResponse>

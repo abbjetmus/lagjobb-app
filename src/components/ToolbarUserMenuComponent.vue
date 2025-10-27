@@ -1,5 +1,5 @@
 <template>
-  <q-btn-dropdown outline color="secondary" :label="currentUser?.name || 'Meny'">
+  <q-btn-dropdown outline color="primary" :label="currentUser?.name || 'Meny'">
     <q-list>
       <q-item v-if="currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
         v-close-popup @click="goToMyGroups">

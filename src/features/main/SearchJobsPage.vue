@@ -1,97 +1,185 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="text-h4 q-mb-md">Sök Uppdrag</div>
+  <q-page class="bg-grey-3">
+    <div class="bg-image">
+      <div class="search-container  q-pa-sm">
+        <div class="text-grey-3">
+          <div class="row items-center">
+            <div class="col-xs-0 col-1"></div>
+            <div class="col-xs-12 col-10">
+              <div class="text-center text-h5 text-md-h4 q-my-md">
+                Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar
+              </div>
 
-    <div class="row q-gutter-md q-mb-lg">
-      <q-select v-model="selectedTypes" :options="uppdragTypes" label="Uppdragstyper" multiple outlined use-chips
-        style="min-width: 250px" />
+              <div class="row">
+                <q-select ref="jobsRef" style="min-width: 300px;" v-model="selectedSubcategories"
+                  :options="filterJobsOptions" use-chips use-input multiple outlined @filter="filterJobsFn"
+                  input-debounce="0" hide-dropdown-icon label="Sök eller ange uppdragstyper..." bg-color="grey-3"
+                  option-label="title" option-value="id" emit-value map-options
+                  class="bg-white col-xs-12 col-md q-mt-sm q-mb-xs" square>
+                  <template v-slot:prepend>
+                    <q-icon name="mdi-briefcase" />
+                  </template>
 
-      <q-select v-model="selectedCities" :options="cities" label="Städer" multiple outlined use-chips
-        style="min-width: 250px" />
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label>{{ scope.opt.title }}</q-item-label>
+                        <q-item-label caption>{{ scope.opt.category }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
 
-      <q-btn color="secondary" label="Sök" @click="searchUppdrag" class="q-ml-md" />
+                <q-select ref="cityRef" style="min-width: 300px;" v-model="selectedCities" :options="filterCityOptions"
+                  use-chips use-input multiple outlined @filter="filterCityFn" input-debounce="0" hide-dropdown-icon
+                  label="Sök eller ange orter..." bg-color="grey-3" option-label="title" option-value="id" emit-value
+                  map-options class="bg-white col-xs-12 col-md q-mt-sm q-mb-xs" square>
+                  <template v-slot:prepend>
+                    <q-icon name="mdi-map-marker" />
+                  </template>
 
-      <q-btn color="secondary" label="Rensa" outline @click="clearFilters" />
+                  <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                      <q-item-section>
+                        <q-item-label>{{ scope.opt.title }}</q-item-label>
+                        <q-item-label caption>{{ scope.opt.county }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+
+                <q-btn color="primary" icon="search" @click="searchUppdrag" class="col-12 col-md-1 q-mt-sm q-mb-xs"
+                  square />
+
+                <q-btn label="visa alla" color="primary" unelevated @click="clearFilters"
+                  class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px;" square />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="loading" class="row justify-center q-pa-xl">
-      <q-spinner color="secondary" size="3em" />
+      <q-spinner color="primary" size="3em" />
     </div>
 
-    <div v-else-if="uppdrag.length === 0" class="text-center q-pa-xl">
-      <q-icon name="search" size="5em" color="grey" />
-      <div class="text-h6 q-mt-md text-grey">Inga uppdrag hittades</div>
-    </div>
-
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="item in uppdrag" :key="item.id" class="col-xs-12 col-sm-6 col-md-4">
-        <q-card @click="goToUppdrag(item.id)" class="cursor-pointer">
-          <q-card-section>
-            <div class="text-h6">{{ item.title }}</div>
-            <div class="text-caption text-grey">{{ item.created }}</div>
-          </q-card-section>
-
-          <q-card-section>
-            <div class="text-body2">{{ truncate(item.description, 100) }}</div>
-            <div v-if="item.price" class="text-bold q-mt-sm">
-              {{ item.price }} kr
-            </div>
-          </q-card-section>
-
-          <q-card-actions>
-            <q-btn flat color="secondary" label="Läs mer" />
-          </q-card-actions>
-        </q-card>
+    <div v-else-if="uppdrag.length === 0" class="bg-grey-2" style="min-height: 50vh;">
+      <div class="text-center q-pa-xl">
+        <q-icon name="search" size="5em" color="grey" />
+        <div class="text-h6 q-mt-md text-grey">Inga uppdrag hittades</div>
       </div>
     </div>
+
+    <q-list v-else separator class="bg-grey-3 q-pa-md">
+      <job-list-item class="bg-white" v-for="item in uppdrag" :key="item.id" :job="item" @click="goToUppdrag(item)" />
+    </q-list>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import { useData } from 'src/stores/data';
-import type { Uppdrag } from 'src/models/Uppdrag';
-
+import { useJobs } from 'src/features/jobs/jobsStore';
+import JobListItem from 'src/features/jobs/components/JobListItem.vue';
+import type { WithId } from 'src/models/withIdType';
+import type { JobsRecord, UsersRecord } from 'app/pocketbase-types';
+import { QSelect } from 'quasar';
+import { useAuth } from 'src/stores/auth';
+import { storeToRefs } from 'pinia';
 const router = useRouter();
 const route = useRoute();
-const dataStore = useData();
-
-const uppdrag = ref<Uppdrag[]>([]);
+const jobsStore = useJobs();
+const authStore = useAuth();
+const { currentUser } = storeToRefs(authStore);
+const jobsRef = ref<QSelect | null>(null);
+const cityRef = ref<QSelect | null>(null);
+const uppdrag = ref<WithId<JobsRecord>[]>([]);
 const loading = ref(false);
-const selectedTypes = ref<string[]>([]);
+const selectedSubcategories = ref<string[]>([]);
 const selectedCities = ref<string[]>([]);
 
-const uppdragTypes = computed(() =>
-  dataStore.uppdragTypes.map(t => ({ label: t.name, value: t.id }))
-);
+const allCities = computed(() => {
+  const citiesMap = new Map<string, { id: string; title: string; county: string }>();
 
-const cities = computed(() =>
-  dataStore.cities.map(c => ({ label: c.name, value: c.id }))
-);
+  jobsStore.counties.forEach(county => {
+    county.expand?.cities_via_county?.forEach(city => {
+      if (!citiesMap.has(city.title)) {
+        citiesMap.set(city.title, {
+          id: city.id,
+          title: city.title,
+          county: county.title
+        });
+      }
+    });
+  });
 
-const truncate = (text: string, length: number) => {
-  if (!text) return '';
-  return text.length > length ? text.substring(0, length) + '...' : text;
-};
+  return Array.from(citiesMap.values()).sort((a, b) => {
+    if (a.county !== b.county) {
+      return a.county.localeCompare(b.county);
+    }
+    return a.title.localeCompare(b.title);
+  });
+});
+
+const allJobSubcategories = computed(() => {
+  const subcategoriesMap = new Map<string, { id: string; title: string; category: string }>();
+
+  jobsStore.categories.forEach(category => {
+    category.expand?.jobSubcategories_via_category?.forEach(sub => {
+      if (!subcategoriesMap.has(sub.title)) {
+        subcategoriesMap.set(sub.title, {
+          id: sub.id,
+          title: sub.title,
+          category: category.title
+        });
+      }
+    });
+  });
+
+  return Array.from(subcategoriesMap.values()).sort((a, b) => {
+    if (a.category !== b.category) {
+      return a.category.localeCompare(b.category);
+    }
+    return a.title.localeCompare(b.title);
+  });
+});
+
+const filterCityOptions = ref<Array<{ id: string; title: string; county: string }>>([]);
+const filterJobsOptions = ref<Array<{ id: string; title: string; category: string }>>([]);
+
+watch(allCities, (cities) => {
+  filterCityOptions.value = cities;
+}, { immediate: true });
+
+watch(allJobSubcategories, (subcategories) => {
+  filterJobsOptions.value = subcategories;
+}, { immediate: true });
 
 const searchUppdrag = async () => {
   loading.value = true;
   try {
-    let filter = '';
+    const filters: string[] = [];
 
-    if (selectedTypes.value.length > 0) {
-      const typeFilters = selectedTypes.value.map(t => `types ~ "${t}"`).join(' || ');
-      filter += `(${typeFilters})`;
+    if (selectedSubcategories.value.length > 0) {
+      const subcategoryFilters = selectedSubcategories.value.map(id => `jobSubcategory = "${id}"`).join(' || ');
+      filters.push(`(${subcategoryFilters})`);
     }
 
-    const records = await pb.collection('uppdrag').getList(1, 50, {
-      filter: filter || undefined,
+    if (selectedCities.value.length > 0) {
+      const cityFilters = selectedCities.value.map(id => `city = "${id}"`).join(' || ');
+      filters.push(`(${cityFilters})`);
+    }
+
+    const filterString = filters.length > 0 ? filters.join(' && ') : '';
+
+    const records = await pb.collection('jobs').getList(1, 50, {
+      ...(filterString && { filter: filterString }),
       sort: '-created',
     });
 
-    uppdrag.value = records.items as unknown as Uppdrag[];
+    uppdrag.value = records.items as unknown as WithId<JobsRecord>[];
   } catch (error) {
     console.error('Search error:', error);
   } finally {
@@ -100,16 +188,63 @@ const searchUppdrag = async () => {
 };
 
 const clearFilters = () => {
-  selectedTypes.value = [];
+  selectedSubcategories.value = [];
   selectedCities.value = [];
-  searchUppdrag();
+  void searchUppdrag();
 };
 
-const goToUppdrag = (id: string) => {
-  router.push(`/uppdrags-info/${id}`);
+const goToUppdrag = (job: WithId<JobsRecord> & { expand?: { createdBy: WithId<UsersRecord> } }) => {
+  if (currentUser.value?.id === job.expand?.createdBy?.id) {
+    router.push(`/uppdrags-info/${job.id}`).catch(() => { });
+  } else {
+    router.push(`/uppdrag/${job.id}`).catch(() => { });
+  }
+};
+
+const filterCityFn = (val: string, update: (fn: () => void) => void) => {
+  update(() => {
+    if (val === '') {
+      filterCityOptions.value = allCities.value;
+    } else {
+      const needle = val.toLowerCase();
+      filterCityOptions.value = allCities.value.filter(city =>
+        city.title.toLowerCase().includes(needle)
+      );
+    }
+  });
+};
+
+const filterJobsFn = (val: string, update: (fn: () => void) => void) => {
+  update(() => {
+    if (val === '') {
+      filterJobsOptions.value = allJobSubcategories.value;
+    } else {
+      const needle = val.toLowerCase();
+      filterJobsOptions.value = allJobSubcategories.value.filter(subcategory =>
+        subcategory.title.toLowerCase().includes(needle)
+      );
+    }
+  });
 };
 
 onMounted(() => {
-  searchUppdrag();
+  void searchUppdrag();
 });
 </script>
+
+<style scoped>
+.bg-image {
+  background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
+  background-size: cover;
+  height: 200px;
+  overflow: hidden;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("../../assets/soccer-team.jpg");
+}
+
+.search-container {
+  max-width: 1000px !important;
+  height: 200px;
+  margin: 0 auto;
+}
+</style>

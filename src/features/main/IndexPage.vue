@@ -80,6 +80,10 @@
         </div>
       </div>
     </div>
+
+    <q-footer class="bg-secondary text-primary q-pa-lg" style="border-top: 2px solid var(--q-primary)">
+      <footer-component />
+    </q-footer>
   </div>
 </template>
 
@@ -88,6 +92,7 @@ import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import { QSelect } from 'quasar';
+import FooterComponent from 'src/components/FooterComponent.vue';
 
 const router = useRouter();
 const jobsStore = useJobs();
@@ -212,7 +217,8 @@ const filterJobsFn = (val: string, update: (fn: () => void) => void) => {
 .bg-image {
   background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
   background-size: cover;
-  height: 100%;
+  height: 80vh;
+  min-height: 500px;
   overflow: hidden;
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
     url("../../assets/soccer-team.jpg");

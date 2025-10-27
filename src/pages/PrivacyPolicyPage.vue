@@ -14,13 +14,13 @@
 
             <div class="text-h6 q-mb-sm q-mt-lg">Integritetspolicy</div>
             <p class="text-body1">
-              Vi värnar om din integritet och behandlar dina personuppgifter 
+              Vi värnar om din integritet och behandlar dina personuppgifter
               enligt gällande dataskyddslagstiftning (GDPR).
             </p>
 
             <p class="text-body1">
-              Vi samlar in och behandlar endast de personuppgifter som är 
-              nödvändiga för att tillhandahålla våra tjänster, såsom namn, 
+              Vi samlar in och behandlar endast de personuppgifter som är
+              nödvändiga för att tillhandahålla våra tjänster, såsom namn,
               e-postadress och kontaktuppgifter.
             </p>
 
@@ -32,8 +32,11 @@
       </div>
     </div>
   </q-page>
+  <q-footer class="bg-secondary text-primary q-pa-lg" style="border-top: 2px solid var(--q-primary)">
+    <footer-component />
+  </q-footer>
 </template>
 
 <script setup lang="ts">
+import FooterComponent from 'src/components/FooterComponent.vue';
 </script>
-
