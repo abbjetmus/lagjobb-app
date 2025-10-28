@@ -69,6 +69,8 @@ export const useAuth = defineStore('auth-module', {
           password: user.password,
           passwordConfirm: user.password,
           name: user.name,
+          phone: user.phone,
+          userAccountType: user.userAccountType,
         } as unknown as UsersRecord
 
         return pb.collection(Collections.Users).create(data).then(() => {
@@ -150,6 +152,7 @@ export const useAuth = defineStore('auth-module', {
       this.currentUser = null
       this.token = null
       this.authModel = null
+      this.expiration = null
     },
     async updateUserImage(image: File | []): Promise<boolean> {
       return pb.collection(Collections.Users).update(this.authModel!.id, {

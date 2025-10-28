@@ -5,10 +5,10 @@
         <div class="col flex flex-center">
           <div class="column items-center">
             <!-- <img src="~assets/logo_256.png" width="120" /> -->
-            <p class="text-secondary text-h4">
+            <div class="text-primary text-h4">
               <span class="text-weight-bold">Lagjobb</span>
-            </p>
-            <p class="text-secondary text-h6 q-mt-sm">Skapa ditt konto</p>
+            </div>
+            <div class="text-primary text-h6">Skapa ditt konto</div>
           </div>
         </div>
 
@@ -18,51 +18,51 @@
               style="max-width: 500px; width: 100%">
               <span v-if="authError" class="block text-center text-red">{{
                 authErrorMessage
-              }}</span>
+                }}</span>
 
-              <div class="column q-gutter-y-sm">
+              <div class="column q-gutter-y-lg">
                 <span v-if="!validInputs" class="text-red text-center">Ett fel uppstod vid registrering. Kontrollera
                   dina uppgifter.</span>
 
-                <q-input no-error-icon v-model="name" bg-color="white" class="q-pa-none" outlined square
-                  :error="r$.name.$errors.length > 0" :error-message="r$.name.$errors[0]" placeholder="Namn" />
+                <q-input no-error-icon v-model="name" bg-color="secondary" class="q-pa-none" outlined square
+                  :error="r$.name.$error" error-message="Namn inte ifyllt korrekt" placeholder="Namn" />
 
-                <q-input no-error-icon v-model="email" bg-color="white" class="q-pa-none" outlined square
-                  :error="r$.email.$errors.length > 0" :error-message="r$.email.$errors[0]" placeholder="E-post" />
+                <q-input no-error-icon v-model="email" bg-color="secondary" class="q-pa-none" outlined square
+                  :error="r$.email.$error" error-message="E-post inte ifyllt korrekt" placeholder="E-post" />
 
-                <q-input no-error-icon v-model="phone" bg-color="white" class="q-pa-none" outlined square
-                  :error="r$.phone.$errors.length > 0" :error-message="r$.phone.$errors[0]" placeholder="Telefon" />
+                <q-input no-error-icon v-model="phone" bg-color="secondary" class="q-pa-none" outlined square
+                  :error="r$.phone.$error" error-message="Telefon inte ifyllt korrekt" placeholder="Telefon" />
 
                 <div class="q-mb-sm">
-                  <div class="text-caption text-grey-7 q-mb-xs">Välj <strong>"Uppdragsgivare"</strong> om du vill skapa
+                  <div class=" q-mb-xs">Välj <strong>"Uppdragsgivare"</strong> om du vill skapa
                     uppdrag, eller
                     <strong>"Uppdragsutförare"</strong> om du vill utföra uppdrag på kontotyp.
                   </div>
-                  <q-select no-error-icon v-model="accountType" bg-color="white" class="q-pa-none" outlined square
-                    :error="r$.accountType.$errors.length > 0" :error-message="r$.accountType.$errors[0]"
-                    :options="accountTypeOptions" label="Kontotyp" />
+                  <q-select no-error-icon v-model="userAccountType" bg-color="secondary" class="q-pa-none" outlined
+                    square :error="r$.userAccountType.$errors.length > 0" :error-message="r$.userAccountType.$errors[0]"
+                    :options="userAccountTypeOptions" label="Kontotyp" />
                 </div>
 
-                <q-input no-error-icon v-model="password" bg-color="white" class="q-pa-none" outlined square
-                  :type="isPassword ? 'password' : 'text'" :error="r$.password.$errors.length > 0"
-                  :error-message="r$.password.$errors[0]" placeholder="Lösenord">
+                <q-input no-error-icon v-model="password" bg-color="secondary" class="q-pa-none" outlined square
+                  :type="isPassword ? 'password' : 'text'" :error="r$.password.$error"
+                  error-message="Lösenord inte ifyllt korrekt" placeholder="Lösenord">
                   <template v-slot:append>
                     <q-icon @click="isPassword = !isPassword"
                       :name="isPassword ? 'visibility_off' : 'visibility'"></q-icon>
                   </template>
                 </q-input>
 
-                <q-input no-error-icon v-model="confirmPassword" bg-color="white" class="q-pa-none" outlined square
-                  :type="isConfirmPassword ? 'password' : 'text'" :error="r$.confirmPassword.$errors.length > 0"
-                  :error-message="r$.confirmPassword.$errors[0]" placeholder="Bekräfta lösenord">
+                <q-input no-error-icon v-model="confirmPassword" bg-color="secondary" class="q-pa-none" outlined square
+                  :type="isConfirmPassword ? 'password' : 'text'" :error="r$.confirmPassword.$error"
+                  error-message="Bekräfta lösenord inte ifyllt korrekt" placeholder="Bekräfta lösenord">
                   <template v-slot:append>
                     <q-icon @click="isConfirmPassword = !isConfirmPassword"
                       :name="isConfirmPassword ? 'visibility_off' : 'visibility'"></q-icon>
                   </template>
                 </q-input>
 
-                <div class="q-mt-sm row justify-between">
-                  <q-btn type="submit" color="secondary" label="Skapa konto" no-caps unelevated class="full-width"
+                <div class="q-mt-lg row justify-between">
+                  <q-btn type="submit" color="primary" label="Skapa konto" no-caps unelevated class="full-width"
                     :loading="loading" square />
                 </div>
               </div>
@@ -93,14 +93,14 @@ const $q = useQuasar();
 const name = ref('');
 const email = ref('');
 const phone = ref('');
-const accountType = ref('');
+const userAccountType = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const isPassword = ref(true);
 const isConfirmPassword = ref(true);
 
 // Account type options
-const accountTypeOptions = Object.values(UsersUserAccountTypeOptions);
+const userAccountTypeOptions = Object.values(UsersUserAccountTypeOptions);
 
 // Common fields
 const loading = ref(false);
@@ -119,7 +119,7 @@ const rules = {
   phone: {
     required: required,
   },
-  accountType: {
+  userAccountType: {
     required: required,
   },
   password: {
@@ -136,7 +136,7 @@ const { r$ } = useRegle({
   name,
   email,
   phone,
-  accountType,
+  userAccountType,
   password,
   confirmPassword
 }, rules);
@@ -152,7 +152,7 @@ const onRegister = async () => {
         name: name.value,
         email: email.value,
         phone: phone.value,
-        accountType: accountType.value,
+        userAccountType: userAccountType.value,
         password: password.value,
       } as Partial<UsersRecord>;
 

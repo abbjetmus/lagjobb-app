@@ -1,5 +1,5 @@
 <template>
-  <q-btn outline color="primary" class="full-width bg-white" icon="image" label="Välj bilder att lägga till"
+  <q-btn unelevated color="secondary" class="full-width" icon="image" label="Välj bilder att lägga till"
     @click="pickImage" style="height: 60px;" />
   <div v-if="images && images.length > 0" class="full-width q-mt-md">
     <div class="row q-col-gutter-md">

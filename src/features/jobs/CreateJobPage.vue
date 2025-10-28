@@ -7,28 +7,29 @@
         <div class="text-h6 q-mb-md">Uppdragsinformation</div>
 
         <q-input v-model="job.title" label="Titel" outlined :error="r$.title.$error"
-          error-message="Titel är obligatoriskt" bg-color="white" no-error-icon />
+          error-message="Titel är obligatoriskt" bg-color="secondary" no-error-icon />
 
         <q-input v-model="job.description" type="textarea" label="Beskrivning" outlined rows="5"
-          :error="r$.description.$error" error-message="Beskrivning är obligatorisk" bg-color="white" no-error-icon />
+          :error="r$.description.$error" error-message="Beskrivning är obligatorisk" bg-color="secondary"
+          no-error-icon />
 
-        <q-input v-model.number="job.price" type="number" label="Pris (kr)" outlined bg-color="white" no-error-icon
+        <q-input v-model.number="job.price" type="number" label="Pris (kr)" outlined bg-color="secondary" no-error-icon
           :error="r$.price.$error" error-message="Pris är obligatoriskt" />
 
         <custom-date-time v-model="job.desiredAt" label="Önskat datum" :error="r$.desiredAt.$error"
-          error-message="Önskat datum är obligatoriskt" class="q-mb-md" bg-color="white" />
+          error-message="Önskat datum är obligatoriskt" class="q-mb-md" bg-color="secondary" />
 
         <q-input v-model.number="job.desiredNumberOfPeople" type="number" label="Önskad minst antal personer" outlined
-          bg-color="white" no-error-icon :error="r$.desiredNumberOfPeople.$error"
+          bg-color="secondary" no-error-icon :error="r$.desiredNumberOfPeople.$error"
           error-message="Antal personer är obligatoriskt" />
 
         <q-input v-model.number="job.estimatedHours" type="number" label="Beräknad tid (timmar)" outlined
-          bg-color="white" no-error-icon :error="r$.estimatedHours.$error"
+          bg-color="secondary" no-error-icon :error="r$.estimatedHours.$error"
           error-message="Beräknad tid är obligatoriskt" />
 
         <q-select v-model="job.jobSubcategories" clearable :options="filterJobSubcategoryOptions" use-input use-chips
           multiple outlined @filter="filterJobSubcategoryFn" input-debounce="0" label="Välj uppdragstyper (max 5)"
-          bg-color="white" option-label="title" option-value="id" :error="r$.jobSubcategories.$error"
+          bg-color="secondary" option-label="title" option-value="id" :error="r$.jobSubcategories.$error"
           error-message="Välj minst en uppdragstyp (max 5)" emit-value map-options no-error-icon :max-values="5">
           <template v-slot:prepend>
             <q-icon name="mdi-briefcase" />
@@ -47,16 +48,16 @@
         <div class="text-h6">Kontaktinformation</div>
 
         <q-checkbox v-model="job.hidePhone" label="Dölj mitt telefonnummer - numret som du anger i inställningar"
-          class="q-mb-md" />
-        <div class="text-subtitle1">Önskar bli kontaktad mellan tiderna</div>
+          class="q-mb-md" bg-color="secondary" />
+        <div>Önskar bli kontaktad mellan tiderna</div>
         <div class="row q-gutter-md">
           <div class="col">
-            <custom-time bg-color="white" hint="HH:mm" v-model="contactHoursFrom" label="Från"
+            <custom-time bg-color="secondary" hint="HH:mm" v-model="contactHoursFrom" label="Från"
               :error="r$.contactHoursFrom.$error"
               error-message="Från-tid är obligatoriskt och måste vara före till-tid" />
           </div>
           <div class="col">
-            <custom-time bg-color="white" hint="HH:mm" v-model="contactHoursTo" label="Till"
+            <custom-time bg-color="secondary" hint="HH:mm" v-model="contactHoursTo" label="Till"
               :error="r$.contactHoursTo.$error"
               error-message="Till-tid är obligatoriskt och måste vara efter från-tid" />
           </div>
@@ -64,11 +65,11 @@
 
         <div class="text-h6 q-mt-md">Plats</div>
 
-        <q-input v-model="job.street" label="Gatuadress" outlined bg-color="white" no-error-icon
+        <q-input v-model="job.street" label="Gatuadress" outlined bg-color="secondary" no-error-icon
           :error="r$.street.$error" error-message="Gatuadress är obligatoriskt" />
 
         <q-select v-model="job.city" clearable :options="filterCityOptions" use-input outlined @filter="filterCityFn"
-          input-debounce="0" label="Välj närmaste stad" bg-color="white" option-label="title" option-value="id"
+          input-debounce="0" label="Välj närmaste stad" bg-color="secondary" option-label="title" option-value="id"
           :error="r$.city.$error" error-message="Stad är obligatoriskt" emit-value map-options no-error-icon>
           <template v-slot:prepend>
             <q-icon name="mdi-map-marker" />
@@ -84,7 +85,7 @@
           </template>
         </q-select>
 
-        <q-input v-model="job.zipcode" label="Postnummer" outlined bg-color="white" no-error-icon
+        <q-input v-model="job.zipcode" label="Postnummer" outlined bg-color="secondary" no-error-icon
           :error="r$.zipcode.$error" error-message="Postnummer är obligatoriskt" />
 
         <div class="text-h6 q-mt-md">Bilder</div>
@@ -94,7 +95,7 @@
         <div align="left" class="row justify-between q-mt-lg">
           <q-btn unelevated type="submit" color="primary" :label="isEdit ? 'Uppdatera uppdrag' : 'Skapa uppdrag'"
             :loading="loading" />
-          <q-btn flat color="primary" label="Avbryt" @click="router.back()" />
+          <q-btn flat color="primary" label="Avbryt" @click="router.back()" unelevated />
         </div>
       </q-form>
     </div>
@@ -416,6 +417,6 @@ const onSubmit = async () => {
 
 <style>
 .q-checkbox__bg {
-  background-color: white;
+  background-color: var(--q-secondary);
 }
 </style>

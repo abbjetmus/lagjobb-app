@@ -7,20 +7,20 @@
         <div class="text-h6 q-mb-md">Typ av grupp</div>
 
         <q-select v-model="group.groupType" :options="Object.values(GroupsGroupTypeOptions)" label="Grupptyp" outlined
-          emit-value map-options :error="r$.groupType.$error" error-message="Grupptyp krävs" bg-color="white"
+          emit-value map-options :error="r$.groupType.$error" error-message="Grupptyp krävs" bg-color="secondary"
           no-error-icon />
 
-        <q-card flat v-if="group.groupType" class="q-pa-none">
+        <q-card flat v-if="group.groupType" class="q-pa-none bg-transparent">
           <component :is="componentMap[group.groupType]" :key="group.groupType" v-model="group" :r="r$" />
         </q-card>
 
         <q-input v-model="group.description" type="textarea" label="Beskrivning" outlined rows="5"
-          :error="r$.description.$error" error-message="Beskrivning är felaktigt ifylld" bg-color="white"
+          :error="r$.description.$error" error-message="Beskrivning är felaktigt ifylld" bg-color="secondary"
           no-error-icon />
 
         <q-select v-model="group.city" :options="filterCityOptions" label="Närmaste stad" outlined emit-value
           map-options use-input @filter="filterCityFn" option-value="id" option-label="title" :error="r$.city.$error"
-          error-message="Stad krävs" bg-color="white" no-error-icon input-debounce="0">
+          error-message="Stad krävs" bg-color="secondary" no-error-icon input-debounce="0">
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
               <q-item-section>
@@ -32,16 +32,13 @@
         </q-select>
 
         <div class="text-h6">Bild</div>
-        <q-card flat class="bg-white">
-          <q-card-section>
-            <ImageThumbnail :photo-url="currentImageUrl" size="150px" @file-selected="onImageSelected" />
-          </q-card-section>
-        </q-card>
 
-        <div align="left" class="row justify-between q-mt-md">
+        <ImageThumbnail :photo-url="currentImageUrl" size="150px" @file-selected="onImageSelected" />
+
+        <div align="left" class="row justify-between q-mt-lg">
           <q-btn unelevated type="submit" color="primary" :label="isEdit ? 'Uppdatera grupp' : 'Skapa grupp'"
             :loading="loading" />
-          <q-btn flat color="primary" label="Avbryt" @click="router.back()" />
+          <q-btn flat color="primary" label="Avbryt" @click="router.back()" unelevated />
         </div>
       </q-form>
     </div>
