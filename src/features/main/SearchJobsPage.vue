@@ -1,12 +1,12 @@
 <template>
   <q-page class="page-background-pattern">
-    <div class="bg-image">
+    <div class="bg-image" style="border-bottom: 2px solid var(--q-primary)">
       <div class="search-container  q-pa-sm">
-        <div class="text-grey-2">
+        <div>
           <div class="row items-center">
             <div class="col-xs-0 col-1"></div>
             <div class="col-xs-12 col-10">
-              <div class="text-center text-h5 text-md-h4 q-my-md">
+              <div class="text-center text-h5 text-md-h4 q-my-md text-secondary">
                 Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar
               </div>
 
@@ -85,30 +85,28 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import JobListItem from 'src/features/jobs/components/JobListItem.vue';
 import type { WithId } from 'src/models/withIdType';
-import type { JobsRecord, UsersRecord } from 'app/pocketbase-types';
-import { useQuasar, QSelect } from 'quasar';
+import type { JobsRecord } from 'app/pocketbase-types';
+import { QSelect } from 'quasar';
 import { useAuth } from 'src/stores/auth';
 import { storeToRefs } from 'pinia';
+import type { JobsExpand } from 'app/expanded-pocketbase-types';
 const router = useRouter();
-const route = useRoute();
 const jobsStore = useJobs();
 const authStore = useAuth();
-const $q = useQuasar();
 const { currentUser } = storeToRefs(authStore);
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);
-const uppdrag = ref<WithId<JobsRecord>[]>([]);
+const uppdrag = ref<(WithId<JobsRecord> & { expand?: JobsExpand })[]>([]);
 const loading = ref(false);
 const selectedSubcategories = ref<string[]>([]);
 const selectedCities = ref<string[]>([]);
 const current = ref(1);
 const totalPages = ref(1);
-const perPage = 50;
 
 const allCities = computed(() => {
   const citiesMap = new Map<string, { id: string; title: string; county: string }>();
@@ -189,7 +187,7 @@ const searchUppdrag = async () => {
       sort: '-created',
     });
 
-    uppdrag.value = records.items as unknown as WithId<JobsRecord>[];
+    uppdrag.value = records.items as unknown as (WithId<JobsRecord> & { expand?: JobsExpand })[];
   } catch (error) {
     console.error('Search error:', error);
   } finally {
@@ -203,11 +201,11 @@ const clearFilters = () => {
   void searchUppdrag();
 };
 
-const goToUppdrag = (job: WithId<JobsRecord> & { expand?: { createdBy: WithId<UsersRecord> } }) => {
+const goToUppdrag = async (job: WithId<JobsRecord> & { expand?: JobsExpand }) => {
   if (currentUser.value?.id === job.expand?.createdBy?.id) {
-    router.push(`/uppdrags-info/${job.id}`).catch(() => { });
+    await router.push(`/skapade-uppdrag/${job.id}`);
   } else {
-    router.push(`/uppdrag/${job.id}`).catch(() => { });
+    await router.push(`/uppdrag/${job.id}`);
   }
 };
 
@@ -246,7 +244,6 @@ onMounted(() => {
 .bg-image {
   background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
   background-size: cover;
-  height: 200px;
   overflow: hidden;
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
     url("../../assets/soccer-team.jpg");

@@ -9,7 +9,7 @@
           </div>
         </q-card-section>
 
-        <!-- <q-separator /> -->
+        <q-separator />
 
         <q-card-section>
           <div class="text-h6 q-mb-sm">Beskrivning</div>

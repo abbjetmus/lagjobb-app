@@ -4,6 +4,7 @@ import type { GroupsRecord } from 'app/pocketbase-types';
 import { Collections } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import { useAuth } from 'src/stores/auth';
+import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 
 interface GroupsState {
   myGroups: WithId<GroupsRecord>[],
@@ -22,6 +23,14 @@ export const useGroups = defineStore('groups-module', {
       return pb.collection(Collections.Groups).getFullList().then(res => {
         this.allGroups = res as unknown as WithId<GroupsRecord>[]
         return true
+      })
+    },
+    async getGroupById(id: string): Promise<WithId<GroupsRecord, GroupsExpand> | null> {
+      return pb.collection(Collections.Groups).getOne(id, { expand: 'city,createdBy' }).then(res => {
+        return res as unknown as WithId<GroupsRecord, GroupsExpand>
+      }).catch(e => {
+        console.error('Get group by id error:', e)
+        return null
       })
     },
     async getMyGroups(): Promise<boolean> {
