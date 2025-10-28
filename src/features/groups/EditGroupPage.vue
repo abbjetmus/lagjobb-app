@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md page-background-pattern">
     <div class="text-h4 q-mb-md">Redigera grupp</div>
 
     <div class="text-center q-pa-xl">

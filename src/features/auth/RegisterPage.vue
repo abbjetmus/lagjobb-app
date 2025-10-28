@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column bg-grey-3">
+  <q-page class="column page-background-pattern">
     <div class="col flex justify-center items-center">
       <div class="column items-center full-width full-height q-pa-md">
         <div class="col flex flex-center">
@@ -18,7 +18,7 @@
               style="max-width: 500px; width: 100%">
               <span v-if="authError" class="block text-center text-red">{{
                 authErrorMessage
-                }}</span>
+              }}</span>
 
               <div class="column q-gutter-y-sm">
                 <span v-if="!validInputs" class="text-red text-center">Ett fel uppstod vid registrering. Kontrollera

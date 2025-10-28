@@ -6,51 +6,63 @@
       </q-card-section>
 
       <q-card-section>
+        <q-select v-model="selectedGroupId" :options="groupOptions" label="Välj grupp" outlined class="q-mb-md"
+          emit-value map-options :rules="[val => !!val || 'Du måste välja en grupp']" ref="groupSelectRef" />
         <q-input v-model="interestMessage" type="textarea" label="Meddelande" outlined rows="5" />
       </q-card-section>
 
-      <q-card-actions align="right">
+      <q-card-actions class="row justify-between q-pa-md">
+        <q-btn unelevated label="Skicka" color="primary" @click="sendInterest" :loading="sendingInterest"
+          :disable="!selectedGroupId" />
         <q-btn flat label="Avbryt" color="primary" @click="cancel" />
-        <q-btn flat label="Skicka" color="primary" @click="sendInterest" :loading="sendingInterest" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import { useQuasar } from 'quasar';
-import { pb } from 'src/boot/pocketbase';
+import { useJobs } from 'src/features/jobs/jobsStore';
 import { useAuth } from 'src/stores/auth';
-import type { JobsRecord } from 'app/pocketbase-types';
+import { InterestRequestsStatusOptions, type JobsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
+import type { GroupsRecord } from 'app/pocketbase-types';
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
-
+const jobsStore = useJobs();
 const $q = useQuasar();
 const authStore = useAuth();
 
 const props = defineProps<{
   job: WithId<JobsRecord>;
+  groups: WithId<GroupsRecord>[];
 }>();
 
 const interestMessage = ref('');
+const selectedGroupId = ref<string>('');
 const sendingInterest = ref(false);
+
+const groupOptions = computed(() =>
+  props.groups.map(group => ({ label: group.name, value: group.id }))
+);
 
 const cancel = () => {
   onDialogCancel();
 };
 
 const sendInterest = async () => {
-  if (!props.job || !authStore.currentUser) return;
+  if (!props.job || !authStore.currentUser || !selectedGroupId.value) return;
 
   sendingInterest.value = true;
   try {
-    await pb.collection('interest_messages').create({
-      uppdragId: props.job.id,
-      userId: authStore.currentUser.id,
-      message: interestMessage.value,
+    await jobsStore.sendInterestRequest({
+      job: props.job.id as string,
+      requestMessage: interestMessage.value,
+      group: selectedGroupId.value,
+      id: '',
+      status: InterestRequestsStatusOptions.Förfrågan,
     });
 
     $q.notify({
@@ -60,6 +72,7 @@ const sendInterest = async () => {
 
     onDialogOK();
     interestMessage.value = '';
+    selectedGroupId.value = '';
   } catch (error) {
     console.error('Send interest error:', error);
     $q.notify({

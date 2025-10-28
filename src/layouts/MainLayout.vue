@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh lpR fff">
-    <q-header class="bg-secondary" style="border-bottom: 2px solid var(--q-primary)">
-      <q-toolbar class="row justify-around">
+    <q-header :dark="$q.dark.isActive" class="bg-secondary" style="border-bottom: 2px solid var(--q-primary)">
+      <q-toolbar :dark="$q.dark.isActive" class="row justify-around">
         <q-toolbar-title class="col-auto">
           <router-link to="/" class="text-primary row items-center no-wrap" style="text-decoration: none; gap: 8px;">
 
@@ -19,6 +19,17 @@
             class="lt-md" />
 
           <q-btn flat color="primary" stack icon="search" label="Sök" to="/sok-uppdrag" />
+
+          <q-toggle v-model="darkMode" @update:model-value="toggleDarkMode"
+            :icon="$q.dark.isActive ? 'dark_mode' : 'light_mode'" size="md" class="gt-xs text-primary"
+            :label="$q.dark.isActive ? 'Mörkt läge' : 'Ljust läge'">
+            <q-tooltip>{{ $q.dark.isActive ? 'Växla till ljust läge' : 'Växla till mörkt läge' }}</q-tooltip>
+          </q-toggle>
+
+          <q-btn flat color="primary" :icon="$q.dark.isActive ? 'dark_mode' : 'light_mode'"
+            @click="toggleDarkMode(!darkMode)" class="lt-sm">
+            <q-tooltip>{{ $q.dark.isActive ? 'Växla till ljust läge' : 'Växla till mörkt läge' }}</q-tooltip>
+          </q-btn>
 
           <toolbar-user-menu color="primary" v-if="isAuthenticated && currentUser" />
 
@@ -38,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from 'src/stores/auth';
 import { useQuasar } from 'quasar';
@@ -51,6 +62,18 @@ const router = useRouter();
 const authStore = useAuth();
 const jobsStore = useJobs();
 const $q = useQuasar();
+
+const darkMode = ref($q.dark.isActive);
+
+const toggleDarkMode = (val: boolean) => {
+  $q.dark.set(val);
+  darkMode.value = val;
+  localStorage.setItem('darkMode', String(val));
+};
+
+watch(() => $q.dark.isActive, (val) => {
+  darkMode.value = val;
+});
 
 const toReturnAfterCancel = ref('');
 
@@ -77,6 +100,12 @@ const goToNewUppdrag = () => {
 };
 
 onMounted(async () => {
+  const savedDarkMode = localStorage.getItem('darkMode');
+  if (savedDarkMode !== null) {
+    $q.dark.set(savedDarkMode === 'true');
+    darkMode.value = savedDarkMode === 'true';
+  }
+
   await Promise.all([
     jobsStore.getAllJobCategories(),
     jobsStore.getAllCounties(),

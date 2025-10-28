@@ -14,3 +14,8 @@ export interface JobCategoriesExpand {
 export interface CountiesExpand {
   cities_via_county: WithId<CitiesRecord>[];
 }
+
+export interface GroupsExpand {
+  city: WithId<CitiesRecord>;
+  createdBy: WithId<UsersRecord>;
+}

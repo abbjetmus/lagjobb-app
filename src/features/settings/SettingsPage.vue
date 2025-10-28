@@ -1,220 +1,304 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="text-h4 q-mb-md">Inställningar</div>
+  <q-page class="q-pa-md page-background-pattern">
+    <div v-if="loading" class="row justify-center q-pa-xl">
+      <q-spinner color="primary" size="3em" />
+    </div>
 
-    <q-card class="q-mb-md">
-      <q-card-section>
-        <div class="text-h6 q-mb-md">Kontoinformation</div>
+    <div v-else-if="currentUser" style="max-width: 600px; margin: 0 auto;" class="q-py-lg">
+      <div class="full-width">
+        <div class="text-center">
+          <ImageThumbnail @file-selected="fileSelected" size="160px" class="q-pa-lg"
+            :photoUrl="currentUser.avatar ? getImageUrl() : null" />
+        </div>
 
-        <q-list>
+        <q-list bordered separator class="q-mt-xl bg-secondary">
           <q-item>
             <q-item-section>
-              <q-item-label>Namn</q-item-label>
-              <q-item-label caption>{{ user?.name || 'Ej angivet' }}</q-item-label>
+              <q-item-label caption>Namn</q-item-label>
+              <q-item-label class="text-subtitle1">{{ currentUser.name || 'Ej angivet' }}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-btn flat round icon="edit" @click="editName" />
+              <q-btn unelevated icon="more_vert" flat color="grey-8">
+                <q-menu>
+                  <q-item clickable v-close-popup class="flex flex-center" @click="editName">
+                    <q-item-label>Ändra namn</q-item-label>
+                  </q-item>
+                </q-menu>
+              </q-btn>
             </q-item-section>
           </q-item>
-
-          <q-separator />
-
-          <q-item>
-            <q-item-section>
-              <q-item-label>E-post</q-item-label>
-              <q-item-label caption>{{ user?.email }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn flat round icon="edit" @click="editEmail" />
-            </q-item-section>
-          </q-item>
-
-          <q-separator />
 
           <q-item>
             <q-item-section>
-              <q-item-label>Telefon</q-item-label>
-              <q-item-label caption>{{ user?.phone || 'Ej angivet' }}</q-item-label>
+              <q-item-label caption>E-post</q-item-label>
+              <q-item-label class="text-subtitle1">{{ currentUser.email }}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-btn flat round icon="edit" @click="editPhone" />
+              <q-btn unelevated icon="more_vert" flat color="grey-8">
+                <q-menu>
+                  <q-item clickable v-close-popup class="flex flex-center" @click="editEmail">
+                    <q-item-label>Ändra e-post</q-item-label>
+                  </q-item>
+                </q-menu>
+              </q-btn>
+            </q-item-section>
+          </q-item>
+
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Telefon</q-item-label>
+              <q-item-label class="text-subtitle1">{{ currentUser.phone || '' }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn unelevated icon="more_vert" flat color="grey-8">
+                <q-menu>
+                  <q-item clickable v-close-popup class="flex flex-center" @click="editPhone">
+                    <q-item-label>Ändra telefon</q-item-label>
+                  </q-item>
+                </q-menu>
+              </q-btn>
+            </q-item-section>
+          </q-item>
+
+          <q-item>
+            <q-item-section>
+              <q-item-label caption>Lösenord</q-item-label>
+              <q-item-label class="text-subtitle1">********</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn unelevated icon="more_vert" flat color="grey-8">
+                <q-menu>
+                  <q-item clickable v-close-popup class="flex flex-center" @click="editPassword">
+                    <q-item-label>Ändra lösenord</q-item-label>
+                  </q-item>
+                </q-menu>
+              </q-btn>
             </q-item-section>
           </q-item>
         </q-list>
-      </q-card-section>
-    </q-card>
 
-    <q-card class="q-mb-md">
-      <q-card-section>
-        <div class="text-h6 q-mb-md">Notifikationer</div>
+        <q-btn unelevated class="full-width q-mt-xl" color="primary" @click="signOut">Logga ut</q-btn>
+      </div>
 
-        <q-list>
-          <q-item tag="label">
-            <q-item-section>
-              <q-item-label>Intressemeddelanden</q-item-label>
-              <q-item-label caption>Få notifikationer när någon visar intresse</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-toggle v-model="settingsStore.interestMessageNotification" @update:model-value="saveSettings" />
-            </q-item-section>
-          </q-item>
+      <div class="text-center q-my-xl full-width">
+        <q-btn unelevated color="red-5" class="full-width q-my-md" label="Radera konto" no-caps
+          @click="confirmDeleteAccount" />
+      </div>
+    </div>
 
-          <q-separator />
+    <EditNameDialog :show="showNameDialog" :currentName="currentUser?.name || ''" @update:show="showNameDialog = $event"
+      @updateName="handleUpdateName" />
 
-          <q-item tag="label">
-            <q-item-section>
-              <q-item-label>Nya uppdrag</q-item-label>
-              <q-item-label caption>Få notifikationer om nya uppdrag</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-toggle v-model="settingsStore.uppdragCreatedNotification" @update:model-value="saveSettings" />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
-    </q-card>
+    <EditEmailDialog :show="showEmailDialog" :currentEmail="currentUser?.email || ''"
+      @update:show="showEmailDialog = $event" @updateEmail="handleUpdateEmail" />
 
-    <q-card class="q-mb-md">
-      <q-card-section>
-        <div class="text-h6 q-mb-md">Autofyll</div>
+    <EditPhoneDialog :show="showPhoneDialog" :currentPhone="currentUser?.phone || ''"
+      @update:show="showPhoneDialog = $event" @updatePhone="handleUpdatePhone" />
 
-        <q-list>
-          <q-item tag="label">
-            <q-item-section>
-              <q-item-label>Namn</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-toggle v-model="settingsStore.autofillName" @update:model-value="saveSettings" />
-            </q-item-section>
-          </q-item>
-
-          <q-item tag="label">
-            <q-item-section>
-              <q-item-label>E-post</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-toggle v-model="settingsStore.autofillEmail" @update:model-value="saveSettings" />
-            </q-item-section>
-          </q-item>
-
-          <q-item tag="label">
-            <q-item-section>
-              <q-item-label>Telefon</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-toggle v-model="settingsStore.autofillPhone" @update:model-value="saveSettings" />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
-    </q-card>
-
-    <q-card>
-      <q-card-section>
-        <div class="text-h6 q-mb-md text-negative">Farlig zon</div>
-        <q-btn color="negative" label="Ta bort konto" @click="confirmDeleteAccount" outline />
-      </q-card-section>
-    </q-card>
-
-    <q-dialog v-model="showEditDialog">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">{{ editDialogTitle }}</div>
-        </q-card-section>
-
-        <q-card-section>
-          <q-input v-model="editValue" :label="editDialogTitle" outlined />
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Avbryt" color="secondary" v-close-popup />
-          <q-btn flat label="Spara" color="secondary" @click="saveEdit" :loading="saving" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <EditPasswordDialog :show="showPasswordDialog" @update:show="showPasswordDialog = $event"
+      @updatePassword="handleUpdatePassword" />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAuth } from 'src/features/auth/authStore';
-import { useSettings } from 'src/stores/settings';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
-import type { UsersRecord } from 'app/pocketbase-types';
+import { pb } from 'src/boot/pocketbase';
+import ImageThumbnail from 'src/components/ImageThumbnail.vue';
+import EditNameDialog from './components/EditNameDialog.vue';
+import EditEmailDialog from './components/EditEmailDialog.vue';
+import EditPhoneDialog from './components/EditPhoneDialog.vue';
+import EditPasswordDialog from './components/EditPasswordDialog.vue';
+import { storeToRefs } from 'pinia';
 
 const authStore = useAuth();
-const settingsStore = useSettings();
 const $q = useQuasar();
 const router = useRouter();
 
-const user = computed(() => authStore.currentUser);
+const { currentUser } = storeToRefs(authStore);
+const loading = ref(false);
 
-const showEditDialog = ref(false);
-const editDialogTitle = ref('');
-const editValue = ref('');
-const editField = ref('');
-const saving = ref(false);
+onMounted(async () => {
+  loading.value = true;
+
+  if (!authStore.authModel && pb.authStore.record) {
+    authStore.authModel = pb.authStore.record;
+  }
+
+  if (!currentUser.value && authStore.isAuthenticated) {
+    await authStore.getUser();
+  }
+
+  loading.value = false;
+});
+const showNameDialog = ref(false);
+const showEmailDialog = ref(false);
+const showPhoneDialog = ref(false);
+const showPasswordDialog = ref(false);
+
+const getImageUrl = () => {
+  if (!currentUser.value?.avatar) return null;
+  return pb.files.getURL(currentUser.value, currentUser.value.avatar);
+};
+
+const fileSelected = async (file: File | null) => {
+  if (!file) {
+    const success = await authStore.updateUserImage([]);
+    if (success) {
+      $q.notify({
+        message: 'Bilden har tagits bort',
+        color: 'primary',
+        position: 'bottom',
+      });
+    }
+    return;
+  }
+
+  const success = await authStore.updateUserImage(file);
+  if (success) {
+    $q.notify({
+      message: 'Bilden har uppdaterats',
+      color: 'primary',
+      position: 'bottom',
+    });
+  } else {
+    $q.notify({
+      message: 'Bilden kunde inte uppdateras',
+      color: 'negative',
+      position: 'bottom',
+    });
+  }
+};
 
 const editName = () => {
-  editDialogTitle.value = 'Namn';
-  editValue.value = user.value?.name || '';
-  editField.value = 'name';
-  showEditDialog.value = true;
+  showNameDialog.value = true;
 };
 
 const editEmail = () => {
-  editDialogTitle.value = 'E-post';
-  editValue.value = user.value?.email || '';
-  editField.value = 'email';
-  showEditDialog.value = true;
+  showEmailDialog.value = true;
 };
 
 const editPhone = () => {
-  editDialogTitle.value = 'Telefon';
-  editValue.value = user.value?.phone || '';
-  editField.value = 'phone';
-  showEditDialog.value = true;
+  showPhoneDialog.value = true;
 };
 
-const saveEdit = async () => {
-  saving.value = true;
-  await authStore.updateUser({ [editField.value as keyof UsersRecord]: editValue.value } as unknown as UsersRecord);
-  showEditDialog.value = false;
+const editPassword = () => {
+  showPasswordDialog.value = true;
 };
 
-const saveSettings = async () => {
-  if (!user.value) return;
-  try {
-    await settingsStore.saveSettings(user.value.id);
-  } catch (error) {
-    console.error('Save settings error:', error);
+const handleUpdateName = async (name: string) => {
+  const success = await authStore.updateUserName(name);
+  if (success) {
+    $q.notify({
+      message: 'Namnet har uppdaterats',
+      color: 'primary',
+      position: 'bottom',
+    });
+  } else {
+    $q.notify({
+      message: 'Namnet kunde inte uppdateras',
+      color: 'negative',
+      icon: 'error',
+      position: 'bottom',
+    });
   }
+};
+
+const handleUpdateEmail = async (email: string) => {
+  const success = await authStore.updateUserEmail(email);
+  if (success) {
+    $q.notify({
+      message: 'E-postadressen har uppdaterats',
+      color: 'primary',
+      position: 'bottom',
+    });
+  } else {
+    $q.notify({
+      message: 'E-postadressen kunde inte uppdateras',
+      color: 'negative',
+      icon: 'error',
+      position: 'bottom',
+    });
+  }
+};
+
+const handleUpdatePhone = async (phone: string) => {
+  const success = await authStore.updateUserPhone(phone);
+  if (success) {
+    $q.notify({
+      message: 'Telefonnumret har uppdaterats',
+      color: 'primary',
+      position: 'bottom',
+    });
+  } else {
+    $q.notify({
+      message: 'Telefonnumret kunde inte uppdateras',
+      color: 'negative',
+      icon: 'error',
+      position: 'bottom',
+    });
+  }
+};
+
+const handleUpdatePassword = async (data: { oldPassword: string; password: string; passwordConfirm: string }) => {
+  const success = await authStore.updateUserPassword(data);
+  if (success) {
+    $q.notify({
+      message: 'Lösenordet har uppdaterats',
+      color: 'primary',
+      position: 'bottom',
+    });
+  } else {
+    $q.notify({
+      message: 'Lösenordet kunde inte uppdateras',
+      color: 'negative',
+      icon: 'error',
+      position: 'bottom',
+    });
+  }
+};
+
+const signOut = () => {
+  authStore.signOut();
+  void router.replace('/');
 };
 
 const confirmDeleteAccount = () => {
   $q.dialog({
-    title: 'Ta bort konto',
+    title: 'Bekräfta borttagning',
     message: 'Är du säker på att du vill ta bort ditt konto? Detta kan inte ångras.',
-    cancel: true,
+    cancel: {
+      label: 'Avbryt',
+      color: 'primary',
+      flat: true,
+    },
+    ok: {
+      label: 'Ja, ta bort',
+      color: 'primary',
+      unelevated: true,
+    },
     persistent: true,
-  }).onOk(async () => {
-    try {
-      await authStore.signOut();
-      $q.notify({
-        type: 'info',
-        message: 'Kontakta support för att ta bort ditt konto.',
-      });
-      router.push('/');
-    } catch (error) {
-      console.error('Delete account error:', error);
-    }
+  }).onOk(() => {
+    void (async () => {
+      const success = await authStore.deleteUser();
+      if (success) {
+        $q.notify({
+          message: 'Ditt konto har tagits bort',
+          color: 'primary',
+          position: 'bottom',
+        });
+        authStore.signOut();
+        void router.replace('/');
+      } else {
+        $q.notify({
+          message: 'Ditt konto kunde inte tas bort',
+          color: 'negative',
+          position: 'bottom',
+        });
+      }
+    })();
   });
 };
-
-onMounted(async () => {
-  if (user.value) {
-    await settingsStore.loadSettings(user.value.id);
-  }
-});
 </script>

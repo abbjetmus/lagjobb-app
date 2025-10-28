@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md bg-grey-2 row justify-center">
+  <q-page class="q-pa-md row justify-center page-background-pattern">
     <div style="max-width: 800px; width: 100%;">
       <div class="text-h5 q-mb-md">{{ isEdit ? 'Uppdatera uppdrag' : 'Skapa nytt uppdrag' }}</div>
       <q-form v-if="job" @submit.prevent="onSubmit" ref="form">
@@ -253,7 +253,7 @@ const { r$ } = useRegle({
   contactHoursFrom: computed(() => contactHoursFrom.value || ''),
   contactHoursTo: computed(() => contactHoursTo.value || ''),
 }, rules, {
-  silent: true
+  silent: false
 });
 
 // Initialize options
@@ -382,46 +382,21 @@ const onSubmit = async () => {
 
   loading.value = true;
   try {
-    // Process images
-    const formData = new FormData();
-
-    // Add job data
-    Object.entries(job.value!).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        formData.append(key, value.toString());
-      }
-    });
-
-    // Add images
-    jobImages.value.forEach((attachment) => {
-      if (attachment.fileAction === FileAction.Add && attachment.file) {
-        formData.append('images', attachment.file);
-      }
-    });
-
     let success = false;
+
     if (isEdit.value) {
-      formData.append('id', job.value!.id);
-      success = await jobsStore.updateJob(formData);
-      if (success) {
-        $q.notify({
-          type: 'positive',
-          message: 'Uppdraget har uppdaterats!',
-        });
-        await router.push('/mina-uppdrag');
-      }
+      success = await jobsStore.updateJob(job.value!, jobImages.value);
     } else {
-      success = await jobsStore.createJob(formData);
-      if (success) {
-        $q.notify({
-          type: 'positive',
-          message: 'Uppdraget har skapats!',
-        });
-        await router.push('/mina-uppdrag');
-      }
+      success = await jobsStore.createJob(job.value!, jobImages.value);
     }
 
-    if (!success) {
+    if (success) {
+      $q.notify({
+        type: 'positive',
+        message: isEdit.value ? 'Uppdraget har uppdaterats!' : 'Uppdraget har skapats!',
+      });
+      await router.push('/mina-uppdrag');
+    } else {
       $q.notify({
         type: 'negative',
         message: 'Ett fel uppstod. Försök igen.',

@@ -184,6 +184,17 @@ export const useAuth = defineStore('auth-module', {
         return false;
       })
     },
+    async updateUserPhone(phone: string): Promise<boolean> {
+      return pb.collection(Collections.Users).update(this.authModel!.id, {
+        phone: phone
+      }).then(() => {
+        this.currentUser!.phone = phone
+        return true
+      }).catch((error) => {
+        console.error("Error updating user phone:", error);
+        return false;
+      })
+    },
     async updateUserPassword(data: { oldPassword: string, password: string, passwordConfirm: string }): Promise<boolean> {
       return pb.collection(Collections.Users).update(this.authModel!.id, {
         oldPassword: data.oldPassword,

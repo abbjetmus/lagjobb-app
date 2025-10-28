@@ -28,11 +28,11 @@
         </q-item-section>
       </q-item>
 
-      <q-item clickable v-close-popup @click="goToLeafletMapTest">
+      <!-- <q-item clickable v-close-popup @click="goToLeafletMapTest">
         <q-item-section>
           <q-item-label>Leaflet Map Test</q-item-label>
         </q-item-section>
-      </q-item>
+      </q-item> -->
 
       <q-separator />
 
@@ -58,7 +58,7 @@ const authStore = useAuth();
 const { currentUser } = storeToRefs(authStore);
 
 const goToMyGroups = async () => {
-  await router.push('/mina-grupper-lista');
+  await router.push('/mina-grupper');
 };
 
 const goToMyUppdrag = async () => {
@@ -73,9 +73,9 @@ const goToSettings = async () => {
   await router.push('/installningar');
 };
 
-const goToLeafletMapTest = async () => {
-  await router.push('/leaflet-map-test');
-};
+// const goToLeafletMapTest = async () => {
+//   await router.push('/leaflet-map-test');
+// };
 
 const logout = async () => {
   authStore.signOut();

@@ -1,91 +1,88 @@
 <template>
-  <q-page class="q-pa-md">
-    <div v-if="loading" class="row justify-center q-pa-xl">
+  <q-page class="page-background-pattern">
+    <div v-if="loading" class="flex flex-center">
       <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="group">
-      <q-btn flat icon="arrow_back" label="Tillbaka" @click="router.back()" class="q-mb-md" />
+      <div v-if="!$q.platform.is.mobile" class="row items-center q-pa-md bg-primary q-gutter-md">
+        <q-btn unelevated color="secondary" text-color="primary" icon="edit" label="Redigera"
+          :to="`/redigera-grupp/${group.id}`" />
+        <q-btn unelevated color="secondary" text-color="primary" icon="more_vert">
+          <q-menu>
+            <q-list>
+              <q-item clickable v-close-popup @click="confirmDelete">
+                <q-item-section>Radera grupp</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+        <q-space />
+      </div>
 
-      <q-card>
-        <q-card-section>
-          <div class="row items-center">
-            <div class="text-h4">{{ group.name }}</div>
-            <q-chip v-if="group.verified" color="positive" text-color="white" class="q-ml-md">
-              Verifierad
-            </q-chip>
-          </div>
-        </q-card-section>
+      <div class="q-pa-md">
+        <group-details :group="group" />
+      </div>
 
-        <q-separator />
-
-        <q-card-section v-if="group.description">
-          <div class="text-h6 q-mb-sm">Beskrivning</div>
-          <div class="text-body1" style="white-space: pre-wrap">{{ group.description }}</div>
-        </q-card-section>
-
-        <q-card-section>
-          <div class="text-h6 q-mb-md">Åtgärder</div>
-          <q-btn color="primary" label="Redigera" :to="`/redigera-grupp/${group.id}`" class="q-mr-sm" />
-          <q-btn color="negative" label="Ta bort" @click="confirmDelete" outline />
-        </q-card-section>
-      </q-card>
+      <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">
+        <q-btn fab icon="edit" color="primary" :to="`/redigera-grupp/${group.id}`" />
+      </q-page-sticky>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import type { Group } from 'src/models/Group';
+import GroupDetails from './components/GroupDetails.vue';
+import { useGroups } from './groupsStore';
+import type { GroupsRecord } from 'app/pocketbase-types';
+import type { WithId } from 'src/models/withIdType';
 import { useQuasar } from 'quasar';
+import { Collections } from 'app/pocketbase-types';
+import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 
-const router = useRouter();
 const route = useRoute();
+const router = useRouter();
+const groupsStore = useGroups();
 const $q = useQuasar();
-
-const group = ref<Group | null>(null);
 const loading = ref(true);
+const group = ref<(WithId<GroupsRecord> & { expand?: GroupsExpand }) | null>(null);
 
-const loadGroup = async () => {
-  const id = route.params.id as string;
-  try {
-    group.value = await pb.collection('groups').getOne(id) as unknown as Group;
-  } catch (error) {
-    console.error('Load group error:', error);
-  } finally {
-    loading.value = false;
-  }
-};
+const groupId = computed(() => route.params.id as string);
 
 const confirmDelete = () => {
-  $q.dialog({
+  void $q.dialog({
     title: 'Bekräfta borttagning',
     message: 'Är du säker på att du vill ta bort denna grupp?',
     cancel: true,
     persistent: true,
-  }).onOk(async () => {
+  }).onOk(() => {
     if (!group.value) return;
 
-    try {
-      await pb.collection('groups').delete(group.value.id);
-      $q.notify({
-        type: 'positive',
-        message: 'Grupp borttagen!',
-      });
-      router.push('/mina-grupper-lista');
-    } catch (error) {
-      console.error('Delete error:', error);
-      $q.notify({
-        type: 'negative',
-        message: 'Kunde inte ta bort grupp.',
-      });
-    }
+    void (async () => {
+      try {
+        await groupsStore.deleteGroup(group.value!.id);
+        $q.notify({
+          type: 'positive',
+          message: 'Grupp borttagen!',
+        });
+        void router.push('/mina-grupper-lista');
+      } catch (error) {
+        console.error('Delete error:', error);
+        $q.notify({
+          type: 'negative',
+          message: 'Kunde inte ta bort grupp.',
+        });
+      }
+    })();
   });
 };
 
-onMounted(() => {
-  loadGroup();
+onMounted(async () => {
+  const id = groupId.value;
+  group.value = await pb.collection(Collections.Groups).getOne(id, { expand: 'city,createdBy' }) as unknown as WithId<GroupsRecord, GroupsExpand>;
+  loading.value = false;
 });
 </script>

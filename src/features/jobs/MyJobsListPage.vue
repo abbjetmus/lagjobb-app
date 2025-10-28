@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md page-background-pattern">
     <div class="text-h4 q-mb-md">Mina uppdrag</div>
 
     <div v-if="loading" class="row justify-center q-pa-xl">

@@ -1,80 +1,167 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="text-h4 q-mb-md">Alla grupper</div>
+  <q-page class="page-background-pattern">
+    <div class="bg-image">
+      <div class="search-container q-pa-sm">
+        <div class="text-grey-3">
+          <div class="text-center text-h5 text-md-h4 q-my-md">
+            Registrerade lag, klasser och föreningar
+          </div>
 
-    <q-tabs v-model="activeTab" dense class="text-grey q-mb-md" active-color="secondary" indicator-color="secondary"
-      align="left">
-      <q-tab name="all" label="Alla" />
-      <q-tab name="1" label="Lag" />
-      <q-tab name="2" label="Klasser" />
-      <q-tab name="3" label="Föreningar" />
-      <q-tab name="4" label="Organisationer" />
-    </q-tabs>
+          <div class="row">
+            <q-select ref="cityRef" style="min-width: 300px;" v-model="selectedCities" :options="filterCityOptions"
+              use-chips use-input multiple outlined @filter="filterCityFn" input-debounce="0" hide-dropdown-icon
+              label="Välj orter..." bg-color="secondary" option-label="title" option-value="id" emit-value map-options
+              class="col-xs-12 col-md q-mt-sm q-mb-xs" square>
+              <template v-slot:prepend>
+                <q-icon name="mdi-map-marker" />
+              </template>
+
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps">
+                  <q-item-section>
+                    <q-item-label>{{ scope.opt.title }}</q-item-label>
+                    <q-item-label caption>{{ scope.opt.county }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+
+            <q-select style="min-width: 300px;" v-model="selectedGroupTypes" :options="groupTypeOptions" use-chips
+              multiple outlined label="Välj grupptyp..." bg-color="secondary" option-label="label" option-value="value"
+              emit-value map-options class="col-xs-12 col-md q-mt-sm q-mb-xs" square>
+              <template v-slot:prepend>
+                <q-icon name="group" />
+              </template>
+            </q-select>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div v-if="loading" class="row justify-center q-pa-xl">
       <q-spinner color="secondary" size="3em" />
     </div>
 
-    <div v-else-if="groups.length === 0" class="text-center q-pa-xl">
-      <q-icon name="groups" size="5em" color="grey" />
-      <div class="text-h6 q-mt-md text-grey">Inga grupper hittades</div>
-    </div>
-
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="group in groups" :key="group.id" class="col-xs-12 col-sm-6 col-md-4">
-        <q-card @click="goToGroup(group.id)" class="cursor-pointer">
-          <q-card-section>
-            <div class="text-h6">{{ group.name }}</div>
-            <q-chip v-if="group.verified" color="positive" text-color="white" size="sm">
-              Verifierad
-            </q-chip>
-          </q-card-section>
-
-          <q-card-section v-if="group.description">
-            <div class="text-body2">{{ truncate(group.description, 100) }}</div>
-          </q-card-section>
-
-          <q-card-actions>
-            <q-btn flat color="secondary" label="Läs mer" />
-          </q-card-actions>
-        </q-card>
+    <div v-else-if="groups.length === 0" style="min-height: 50vh;">
+      <div class="text-center q-pa-xl">
+        <q-icon name="groups" size="5em" />
+        <div class="text-h6 q-mt-md text-grey">Inga grupper hittades</div>
       </div>
     </div>
+
+    <q-list v-else separator class="q-pa-md">
+      <group-list-item v-for="group in groups" :key="group.id" :group="group" :to="`/grupp/${group.id}`" />
+    </q-list>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { pb } from 'src/boot/pocketbase';
-import type { Group } from 'src/models/Group';
+import { Collections, GroupsGroupTypeOptions } from 'app/pocketbase-types';
+import type { WithId } from 'src/models/withIdType';
+import type { GroupsRecord } from 'app/pocketbase-types';
+import GroupListItem from './components/GroupListItem.vue';
+import { useJobs } from 'src/features/jobs/jobsStore';
+import { QSelect } from 'quasar';
 
-const router = useRouter();
 const route = useRoute();
+const jobsStore = useJobs();
 
-const groups = ref<Group[]>([]);
+const groups = ref<WithId<GroupsRecord>[]>([]);
 const loading = ref(true);
-const activeTab = ref('all');
+const selectedCities = ref<string[]>([]);
+const selectedGroupTypes = ref<GroupsGroupTypeOptions[]>([]);
+const cityRef = ref<QSelect | null>(null);
 
-const truncate = (text: string, length: number) => {
-  if (!text) return '';
-  return text.length > length ? text.substring(0, length) + '...' : text;
+const groupTypeOptions = [
+  { label: 'Lag', value: GroupsGroupTypeOptions.Lag },
+  { label: 'Klass', value: GroupsGroupTypeOptions.Klass },
+  { label: 'Förening', value: GroupsGroupTypeOptions['Förening'] },
+  { label: 'Organisation', value: GroupsGroupTypeOptions.Organisation },
+];
+
+const allCities = computed(() => {
+  const citiesMap = new Map<string, { id: string; title: string; county: string }>();
+
+  jobsStore.counties.forEach(county => {
+    county.expand?.cities_via_county?.forEach(city => {
+      if (!citiesMap.has(city.title)) {
+        citiesMap.set(city.title, {
+          id: city.id,
+          title: city.title,
+          county: county.title
+        });
+      }
+    });
+  });
+
+  return Array.from(citiesMap.values()).sort((a, b) => {
+    if (a.county !== b.county) {
+      return a.county.localeCompare(b.county);
+    }
+    return a.title.localeCompare(b.title);
+  });
+});
+
+const filterCityOptions = ref<Array<{ id: string; title: string; county: string }>>([]);
+
+watch(allCities, (cities) => {
+  filterCityOptions.value = cities;
+}, { immediate: true });
+
+watch([selectedCities, selectedGroupTypes], () => {
+  void loadGroups();
+}, { deep: true });
+
+watch(() => route.query.groupType, (groupType) => {
+  if (groupType && typeof groupType === 'string') {
+    const groupTypeValue = groupTypeOptions.find(opt => opt.label === groupType);
+    if (groupTypeValue && !selectedGroupTypes.value.includes(groupTypeValue.value)) {
+      selectedGroupTypes.value = [groupTypeValue.value];
+    }
+  } else if (!groupType) {
+    selectedGroupTypes.value = [];
+  }
+});
+
+const filterCityFn = (val: string, update: (fn: () => void) => void) => {
+  update(() => {
+    if (val === '') {
+      filterCityOptions.value = allCities.value;
+    } else {
+      const needle = val.toLowerCase();
+      filterCityOptions.value = allCities.value.filter(city =>
+        city.title.toLowerCase().includes(needle)
+      );
+    }
+  });
 };
 
 const loadGroups = async () => {
   loading.value = true;
   try {
-    let filter = '';
-    if (activeTab.value !== 'all') {
-      filter = `groupTypeId=${activeTab.value}`;
+    const filters: string[] = [];
+
+    if (selectedCities.value.length > 0) {
+      const cityFilter = selectedCities.value.map(cityId => `city="${cityId}"`).join(' || ');
+      filters.push(`(${cityFilter})`);
     }
 
-    const records = await pb.collection('groups').getList(1, 50, {
-      filter: filter || undefined,
+    if (selectedGroupTypes.value.length > 0) {
+      const groupTypeFilter = selectedGroupTypes.value.map(type => `groupType="${type}"`).join(' || ');
+      filters.push(`(${groupTypeFilter})`);
+    }
+
+    const filter = filters.length > 0 ? filters.join(' && ') : undefined;
+
+    const records = await pb.collection(Collections.Groups).getList(1, 50, {
+      ...(filter && { filter }),
       sort: '-created',
     });
 
-    groups.value = records.items as unknown as Group[];
+    groups.value = records.items as unknown as WithId<GroupsRecord>[];
   } catch (error) {
     console.error('Load groups error:', error);
   } finally {
@@ -82,18 +169,36 @@ const loadGroups = async () => {
   }
 };
 
-const goToGroup = (id: string) => {
-  router.push(`/grupp/${id}`);
-};
-
-watch(activeTab, () => {
-  loadGroups();
-});
-
-onMounted(() => {
-  if (route.params.groupTypeId) {
-    activeTab.value = route.params.groupTypeId as string;
+onMounted(async () => {
+  if (jobsStore.counties.length === 0) {
+    await jobsStore.getAllCounties();
   }
-  loadGroups();
+
+  const groupTypeFromQuery = route.query.groupType;
+  if (groupTypeFromQuery && typeof groupTypeFromQuery === 'string') {
+    const groupTypeValue = groupTypeOptions.find(opt => opt.label === groupTypeFromQuery);
+    if (groupTypeValue) {
+      selectedGroupTypes.value = [groupTypeValue.value];
+    }
+  } else {
+    void loadGroups();
+  }
 });
 </script>
+
+<style scoped>
+.bg-image {
+  background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
+  background-size: cover;
+  height: 200px;
+  overflow: hidden;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("../../assets/soccer-team.jpg");
+}
+
+.search-container {
+  max-width: 1000px !important;
+  height: 200px;
+  margin: 0 auto;
+}
+</style>

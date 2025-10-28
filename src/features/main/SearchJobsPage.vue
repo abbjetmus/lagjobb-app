@@ -1,8 +1,8 @@
 <template>
-  <q-page class="bg-grey-3">
+  <q-page class="page-background-pattern">
     <div class="bg-image">
       <div class="search-container  q-pa-sm">
-        <div class="text-grey-3">
+        <div class="text-grey-2">
           <div class="row items-center">
             <div class="col-xs-0 col-1"></div>
             <div class="col-xs-12 col-10">
@@ -13,9 +13,9 @@
               <div class="row">
                 <q-select ref="jobsRef" style="min-width: 300px;" v-model="selectedSubcategories"
                   :options="filterJobsOptions" use-chips use-input multiple outlined @filter="filterJobsFn"
-                  input-debounce="0" hide-dropdown-icon label="Sök eller ange uppdragstyper..." bg-color="grey-3"
-                  option-label="title" option-value="id" emit-value map-options
-                  class="bg-white col-xs-12 col-md q-mt-sm q-mb-xs" square>
+                  input-debounce="0" hide-dropdown-icon label="Välj uppdragstyper..." bg-color="secondary"
+                  option-label="title" option-value="id" emit-value map-options class="col-xs-12 col-md q-mt-sm q-mb-xs"
+                  square>
                   <template v-slot:prepend>
                     <q-icon name="mdi-briefcase" />
                   </template>
@@ -32,8 +32,8 @@
 
                 <q-select ref="cityRef" style="min-width: 300px;" v-model="selectedCities" :options="filterCityOptions"
                   use-chips use-input multiple outlined @filter="filterCityFn" input-debounce="0" hide-dropdown-icon
-                  label="Sök eller ange orter..." bg-color="grey-3" option-label="title" option-value="id" emit-value
-                  map-options class="bg-white col-xs-12 col-md q-mt-sm q-mb-xs" square>
+                  label="Välj orter..." bg-color="secondary" option-label="title" option-value="id" emit-value
+                  map-options class="col-xs-12 col-md q-mt-sm q-mb-xs" square>
                   <template v-slot:prepend>
                     <q-icon name="mdi-map-marker" />
                   </template>
@@ -48,11 +48,12 @@
                   </template>
                 </q-select>
 
-                <q-btn color="primary" icon="search" @click="searchUppdrag" class="col-12 col-md-1 q-mt-sm q-mb-xs"
-                  square />
+                <q-btn unelevated color="primary" icon="search" @click="searchUppdrag"
+                  class="col-12 col-md-1 q-mt-sm q-mb-xs" square />
 
                 <q-btn label="visa alla" color="primary" unelevated @click="clearFilters"
-                  class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px;" square />
+                  class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px; margin-left: 1px;"
+                  square />
               </div>
             </div>
           </div>
@@ -64,16 +65,21 @@
       <q-spinner color="primary" size="3em" />
     </div>
 
-    <div v-else-if="uppdrag.length === 0" class="bg-grey-2" style="min-height: 50vh;">
+    <div v-else-if="uppdrag.length === 0" style="min-height: 50vh;">
       <div class="text-center q-pa-xl">
         <q-icon name="search" size="5em" color="grey" />
         <div class="text-h6 q-mt-md text-grey">Inga uppdrag hittades</div>
       </div>
     </div>
 
-    <q-list v-else separator class="bg-grey-3 q-pa-md">
-      <job-list-item class="bg-white" v-for="item in uppdrag" :key="item.id" :job="item" @click="goToUppdrag(item)" />
+    <q-list v-else separator class="q-pa-md">
+      <job-list-item v-for="item in uppdrag" :key="item.id" :job="item" @click="goToUppdrag(item)" />
     </q-list>
+
+    <div v-if="!loading && uppdrag.length > 0" class="q-pa-lg flex flex-center">
+      <q-pagination v-model="current" :max="totalPages" direction-links boundary-links icon-first="skip_previous"
+        icon-last="skip_next" icon-prev="fast_rewind" icon-next="fast_forward" />
+    </div>
   </q-page>
 </template>
 
@@ -85,13 +91,14 @@ import { useJobs } from 'src/features/jobs/jobsStore';
 import JobListItem from 'src/features/jobs/components/JobListItem.vue';
 import type { WithId } from 'src/models/withIdType';
 import type { JobsRecord, UsersRecord } from 'app/pocketbase-types';
-import { QSelect } from 'quasar';
+import { useQuasar, QSelect } from 'quasar';
 import { useAuth } from 'src/stores/auth';
 import { storeToRefs } from 'pinia';
 const router = useRouter();
 const route = useRoute();
 const jobsStore = useJobs();
 const authStore = useAuth();
+const $q = useQuasar();
 const { currentUser } = storeToRefs(authStore);
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);
@@ -99,6 +106,9 @@ const uppdrag = ref<WithId<JobsRecord>[]>([]);
 const loading = ref(false);
 const selectedSubcategories = ref<string[]>([]);
 const selectedCities = ref<string[]>([]);
+const current = ref(1);
+const totalPages = ref(1);
+const perPage = 50;
 
 const allCities = computed(() => {
   const citiesMap = new Map<string, { id: string; title: string; county: string }>();

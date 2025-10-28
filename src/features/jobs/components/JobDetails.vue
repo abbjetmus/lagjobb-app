@@ -1,7 +1,7 @@
 <template>
   <div class="row q-col-gutter-md">
     <div class="col-xs-12 col-md-8">
-      <q-card flat>
+      <q-card flat class="bg-transparent">
         <q-card-section>
           <div class="text-h4">{{ job.title }}</div>
           <div class="text-caption text-grey q-mt-sm">
@@ -9,7 +9,7 @@
           </div>
         </q-card-section>
 
-        <q-separator />
+        <!-- <q-separator /> -->
 
         <q-card-section>
           <div class="text-h6 q-mb-sm">Beskrivning</div>
@@ -48,7 +48,7 @@
     </div>
 
     <div class="column col-xs-12 col-md-4 q-gutter-md">
-      <q-card class="col-auto" flat>
+      <q-card class="col-auto bg-transparent" flat>
         <q-card-section>
           <div class="text-h6 q-mb-sm">Kontakt</div>
           <div class="q-mb-sm">
@@ -65,13 +65,17 @@
           </div>
         </q-card-section>
 
-        <q-card-actions v-if="authStore.isAuthenticated">
+        <q-card-actions v-if="authStore.isAuthenticated && isUppdragsutforare">
           <q-btn unelevated color="green-6" label="Skicka förfrågan" @click="showSendInterestDialog"
-            class="full-width" />
+            :disable="!hasGroups" class="full-width" />
         </q-card-actions>
+        <div v-if="authStore.isAuthenticated && isUppdragsutforare && !hasGroups"
+          class="text-caption text-grey q-px-md q-pb-md text-center">
+          Du måste ha skapat en grupp (lag, klass, förening, etc.) för att kunna skicka förfrågan.
+        </div>
       </q-card>
 
-      <q-card flat class="col">
+      <q-card flat class="col bg-transparent">
         <q-card-section>
           <div class="text-h6">Plats</div>
           <div>{{ job.street }}, {{ job.zipcode }} {{ job.expand?.city?.title }}</div>
@@ -84,10 +88,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import { useAuth } from 'src/stores/auth';
 import type { JobsRecord } from 'app/pocketbase-types';
+import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import { useQuasar } from 'quasar';
 import type { WithId } from 'src/models/withIdType';
 import type { JobsExpand } from 'app/expanded-pocketbase-types';
@@ -95,25 +100,44 @@ import ImageGallery from 'src/components/ImageGallery.vue';
 import LeafletMap from 'src/components/LeafletMap.vue';
 import { formatDateTime } from 'src/utils/dateUtils';
 import SendInterestDialog from './SendInterestDialog.vue';
+import { useGroups } from 'src/features/groups/groupsStore';
+import type { GroupsRecord } from 'app/pocketbase-types';
 
 const authStore = useAuth();
+const groupsStore = useGroups();
 const $q = useQuasar();
 
 const props = defineProps<{
   job: WithId<JobsRecord> & { expand?: JobsExpand };
 }>();
 
+const userGroups = ref<WithId<GroupsRecord>[]>([]);
+
 const imageUrls = computed(() => {
   if (!props.job.images || props.job.images.length === 0) return [];
   return props.job.images.map(imageName => pb.files.getURL(props.job, imageName));
 });
+
+const isUppdragsutforare = computed(() =>
+  authStore.currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare
+);
+
+const hasGroups = computed(() => userGroups.value.length > 0);
 
 const showSendInterestDialog = () => {
   $q.dialog({
     component: SendInterestDialog,
     componentProps: {
       job: props.job,
+      groups: userGroups.value,
     },
   });
 };
+
+onMounted(async () => {
+  if (authStore.isAuthenticated && isUppdragsutforare.value) {
+    await groupsStore.getMyGroups();
+    userGroups.value = groupsStore.myGroups;
+  }
+});
 </script>

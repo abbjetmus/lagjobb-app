@@ -1,21 +1,21 @@
 <template>
   <div>
     <div class="bg-image">
-      <q-page class="flex flex-center q-pa-sm">
-        <div class="text-grey-3">
+      <q-page class="flex flex-center q-pa-sm" style="border-bottom: 2px solid var(--q-primary)">
+        <div>
           <div class="row items-center">
             <div class="col-xs-0 col-1"></div>
             <div class="col-xs-12 col-10">
-              <p class="text-center text-h5 text-md-h4">
+              <p class="text-center text-h5 text-md-h4 text-white">
                 Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar
               </p>
-              <p class="text-center text-subtitle1 text-sm-h5">Sök bland tusentals intressanta uppdrag</p>
+              <p class="text-center text-subtitle1 text-sm-h5 text-white">Sök bland tusentals intressanta uppdrag</p>
 
               <div class="row">
                 <q-select ref="jobsRef" v-model="selectedSubcategories" :options="filterJobsOptions" use-chips use-input
                   multiple outlined @filter="filterJobsFn" input-debounce="0" hide-dropdown-icon
-                  label="Sök eller ange uppdragstyper..." bg-color="grey-3" option-label="title" option-value="id"
-                  emit-value map-options class="shadow-1 col-xs-12 col-md q-mt-sm q-mb-xs" square>
+                  label="Välj uppdragstyper..." bg-color="secondary" option-label="title" option-value="id" emit-value
+                  map-options class="col-xs-12 col-md q-mt-sm q-mb-xs" square>
                   <template v-slot:prepend>
                     <q-icon name="mdi-briefcase" />
                   </template>
@@ -31,9 +31,9 @@
                 </q-select>
 
                 <q-select ref="cityRef" v-model="selectedCities" :options="filterCityOptions" use-chips use-input
-                  multiple outlined @filter="filterCityFn" input-debounce="0" hide-dropdown-icon
-                  label="Sök eller ange orter..." bg-color="grey-3" option-label="title" option-value="id" emit-value
-                  map-options class="shadow-1 col-xs-12 col-md q-mt-sm q-mb-xs" square>
+                  multiple outlined @filter="filterCityFn" input-debounce="0" hide-dropdown-icon label="Välj orter..."
+                  bg-color="secondary" option-label="title" option-value="id" emit-value map-options
+                  class="col-xs-12 col-md q-mt-sm q-mb-xs" square>
                   <template v-slot:prepend>
                     <q-icon name="mdi-map-marker" />
                   </template>
@@ -48,10 +48,11 @@
                   </template>
                 </q-select>
 
-                <q-btn color="primary" icon="search" @click="search()" class="col-12 col-md-1 q-mt-sm q-mb-xs" square />
-
-                <q-btn label="visa alla uppdrag" color="primary" @click="searchAll()"
-                  class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px;" square />
+                <q-btn unelevated color="primary" icon="search" @click="search()"
+                  class="col-12 col-md-1 q-mt-sm q-mb-xs" square />
+                <q-btn st unelevated label="visa alla uppdrag" color="primary" @click="searchAll()"
+                  class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px; margin-left: 1px;"
+                  square />
               </div>
             </div>
             <div class="col-xs-0 col-1"></div>
@@ -60,28 +61,29 @@
       </q-page>
     </div>
 
-    <div class="bg-grey-2 text-center q-py-xl q-px-md">
-      <span class="text-grey-9 block text-h5 text-md-h4">
+    <div class="text-center q-py-xl q-px-md bg-grey-2">
+      <span class="block text-h5 text-md-h4">
         250 registrerade lag, klasser och föreningar redo att hjälpa dig
       </span>
-      <span class="text-center text-grey-7 block q-mb-xl text-subtitle1 text-sm-h5">
+      <span class="text-center block q-mb-xl text-subtitle1 text-sm-h5">
         Klicka på kategori för ett se vilka de är
       </span>
       <div class="row justify-center">
         <div class="col-xs-12 col-md-8 col-lg-6 row justify-around q-gutter-md">
           <q-btn unelevated style="width: 140px;" label="Lag" color="primary"
-            :to="{ name: 'AllaLag', params: { groupTypeId: 1 } }" square />
+            :to="{ path: '/grupper', query: { groupType: 'Lag' } }" square />
           <q-btn unelevated style="width: 140px;" label="Klasser" color="primary"
-            :to="{ name: 'AllaLag', params: { groupTypeId: 2 } }" square />
+            :to="{ path: '/grupper', query: { groupType: 'Klass' } }" square />
           <q-btn unelevated style="width: 140px;" label="Föreningar" color="primary"
-            :to="{ name: 'AllaLag', params: { groupTypeId: 3 } }" square />
+            :to="{ path: '/grupper', query: { groupType: 'Förening' } }" square />
           <q-btn unelevated style="width: 140px;" label="Organisationer" color="primary"
-            :to="{ name: 'AllaLag', params: { groupTypeId: 4 } }" square />
+            :to="{ path: '/grupper', query: { groupType: 'Organisation' } }" square />
         </div>
       </div>
     </div>
 
-    <q-footer class="bg-secondary text-primary q-pa-lg" style="border-top: 2px solid var(--q-primary)">
+    <q-footer :dark="$q.dark.isActive" class="bg-secondary text-primary q-pa-lg"
+      style="border-top: 2px solid var(--q-primary)">
       <footer-component />
     </q-footer>
   </div>
@@ -91,11 +93,12 @@
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useJobs } from 'src/features/jobs/jobsStore';
-import { QSelect } from 'quasar';
+import { useQuasar, QSelect } from 'quasar';
 import FooterComponent from 'src/components/FooterComponent.vue';
 
 const router = useRouter();
 const jobsStore = useJobs();
+const $q = useQuasar();
 
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);
@@ -217,7 +220,6 @@ const filterJobsFn = (val: string, update: (fn: () => void) => void) => {
 .bg-image {
   background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
   background-size: cover;
-  height: 80vh;
   min-height: 500px;
   overflow: hidden;
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),

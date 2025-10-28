@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { pb } from 'src/boot/pocketbase'
-import type { CountiesRecord, JobCategoriesRecord } from 'app/pocketbase-types';
+import type { CountiesRecord, InterestRequestsRecord, JobCategoriesRecord } from 'app/pocketbase-types';
 import { Collections, type JobsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import type { CountiesExpand, JobCategoriesExpand, JobsExpand } from 'app/expanded-pocketbase-types';
 import { useAuth } from 'src/stores/auth';
+import type { Attachment } from 'src/models/attachment';
+import { FileAction } from 'src/models/enums';
 
 interface JobsState {
   jobs: WithId<JobsRecord>[],
@@ -45,8 +47,12 @@ export const useJobs = defineStore('jobs-module', {
         return true
       })
     },
-    async createJob(job: JobsRecord | FormData): Promise<boolean> {
-      return pb.collection(Collections.Jobs).create(job).then(res => {
+    async createJob(job: JobsRecord, images: Attachment[]): Promise<boolean> {
+      const jobToCreate = {
+        ...job,
+        'images': images.filter(a => a.fileAction === FileAction.Add).map(a => a.file),
+      }
+      return pb.collection(Collections.Jobs).create(jobToCreate).then(res => {
         this.jobs = [...this.jobs, res as unknown as WithId<JobsRecord>]
         return true
       })
@@ -59,10 +65,14 @@ export const useJobs = defineStore('jobs-module', {
         return null
       })
     },
-    async updateJob(job: JobsRecord | FormData): Promise<boolean> {
-      const jobId = job instanceof FormData ? job.get('id') as string : job.id;
-      return pb.collection(Collections.Jobs).update(jobId, job).then(res => {
-        this.jobs = this.jobs.map(j => j.id === jobId ? res as unknown as WithId<JobsRecord> : j)
+    async updateJob(job: JobsRecord, images: Attachment[]): Promise<boolean> {
+      const jobToUpdate = {
+        ...job,
+        'images-': images.filter(a => a.fileAction === FileAction.Delete).map(a => a.name),
+        'images+': images.filter(a => a.fileAction === FileAction.Add).map(a => a.file),
+      }
+      return pb.collection(Collections.Jobs).update(job.id, jobToUpdate).then(res => {
+        this.jobs = this.jobs.map(j => j.id === job.id ? res as unknown as WithId<JobsRecord> : j)
         return true
       })
     },
@@ -98,5 +108,13 @@ export const useJobs = defineStore('jobs-module', {
         return false
       })
     },
+    async sendInterestRequest(interestRequest: InterestRequestsRecord): Promise<boolean> {
+      return pb.collection(Collections.InterestRequests).create(interestRequest).then(() => {
+        return true
+      }).catch(e => {
+        console.error('Send interest request error:', e)
+        return false
+      })
+    }
   }
 })

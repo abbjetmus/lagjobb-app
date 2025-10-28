@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md page-background-pattern">
     <div class="row justify-center">
       <div class="col-xs-12 col-md-10 col-lg-8">
         <div class="text-h4 q-mb-md">Annonsera</div>

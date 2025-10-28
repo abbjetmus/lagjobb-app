@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md bg-grey-3">
+  <q-page class="q-pa-md page-background-pattern">
     <div v-if="loading" class="flex flex-center">
       <q-spinner color="secondary" size="3em" />
     </div>
