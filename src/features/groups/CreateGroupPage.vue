@@ -206,7 +206,7 @@ onBeforeMount(async () => {
         type: 'negative',
         message: 'Kunde inte ladda grupp.',
       });
-      void router.push('/mina-grupper-lista');
+      void router.push('/mina-grupper');
     }
   }
   initialLoading.value = false;

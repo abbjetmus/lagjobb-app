@@ -6,9 +6,20 @@
       </q-card-section>
 
       <q-card-section>
-        <q-select v-model="selectedGroupId" :options="groupOptions" label="Välj grupp" outlined class="q-mb-md"
-          emit-value map-options :rules="[val => !!val || 'Du måste välja en grupp']" ref="groupSelectRef" />
-        <q-input v-model="interestMessage" type="textarea" label="Meddelande" outlined rows="5" />
+        <q-select bg-color="secondary" v-model="selectedGroupId" :options="groupOptions" label="Välj grupp" outlined
+          class="q-mb-md" emit-value map-options :rules="[val => !!val || 'Du måste välja en grupp']"
+          ref="groupSelectRef" no-error-icon>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
+                <q-item-label caption>{{ scope.opt.caption }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <q-input bg-color="secondary" v-model="interestMessage" type="textarea" label="Meddelande" outlined rows="5"
+          no-error-icon />
       </q-card-section>
 
       <q-card-actions class="row justify-between q-pa-md">
@@ -28,7 +39,7 @@ import { useJobs } from 'src/features/jobs/jobsStore';
 import { useAuth } from 'src/stores/auth';
 import { InterestRequestsStatusOptions, type JobsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
-import type { GroupsRecord } from 'app/pocketbase-types';
+import type { GroupsRecord, InterestRequestsRecord } from 'app/pocketbase-types';
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 const jobsStore = useJobs();
@@ -45,7 +56,11 @@ const selectedGroupId = ref<string>('');
 const sendingInterest = ref(false);
 
 const groupOptions = computed(() =>
-  props.groups.map(group => ({ label: group.name, value: group.id }))
+  props.groups.map(group => ({
+    label: group.groupName,
+    value: group.id,
+    caption: group.groupType
+  }))
 );
 
 const cancel = () => {
@@ -56,31 +71,30 @@ const sendInterest = async () => {
   if (!props.job || !authStore.currentUser || !selectedGroupId.value) return;
 
   sendingInterest.value = true;
-  try {
-    await jobsStore.sendInterestRequest({
-      job: props.job.id as string,
-      requestMessage: interestMessage.value,
-      group: selectedGroupId.value,
-      id: '',
-      status: InterestRequestsStatusOptions.Förfrågan,
-    });
+  const success = await jobsStore.sendInterestRequest({
+    id: '',
+    job: props.job.id,
+    requestMessage: interestMessage.value,
+    group: selectedGroupId.value,
+    status: InterestRequestsStatusOptions.Förfrågan
+  } as InterestRequestsRecord);
 
+  if (!success) {
+    $q.notify({
+      type: 'negative',
+      message: 'Kunde inte skicka förfrågan.',
+    });
+  }
+  else {
     $q.notify({
       type: 'positive',
-      message: 'Ditt intresse har skickats!',
+      message: 'Förfrågan har skickats!',
     });
 
     onDialogOK();
     interestMessage.value = '';
     selectedGroupId.value = '';
-  } catch (error) {
-    console.error('Send interest error:', error);
-    $q.notify({
-      type: 'negative',
-      message: 'Kunde inte skicka meddelande.',
-    });
-  } finally {
-    sendingInterest.value = false;
   }
+
 };
 </script>

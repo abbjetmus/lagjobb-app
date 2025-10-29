@@ -22,7 +22,7 @@ import type { WithId } from 'src/models/withIdType';
 const route = useRoute();
 const jobsStore = useJobs();
 const loading = ref(true);
-const job = ref<WithId<JobsRecord> & { expand?: JobsExpand } | null>(null);
+const job = ref<WithId<JobsRecord, JobsExpand> | null>(null);
 
 const jobId = computed(() => route.params.id as string);
 

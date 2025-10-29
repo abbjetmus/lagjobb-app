@@ -4,7 +4,6 @@
       <q-toolbar :dark="$q.dark.isActive" class="row justify-around">
         <q-toolbar-title class="col-auto">
           <router-link to="/" class="text-primary row items-center no-wrap" style="text-decoration: none; gap: 8px;">
-
             <span>Lag <q-avatar size="32px">
                 <img src="../assets/team.svg" />
               </q-avatar> Jobb</span>

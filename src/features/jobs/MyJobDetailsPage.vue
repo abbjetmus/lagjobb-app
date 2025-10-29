@@ -1,5 +1,12 @@
 <template>
-  <q-page class="q-pa-md page-background-pattern">
+  <q-page class="page-background-pattern">
+
+    <div v-if="!$q.platform.is.mobile" class="row items-center q-pa-sm bg-primary">
+      <q-btn unelevated color="secondary" text-color="primary" icon="question_answer" label="Förfrågan"
+        :to="`/interest-requests?jobId=${jobId}`" />
+      <q-space />
+    </div>
+
     <div v-if="loading" class="flex flex-center">
       <q-spinner color="secondary" size="3em" />
     </div>

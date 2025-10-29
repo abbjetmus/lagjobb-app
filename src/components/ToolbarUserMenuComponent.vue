@@ -9,16 +9,16 @@
       </q-item>
 
       <q-item v-if="currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
-        v-close-popup @click="goToMyUppdrag">
+        v-close-popup @click="goToMyJobs">
         <q-item-section>
           <q-item-label>Mina uppdrag</q-item-label>
         </q-item-section>
       </q-item>
 
       <q-item v-if="currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsgivare" clickable v-close-popup
-        @click="goToJobbUppdrag">
+        @click="goToCreatedJobs">
         <q-item-section>
-          <q-item-label>Mina uppdrag</q-item-label>
+          <q-item-label>Skapade uppdrag</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -61,12 +61,12 @@ const goToMyGroups = async () => {
   await router.push('/mina-grupper');
 };
 
-const goToMyUppdrag = async () => {
-  await router.push('/skapade-uppdrag');
+const goToMyJobs = async () => {
+  await router.push('/mina-uppdrag');
 };
 
-const goToJobbUppdrag = async () => {
-  await router.push('/jobb-uppdrag');
+const goToCreatedJobs = async () => {
+  await router.push('/skapade-uppdrag');
 };
 
 const goToSettings = async () => {

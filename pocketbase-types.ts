@@ -15,6 +15,7 @@ export enum Collections {
 	Counties = "counties",
 	Groups = "groups",
 	InterestRequests = "interestRequests",
+	InterestRequestsJobsView = "interestRequestsJobsView",
 	JobCategories = "jobCategories",
 	JobSubcategories = "jobSubcategories",
 	Jobs = "jobs",
@@ -23,7 +24,9 @@ export enum Collections {
 
 // Alias types for improved usability
 export type IsoDateString = string
+export type IsoAutoDateString = string & { readonly autodate: unique symbol }
 export type RecordIdString = string
+export type FileNameString = string & { readonly filename: unique symbol }
 export type HTMLString = string
 
 type ExpandType<T> = unknown extends T
@@ -50,71 +53,71 @@ export type AuthSystemFields<T = unknown> = {
 
 export type AuthoriginsRecord = {
 	collectionRef: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	fingerprint: string
 	id: string
 	recordRef: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export type ExternalauthsRecord = {
 	collectionRef: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	provider: string
 	providerId: string
 	recordRef: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export type MfasRecord = {
 	collectionRef: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	method: string
 	recordRef: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export type OtpsRecord = {
 	collectionRef: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	password: string
 	recordRef: string
 	sentTo?: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export type SuperusersRecord = {
-	created?: IsoDateString
+	created: IsoAutoDateString
 	email: string
 	emailVisibility?: boolean
 	id: string
 	password: string
 	tokenKey: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 	verified?: boolean
 }
 
 export type CitiesRecord = {
 	county: RecordIdString
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	latitude: number
 	longitude: number
 	name: string
 	title: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export type CountiesRecord = {
 	color: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	name: string
 	title: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export enum GroupsGroupTypeOptions {
@@ -125,7 +128,7 @@ export enum GroupsGroupTypeOptions {
 }
 export type GroupsRecord = {
 	city: RecordIdString
-	created?: IsoDateString
+	created: IsoAutoDateString
 	createdBy: RecordIdString
 	description?: string
 	groupCategoryName?: string
@@ -133,10 +136,10 @@ export type GroupsRecord = {
 	groupSubcategoryName?: string
 	groupType: GroupsGroupTypeOptions
 	id: string
-	image?: string
+	image?: FileNameString
 	jobs?: RecordIdString
 	sectionName?: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 	verified?: boolean
 }
 
@@ -150,7 +153,7 @@ export enum InterestRequestsStatusOptions {
 export type InterestRequestsRecord = {
 	approvedAt?: IsoDateString
 	completedAt?: IsoDateString
-	created?: IsoDateString
+	created: IsoAutoDateString
 	doneAt?: IsoDateString
 	group: RecordIdString
 	id: string
@@ -160,25 +163,55 @@ export type InterestRequestsRecord = {
 	responseAt?: IsoDateString
 	responseMessage?: string
 	status: InterestRequestsStatusOptions
-	updated?: IsoDateString
+	updated: IsoAutoDateString
+}
+
+export enum InterestRequestsJobsViewStatusOptions {
+	"Granskning" = "Granskning",
+	"Godkänd" = "Godkänd",
+	"Publicerad" = "Publicerad",
+	"Genomförd" = "Genomförd",
+}
+export type InterestRequestsJobsViewRecord = {
+	assignedGroup?: RecordIdString
+	city: RecordIdString
+	contactHours?: string
+	created: IsoAutoDateString
+	createdBy?: RecordIdString
+	description?: string
+	desiredAt?: IsoDateString
+	desiredNumberOfPeople?: number
+	estimatedHours?: number
+	groupCreatedBy: RecordIdString
+	hidePhone?: boolean
+	id: string
+	jobSubcategories?: RecordIdString[]
+	latitude?: number
+	longitude?: number
+	price?: number
+	status?: InterestRequestsJobsViewStatusOptions
+	street: string
+	title?: string
+	updated: IsoAutoDateString
+	zipcode?: string
 }
 
 export type JobCategoriesRecord = {
 	color: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	name: string
 	title: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export type JobSubcategoriesRecord = {
 	category: RecordIdString
-	created?: IsoDateString
+	created: IsoAutoDateString
 	id: string
 	name: string
 	title: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 }
 
 export enum JobsStatusOptions {
@@ -191,7 +224,7 @@ export type JobsRecord = {
 	assignedGroup?: RecordIdString
 	city: RecordIdString
 	contactHours?: string
-	created?: IsoDateString
+	created: IsoAutoDateString
 	createdBy?: RecordIdString
 	description?: string
 	desiredAt?: IsoDateString
@@ -199,7 +232,7 @@ export type JobsRecord = {
 	estimatedHours?: number
 	hidePhone?: boolean
 	id: string
-	images?: string[]
+	images?: FileNameString[]
 	jobSubcategories?: RecordIdString[]
 	latitude?: number
 	longitude?: number
@@ -207,7 +240,7 @@ export type JobsRecord = {
 	status?: JobsStatusOptions
 	street: string
 	title?: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 	zipcode?: string
 }
 
@@ -216,8 +249,8 @@ export enum UsersUserAccountTypeOptions {
 	"Uppdragsutförare" = "Uppdragsutförare",
 }
 export type UsersRecord = {
-	avatar?: string
-	created?: IsoDateString
+	avatar?: FileNameString
+	created: IsoAutoDateString
 	email: string
 	emailVisibility?: boolean
 	id: string
@@ -225,7 +258,7 @@ export type UsersRecord = {
 	password: string
 	phone?: string
 	tokenKey: string
-	updated?: IsoDateString
+	updated: IsoAutoDateString
 	userAccountType: UsersUserAccountTypeOptions
 	verified?: boolean
 }
@@ -240,6 +273,7 @@ export type CitiesResponse<Texpand = unknown> = Required<CitiesRecord> & BaseSys
 export type CountiesResponse<Texpand = unknown> = Required<CountiesRecord> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type InterestRequestsResponse<Texpand = unknown> = Required<InterestRequestsRecord> & BaseSystemFields<Texpand>
+export type InterestRequestsJobsViewResponse<Texpand = unknown> = Required<InterestRequestsJobsViewRecord> & BaseSystemFields<Texpand>
 export type JobCategoriesResponse<Texpand = unknown> = Required<JobCategoriesRecord> & BaseSystemFields<Texpand>
 export type JobSubcategoriesResponse<Texpand = unknown> = Required<JobSubcategoriesRecord> & BaseSystemFields<Texpand>
 export type JobsResponse<Texpand = unknown> = Required<JobsRecord> & BaseSystemFields<Texpand>
@@ -257,6 +291,7 @@ export type CollectionRecords = {
 	counties: CountiesRecord
 	groups: GroupsRecord
 	interestRequests: InterestRequestsRecord
+	interestRequestsJobsView: InterestRequestsJobsViewRecord
 	jobCategories: JobCategoriesRecord
 	jobSubcategories: JobSubcategoriesRecord
 	jobs: JobsRecord
@@ -273,27 +308,75 @@ export type CollectionResponses = {
 	counties: CountiesResponse
 	groups: GroupsResponse
 	interestRequests: InterestRequestsResponse
+	interestRequestsJobsView: InterestRequestsJobsViewResponse
 	jobCategories: JobCategoriesResponse
 	jobSubcategories: JobSubcategoriesResponse
 	jobs: JobsResponse
 	users: UsersResponse
 }
 
+// Utility types for create/update operations
+
+type ProcessCreateAndUpdateFields<T> = Omit<{
+	// Omit AutoDate fields
+	[K in keyof T as Extract<T[K], IsoAutoDateString> extends never ? K : never]: 
+		// Convert FileNameString to File
+		T[K] extends infer U ? 
+			U extends (FileNameString | FileNameString[]) ? 
+				U extends any[] ? File[] : File 
+			: U
+		: never
+}, 'id'>
+
+// Create type for Auth collections
+export type CreateAuth<T> = {
+	id?: RecordIdString
+	email: string
+	emailVisibility?: boolean
+	password: string
+	passwordConfirm: string
+	verified?: boolean
+} & ProcessCreateAndUpdateFields<T>
+
+// Create type for Base collections
+export type CreateBase<T> = {
+	id?: RecordIdString
+} & ProcessCreateAndUpdateFields<T>
+
+// Update type for Auth collections
+export type UpdateAuth<T> = Partial<
+	Omit<ProcessCreateAndUpdateFields<T>, keyof AuthSystemFields>
+> & {
+	email?: string
+	emailVisibility?: boolean
+	oldPassword?: string
+	password?: string
+	passwordConfirm?: string
+	verified?: boolean
+}
+
+// Update type for Base collections
+export type UpdateBase<T> = Partial<
+	Omit<ProcessCreateAndUpdateFields<T>, keyof BaseSystemFields>
+>
+
+// Get the correct create type for any collection
+export type Create<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? CreateAuth<CollectionRecords[T]>
+		: CreateBase<CollectionRecords[T]>
+
+// Get the correct update type for any collection
+export type Update<T extends keyof CollectionResponses> =
+	CollectionResponses[T] extends AuthSystemFields
+		? UpdateAuth<CollectionRecords[T]>
+		: UpdateBase<CollectionRecords[T]>
+
 // Type for usage with type asserted PocketBase instance
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
-export type TypedPocketBase = PocketBase & {
-	collection(idOrName: '_authOrigins'): RecordService<AuthoriginsResponse>
-	collection(idOrName: '_externalAuths'): RecordService<ExternalauthsResponse>
-	collection(idOrName: '_mfas'): RecordService<MfasResponse>
-	collection(idOrName: '_otps'): RecordService<OtpsResponse>
-	collection(idOrName: '_superusers'): RecordService<SuperusersResponse>
-	collection(idOrName: 'cities'): RecordService<CitiesResponse>
-	collection(idOrName: 'counties'): RecordService<CountiesResponse>
-	collection(idOrName: 'groups'): RecordService<GroupsResponse>
-	collection(idOrName: 'interestRequests'): RecordService<InterestRequestsResponse>
-	collection(idOrName: 'jobCategories'): RecordService<JobCategoriesResponse>
-	collection(idOrName: 'jobSubcategories'): RecordService<JobSubcategoriesResponse>
-	collection(idOrName: 'jobs'): RecordService<JobsResponse>
-	collection(idOrName: 'users'): RecordService<UsersResponse>
-}
+export type TypedPocketBase = {
+	collection<T extends keyof CollectionResponses>(
+		idOrName: T
+	): RecordService<CollectionResponses[T]>
+} & PocketBase

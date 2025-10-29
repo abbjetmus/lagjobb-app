@@ -34,6 +34,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/skapa-grupp', component: () => import('src/features/groups/CreateGroupPage.vue'), meta: { requiresAuth: true } },
       { path: '/redigera-uppdrag/:id', component: () => import('src/features/jobs/CreateJobPage.vue'), meta: { requiresAuth: true } },
       { path: '/redigera-grupp/:id', component: () => import('src/features/groups/CreateGroupPage.vue'), meta: { requiresAuth: true } },
+      { path: '/interest-requests', component: () => import('src/features/interestRequests/InterestRequestPage.vue'), meta: { requiresAuth: true } },
       { path: '/leaflet-map-test', component: () => import('src/components/LeafletMapTest.vue'), meta: { requiresAuth: false } },
     ]
   },
