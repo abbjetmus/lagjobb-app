@@ -73,22 +73,45 @@ export const useAuth = defineStore('auth-module', {
           userAccountType: user.userAccountType,
         } as unknown as UsersRecord
 
-        return pb.collection(Collections.Users).create(data).then(() => {
-          return this.signIn(user.email, user.password);
-        });
+        await pb.collection(Collections.Users).create(data);
+
+        await pb.collection(Collections.Users).requestVerification(user.email);
+
+        return true;
       } catch (error) {
         console.error("Sign-up error:", error);
         return false;
       }
     },
     async signIn(emailUsername: string, password: string): Promise<boolean> {
-      return pb.collection(Collections.Users).authWithPassword(emailUsername, password).then(() => {
+      return pb.collection(Collections.Users).authWithPassword(emailUsername, password).then((authData) => {
+        // Check if user is verified
+        if (!authData.record.verified) {
+          this.signOut();
+          throw new Error("Email not verified");
+        }
         return true
       })
         .catch((error) => {
           console.error("Sign-in error:", error);
-          return false;
+          throw error;
         });
+    },
+    async requestVerification(email: string): Promise<boolean> {
+      return pb.collection(Collections.Users).requestVerification(email).then(() => {
+        return true;
+      }).catch((error) => {
+        console.error("Request verification error:", error);
+        return false;
+      });
+    },
+    async confirmVerification(token: string): Promise<boolean> {
+      return pb.collection(Collections.Users).confirmVerification(token).then(() => {
+        return true;
+      }).catch((error) => {
+        console.error("Confirm verification error:", error);
+        return false;
+      });
     },
     async signInWithPhone(phoneNumber: string, idToken: string): Promise<boolean> {
       try {

@@ -33,7 +33,7 @@
         <q-slide-transition appear>
           <div v-if="isApproved" v-show="step > 1">
             <span class="block">Du kan nu hålla kontakt med {{ groupName }} på numret {{ groupPhone
-              }}.</span>
+            }}.</span>
             <span class="block" v-if="step === 2">
               Klick på knappen utfört när uppdraget är utfört.
             </span>
@@ -46,7 +46,7 @@
         class="gt-sm-step-icon">
         <q-slide-transition appear>
           <div v-show="step > 2">
-            <span class="block">Du kan nu godkänna betalningen.</span>
+            <span class="block">När du har betalat för uppdraget kan du klicka på knappen betala.</span>
             <q-btn v-show="step === 3" color="green" label="Betala" @click="pay" no-caps unelevated />
           </div>
         </q-slide-transition>
@@ -56,8 +56,8 @@
         <q-slide-transition appear>
           <div v-show="step > 3">
             <div v-show="step === 4">
-              <span class="block">Lämna gärna omdöme på utförda arbetet</span>
-              <q-rating class="block q-mb-sm" v-model="rating" max="5" size="2em" color="yellow" icon="star_border"
+              <span class="block">Lämna gärna omdöme på utförda arbetet med stjärnorna och en kommentar.</span>
+              <q-rating class="q-mb-sm" v-model="rating" max="5" size="2em" color="yellow" icon="star_border"
                 icon-selected="star" icon-half="star_half" no-dimming />
               <q-chat-message sent size="12">
                 <q-input type="textarea" v-model="reviewMessage" dense borderless no-error-icon hide-bottom-space
@@ -68,7 +68,7 @@
               :stamp="formatDateTime(new Date(interestRequest.doneAt || interestRequest.updated))">
               <div>
                 <span class="block">{{ reviewMessage }}</span>
-                <q-rating class="block q-mb-sm" v-model="rating" max="5" size="1.6em" color="yellow" icon="star_border"
+                <q-rating class="q-mb-sm" v-model="rating" max="5" size="1.6em" color="yellow" icon="star_border"
                   icon-selected="star" icon-half="star_half" no-dimming readonly />
               </div>
             </q-chat-message>
@@ -90,6 +90,7 @@ import { formatDateTime } from 'src/utils/dateUtils';
 import type { WithId } from 'src/models/withIdType';
 import { useQuasar } from 'quasar';
 import { pb } from 'src/boot/pocketbase';
+import GroupDetailsDialog from 'src/features/groups/components/GroupDetailsDialog.vue';
 
 interface Props {
   interestRequestId: string;
@@ -244,10 +245,11 @@ const done = async () => {
 };
 
 const showGroupDialog = () => {
+  if (!interestRequest.value?.expand?.group) return;
   $q.dialog({
-    component: () => import('src/features/groups/components/GroupDetails.vue'),
+    component: GroupDetailsDialog,
     componentProps: {
-      group: interestRequest.value?.expand?.group,
+      group: interestRequest.value.expand.group,
     },
   });
 };

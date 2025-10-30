@@ -14,11 +14,23 @@
 
         <div class="col" style="max-width: 500px; width: 100%">
           <div style="width: 100%" class="row justify-center">
-            <q-form ref="registerForm" @submit.prevent="onRegister" class="q-mt-md" greedy
+            <div v-if="showSuccess" class="column items-center q-gutter-y-md" style="max-width: 500px; width: 100%">
+              <q-icon name="email" color="primary" size="5em" />
+              <p class="text-h6 text-center">Verifieringslänk skickad!</p>
+              <p class="text-body2 text-center">Vi har skickat en verifieringslänk till din e-postadress.</p>
+              <p class="text-body2 text-center">Klicka på länken i e-postmeddelandet för att aktivera ditt konto.</p>
+              <div class="column q-gutter-y-sm full-width">
+                <q-btn color="secondary" label="Skicka länken igen" no-caps unelevated class="full-width"
+                  :loading="resending" @click="resendVerification" />
+                <q-btn color="primary" label="Gå till startsidan" no-caps unelevated class="full-width" to="/" />
+              </div>
+            </div>
+
+            <q-form v-else ref="registerForm" @submit.prevent="onRegister" class="q-mt-md" greedy
               style="max-width: 500px; width: 100%">
               <span v-if="authError" class="block text-center text-red">{{
                 authErrorMessage
-                }}</span>
+              }}</span>
 
               <div class="column q-gutter-y-lg">
                 <span v-if="!validInputs" class="text-red text-center">Ett fel uppstod vid registrering. Kontrollera
@@ -76,17 +88,15 @@
 
 <script setup lang="ts">
 import { QForm } from 'quasar';
-import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { useAuth } from 'src/features/auth/authStore';
 import { useRegle } from '@regle/core';
 import { required, email as emailRule, minLength, sameAs } from '@regle/rules';
-import { useQuasar } from 'quasar';
 import type { UsersRecord } from 'app/pocketbase-types';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
+import { useQuasar } from 'quasar';
 
 const authStore = useAuth();
-const router = useRouter();
 const $q = useQuasar();
 
 // Form fields
@@ -107,6 +117,9 @@ const loading = ref(false);
 const validInputs = ref(true);
 const authError = ref(false);
 const authErrorMessage = ref('');
+const showSuccess = ref(false);
+const resending = ref(false);
+const userEmail = ref('');
 
 const rules = {
   name: {
@@ -158,11 +171,8 @@ const onRegister = async () => {
 
       const success = await authStore.signUp(userData as UsersRecord);
       if (success) {
-        $q.notify({
-          type: 'positive',
-          message: 'Konto skapat! Du är nu inloggad.',
-        });
-        await router.replace('/');
+        showSuccess.value = true;
+        userEmail.value = email.value;
       } else {
         validInputs.value = false;
         authError.value = true;
@@ -176,10 +186,30 @@ const onRegister = async () => {
     loading.value = false;
   }
 };
+
+const resendVerification = async () => {
+  resending.value = true;
+  try {
+    const success = await authStore.requestVerification(userEmail.value);
+    if (success) {
+      $q.notify({
+        type: 'positive',
+        message: 'Verifieringslänk har skickats igen!',
+      });
+    } else {
+      $q.notify({
+        type: 'negative',
+        message: 'Kunde inte skicka verifieringslänk. Försök igen senare.',
+      });
+    }
+  } catch {
+    $q.notify({
+      type: 'negative',
+      message: 'Ett fel uppstod vid skickande av verifieringslänk.',
+    });
+  }
+  resending.value = false;
+};
 </script>
 
-<style scoped>
-.background-turquoise-dark {
-  background: linear-gradient(135deg, #26a69a 0%, #00695c 100%);
-}
-</style>
+<style scoped></style>

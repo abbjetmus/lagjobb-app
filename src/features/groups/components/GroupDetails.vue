@@ -46,7 +46,7 @@
         <q-card-section>
           <div class="text-h6 q-mb-sm">Information</div>
           <div v-if="group.expand?.city" class="q-mb-sm">
-            <q-icon name="location_on" /> Stad: {{ group.expand.city.name }}
+            <q-icon name="location_on" /> Stad: {{ group.expand.city.title }}
           </div>
           <div v-if="group.expand?.createdBy" class="q-mb-sm">
             <q-icon name="person" /> Skapad av: {{ group.expand.createdBy.name }}

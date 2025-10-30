@@ -119,7 +119,11 @@ const onSubmit = async () => {
       error.value = 'Felaktiga inloggningsuppgifter. Kontrollera dina uppgifter och försök igen.';
     }
   } catch (err: unknown) {
-    error.value = 'Ett fel uppstod. Kontrollera dina uppgifter och försök igen.';
+    if (err instanceof Error && err.message === 'Email not verified') {
+      error.value = 'E-post inte verifierad. Kontrollera din e-post för verifieringslänk.';
+    } else {
+      error.value = 'Ett fel uppstod. Kontrollera dina uppgifter och försök igen.';
+    }
     console.error(err);
   } finally {
     loading.value = false;

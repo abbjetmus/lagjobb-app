@@ -7,11 +7,19 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('src/features/main/IndexPage.vue'), meta: { requiresAuth: false } },
       {
-        path: 'glomt-losenord', component: () => import('src/features/auth/ForgotPasswordPage.vue'),
+        path: 'auth/forgot-password', component: () => import('src/features/auth/ForgotPasswordPage.vue'),
       },
       {
         path: 'register',
         component: () => import('src/features/auth/RegisterPage.vue'),
+      },
+      {
+        path: 'auth/confirm-verification/:token',
+        component: () => import('src/features/auth/EmailVerificationPage.vue'),
+      },
+      {
+        path: 'auth/confirm-password-reset/:token',
+        component: () => import('src/features/auth/ResetPasswordPage.vue'),
       },
       { name: 'search', path: '/sok-uppdrag', component: () => import('src/features/main/SearchJobsPage.vue'), meta: { requiresAuth: false } },
       { path: '/uppdrag/:id', component: () => import('src/features/jobs/JobDetailsPage.vue'), meta: { requiresAuth: false } },

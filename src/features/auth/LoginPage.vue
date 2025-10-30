@@ -1,18 +1,18 @@
 <template>
-  <q-page class="column background-turquoise-dark">
+  <q-page class="column page-background-pattern">
     <div class="col flex justify-center items-center">
       <div class="column items-center full-width full-height q-pa-md">
         <div class="col flex flex-center">
           <div class="column items-center">
             <!-- <img src="~assets/logo_256.png" width="120" /> -->
-            <p class="text-primary text-h4">
+            <div class="text-primary text-h4">
               <span class="text-weight-bold">Lagjobb</span>
-            </p>
+            </div>
           </div>
         </div>
 
         <div class="col" style="max-width: 500px; width: 100%">
-          <q-tabs v-model="activeTab" class="text-white" active-color="white" indicator-color="white">
+          <q-tabs v-model="activeTab" class="text-primary" active-color="primary" indicator-color="primary">
             <q-tab name="signin" label="Logga in" />
             <q-tab name="signup" label="Registrera" />
           </q-tabs>
@@ -25,18 +25,35 @@
                   style="max-width: 500px; width: 100%">
                   <span v-if="authError" class="block text-center text-red">{{
                     authErrorMessage
-                    }}</span>
+                  }}</span>
 
-                  <div class="column q-gutter-y-sm">
+                  <div v-if="showNotVerified" class="column q-gutter-y-md">
+                    <q-banner class="bg-negative text-white" rounded>
+                      <template v-slot:avatar>
+                        <q-icon name="warning" />
+                      </template>
+                      <div class="text-subtitle1 q-mb-sm">E-post inte verifierad</div>
+                      <div class="text-body2 q-mb-md">
+                        Du behöver verifiera din e-postadress innan du kan logga in.
+                      </div>
+                      <div class="row q-gutter-x-sm">
+                        <q-btn flat label="Skicka verifieringslänk igen" color="white" :loading="resending"
+                          @click="resendVerification" />
+                      </div>
+                    </q-banner>
+                    <q-btn flat color="grey-7" label="Tillbaka till inloggning" @click="showNotVerified = false" />
+                  </div>
+
+                  <div v-else class="column q-gutter-y-lg">
                     <span v-if="!validInputs" class="text-red text-center">E-post eller användarnamn eller lösenord
                       matchar
                       inget
                       konto</span>
-                    <q-input no-error-icon v-model="emailUsername" bg-color="white" class="q-pa-none" outlined square
-                      :error="r$.emailUsername.$errors.length > 0" :error-message="r$.emailUsername.$errors[0]"
+                    <q-input no-error-icon v-model="emailUsername" bg-color="secondary" class="q-pa-none" outlined
+                      square :error="r$.emailUsername.$errors.length > 0" :error-message="r$.emailUsername.$errors[0]"
                       placeholder="E-post eller användarnamn" />
 
-                    <q-input no-error-icon v-model="password" bg-color="white" class="q-pa-none" outlined square
+                    <q-input no-error-icon v-model="password" bg-color="secondary" class="q-pa-none" outlined square
                       :type="isPassword ? 'password' : 'text'" :error="r$.password.$errors.length > 0"
                       :error-message="r$.password.$errors[0]" placeholder="Lösenord">
                       <template v-slot:append>
@@ -46,14 +63,14 @@
                     </q-input>
 
                     <div class="q-mt-sm row justify-between">
-                      <q-btn type="submit" color="secondary" label="Logga in" no-caps unelevated class="full-width"
+                      <q-btn type="submit" color="primary" label="Logga in" no-caps unelevated class="full-width"
                         :loading="loading" square />
                     </div>
                   </div>
 
-                  <div class="row justify-between q-mt-lg">
+                  <div v-if="!showNotVerified" class="row justify-between q-mt-lg">
                     <div></div>
-                    <q-btn @click="forgotPassword()" flat color="white">Glömt lösenord?</q-btn>
+                    <q-btn @click="forgotPassword()" flat color="grey-7">Glömt lösenord?</q-btn>
                   </div>
                 </q-form>
               </div>
@@ -66,34 +83,36 @@
                   style="max-width: 500px; width: 100%">
                   <span v-if="authError" class="block text-center text-red">{{
                     authErrorMessage
-                    }}</span>
+                  }}</span>
 
-                  <div class="column q-gutter-y-sm">
+                  <div class="column q-gutter-y-lg">
                     <span v-if="!validInputs" class="text-red text-center">E-post eller användarnamn eller lösenord
                       matchar
                       inget
                       konto</span>
 
-                    <q-input no-error-icon v-model="signUpName" bg-color="white" class="q-pa-none" outlined square
+                    <q-input no-error-icon v-model="signUpName" bg-color="secondary" class="q-pa-none" outlined square
                       :error="r$.signUpName.$errors.length > 0" :error-message="r$.signUpName.$errors[0]"
                       placeholder="Namn" />
 
-                    <q-input no-error-icon v-model="signUpEmail" bg-color="white" class="q-pa-none" outlined square
+                    <q-input no-error-icon v-model="signUpEmail" bg-color="secondary" class="q-pa-none" outlined square
                       :error="r$.signUpEmail.$errors.length > 0" :error-message="r$.signUpEmail.$errors[0]"
                       placeholder="E-post" />
 
-                    <q-input no-error-icon v-model="signUpPassword" bg-color="white" class="q-pa-none" outlined square
-                      :type="isSignUpPassword ? 'password' : 'text'" :error="r$.signUpPassword.$errors.length > 0"
-                      :error-message="r$.signUpPassword.$errors[0]" placeholder="Lösenord">
+                    <q-input no-error-icon v-model="signUpPassword" bg-color="secondary" class="q-pa-none" outlined
+                      square :type="isSignUpPassword ? 'password' : 'text'"
+                      :error="r$.signUpPassword.$errors.length > 0" :error-message="r$.signUpPassword.$errors[0]"
+                      placeholder="Lösenord">
                       <template v-slot:append>
                         <q-icon @click="isSignUpPassword = !isSignUpPassword"
                           :name="isSignUpPassword ? 'visibility_off' : 'visibility'"></q-icon>
                       </template>
                     </q-input>
 
-                    <q-input no-error-icon v-model="confirmPassword" bg-color="white" class="q-pa-none" outlined square
-                      :type="isConfirmPassword ? 'password' : 'text'" :error="r$.confirmPassword.$errors.length > 0"
-                      :error-message="r$.confirmPassword.$errors[0]" placeholder="Bekräfta lösenord">
+                    <q-input no-error-icon v-model="confirmPassword" bg-color="secondary" class="q-pa-none" outlined
+                      square :type="isConfirmPassword ? 'password' : 'text'"
+                      :error="r$.confirmPassword.$errors.length > 0" :error-message="r$.confirmPassword.$errors[0]"
+                      placeholder="Bekräfta lösenord">
                       <template v-slot:append>
                         <q-icon @click="isConfirmPassword = !isConfirmPassword"
                           :name="isConfirmPassword ? 'visibility_off' : 'visibility'"></q-icon>
@@ -101,7 +120,7 @@
                     </q-input>
 
                     <div class="q-mt-sm row justify-between">
-                      <q-btn type="submit" color="secondary" label="Registrera" no-caps unelevated class="full-width"
+                      <q-btn type="submit" color="primary" label="Registrera" no-caps unelevated class="full-width"
                         :loading="loading" square />
                     </div>
                   </div>
@@ -122,9 +141,12 @@ import { ref, computed, watch } from 'vue';
 import { useAuth } from 'src/features/auth/authStore';
 import { useRegle } from '@regle/core';
 import { required, email, minLength, sameAs } from '@regle/rules';
+import { useQuasar } from 'quasar';
+import type { UsersRecord } from 'app/pocketbase-types';
 
 const authStore = useAuth();
 const router = useRouter();
+const $q = useQuasar();
 
 // Tab management
 const activeTab = ref('signin');
@@ -147,6 +169,8 @@ const loading = ref(false);
 const validInputs = ref(true);
 const authError = ref(false);
 const authErrorMessage = ref('');
+const showNotVerified = ref(false);
+const resending = ref(false);
 
 // Add watcher for activeTab
 watch(activeTab, (newValue) => {
@@ -218,7 +242,11 @@ const onSignIn = async () => {
     } catch (error) {
       validInputs.value = false;
       authError.value = true;
-      authErrorMessage.value = 'Ett fel uppstod vid inloggning.';
+      if (error instanceof Error && error.message === 'Email not verified') {
+        showNotVerified.value = true;
+      } else {
+        authErrorMessage.value = 'Ett fel uppstod vid inloggning.';
+      }
     }
     loading.value = false;
   }
@@ -235,7 +263,9 @@ const onSignUp = async () => {
         name: signUpName.value,
         email: signUpEmail.value,
         password: signUpPassword.value,
-      } as any;
+        phone: '',
+        userAccountType: '',
+      } as unknown as UsersRecord;
 
       const success = await authStore.signUp(userData);
       if (success) {
@@ -245,7 +275,7 @@ const onSignUp = async () => {
         authError.value = true;
         authErrorMessage.value = 'Registrering misslyckades. Kontrollera dina uppgifter.';
       }
-    } catch (error) {
+    } catch {
       validInputs.value = false;
       authError.value = true;
       authErrorMessage.value = 'Ett fel uppstod vid registrering.';
@@ -257,10 +287,31 @@ const onSignUp = async () => {
 const forgotPassword = async () => {
   await router.push('/auth/forgot-password');
 };
+
+const resendVerification = async () => {
+  resending.value = true;
+  try {
+    const success = await authStore.requestVerification(emailUsername.value);
+    if (success) {
+      $q.notify({
+        type: 'positive',
+        message: 'Verifieringslänk har skickats igen!',
+      });
+      showNotVerified.value = false;
+    } else {
+      $q.notify({
+        type: 'negative',
+        message: 'Kunde inte skicka verifieringslänk. Försök igen senare.',
+      });
+    }
+  } catch {
+    $q.notify({
+      type: 'negative',
+      message: 'Ett fel uppstod vid skickande av verifieringslänk.',
+    });
+  }
+  resending.value = false;
+};
 </script>
 
-<style scoped>
-.background-turquoise-dark {
-  background: linear-gradient(135deg, #26a69a 0%, #00695c 100%);
-}
-</style>
+<style scoped></style>
