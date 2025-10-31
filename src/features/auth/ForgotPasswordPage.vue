@@ -1,8 +1,8 @@
 <template>
   <q-page class="column page-background-pattern">
     <div class="col flex justify-center items-center">
-      <div class="column items-center full-width full-height q-pa-md">
-        <div class="col flex flex-center">
+      <div class="column items-center full-width q-pa-md">
+        <div class="flex flex-center q-mb-md">
           <div class="column items-center">
             <div class="text-primary text-h4">
               <span class="text-weight-bold">Lagjobb</span>
@@ -11,7 +11,7 @@
           </div>
         </div>
 
-        <div class="col" style="max-width: 500px; width: 100%">
+        <div style="max-width: 500px; width: 100%">
           <div style="width: 100%" class="row justify-center">
             <div v-if="showSuccess" class="column items-center q-gutter-y-md" style="max-width: 500px; width: 100%">
               <q-icon name="email" color="primary" size="5em" />

@@ -1,14 +1,15 @@
 <template>
-  <q-dialog ref="dialogRef" padding>
-    <q-card class="row no-wrap" style="min-width: 600px; max-width: 800px">
+  <q-dialog ref="dialogRef" :maximized="$q.screen.lt.md" :padding="!$q.screen.lt.md">
+    <q-card class="row" :class="$q.screen.lt.md ? 'full-width full-height' : 'no-wrap'"
+      :style="$q.screen.lt.md ? 'border-radius: 4px;' : 'min-width: 600px; max-width: 800px; border-radius: 4px;'">
       <!-- Image section -->
-      <div class="col-4">
-        <img src="src/assets/apples.jpg" alt="Apples" class="full-height full-width"
+      <div class="col-4 gt-sm">
+        <img :src="applesImage" alt="Apples" class="full-height full-width"
           style="object-fit: cover; border-radius: 4px 0 0 4px;" />
       </div>
 
       <!-- Form section -->
-      <div class="col-8">
+      <div :class="$q.screen.lt.md ? 'col-12' : 'col-8'">
         <q-card-section class="bg-primary text-white shadow-0">
           <div class="text-h6 text-center">Inloggning</div>
         </q-card-section>
@@ -54,6 +55,7 @@ import { useRouter } from 'vue-router';
 import { useRegle } from '@regle/core';
 import { required, email as emailRule } from '@regle/rules';
 import { useDialogPluginComponent } from 'quasar';
+import applesImage from 'src/assets/apples.jpg';
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
