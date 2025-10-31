@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "dockerfileLines": [
+    "FROM socialengine/nginx-spa:latest",
+    "COPY ./dist/spa /app",
+    "RUN if [ -d /app/well-known ]; then mv /app/well-known /app/.well-known; fi",
+    "RUN chmod -R 777 /app"
+  ]
+}

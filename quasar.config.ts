@@ -2,6 +2,11 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+import dotenv from 'dotenv';
+
+const env = dotenv.config({
+  path: `.env.${process.env.ENV_FILE}`,
+}).parsed;
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -44,6 +49,13 @@ export default defineConfig((/* ctx */) => {
 
       env: {
         PB_URL: process.env.PB_URL || 'http://localhost:8090',
+        APP_DESCRIPTION: process.env.APP_DESCRIPTION || 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig!',
+      },
+
+      // Variables injected into index.html (see <%= %> tokens there)
+      htmlVariables: {
+        productName: 'Lagjobb',
+        productDescription: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig!'
       },
       // ignorePublicFolder: true,
       // minify: false,
