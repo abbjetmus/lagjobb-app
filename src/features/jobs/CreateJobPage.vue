@@ -2,7 +2,7 @@
   <q-page class="q-pa-md row justify-center page-background-pattern">
     <div style="max-width: 800px; width: 100%;">
       <div class="text-h5 q-mb-md">{{ isEdit ? 'Uppdatera uppdrag' : 'Skapa nytt uppdrag' }}</div>
-      <q-form v-if="job" @submit.prevent="onSubmit" ref="form">
+      <q-form @submit.prevent="onSubmit" ref="form">
 
         <div class="text-h6 q-mb-md">Uppdragsinformation</div>
 
@@ -89,7 +89,7 @@
           :error="r$.zipcode.$error" error-message="Postnummer är obligatoriskt" />
 
         <div class="text-h6 q-mt-md">Bilder</div>
-        <image-picker v-model:images="jobImages" collection-name="jobs" :collection-item-id="job?.id" />
+        <image-picker v-model:images="jobImages" collection-name="jobs" :collection-item-id="job.id" />
 
 
         <div align="left" class="row justify-between q-mt-lg">
@@ -125,7 +125,21 @@ const $q = useQuasar();
 
 const loading = ref(false);
 const initialLoading = ref(true);
-const job = ref<JobsRecord | null>(null);
+const job = ref<JobsRecord>({
+  createdBy: '',
+  title: '',
+  description: '',
+  price: undefined,
+  desiredAt: '',
+  desiredNumberOfPeople: undefined,
+  estimatedHours: undefined,
+  jobSubcategories: [],
+  contactHours: '',
+  hidePhone: false,
+  street: '',
+  city: '',
+  zipcode: '',
+} as unknown as JobsRecord);
 
 // City selection
 const filterCityOptions = ref<Array<{ id: string; title: string; county: string }>>([]);
@@ -240,21 +254,21 @@ const rules = computed(() => ({
 }));
 
 const { r$ } = useRegle({
-  title: computed(() => job.value?.title || ''),
-  description: computed(() => job.value?.description || ''),
-  price: computed(() => job.value?.price),
-  desiredAt: computed(() => job.value?.desiredAt || ''),
-  desiredNumberOfPeople: computed(() => job.value?.desiredNumberOfPeople),
-  estimatedHours: computed(() => job.value?.estimatedHours),
-  street: computed(() => job.value?.street || ''),
-  zipcode: computed(() => job.value?.zipcode || ''),
-  hidePhone: computed(() => job.value?.hidePhone || false),
-  city: computed(() => job.value?.city || ''),
-  jobSubcategories: computed(() => job.value?.jobSubcategories || []),
+  title: computed(() => job.value.title || ''),
+  description: computed(() => job.value.description || ''),
+  price: computed(() => job.value.price),
+  desiredAt: computed(() => job.value.desiredAt || ''),
+  desiredNumberOfPeople: computed(() => job.value.desiredNumberOfPeople),
+  estimatedHours: computed(() => job.value.estimatedHours),
+  street: computed(() => job.value.street || ''),
+  zipcode: computed(() => job.value.zipcode || ''),
+  hidePhone: computed(() => job.value.hidePhone || false),
+  city: computed(() => job.value.city || ''),
+  jobSubcategories: computed(() => job.value.jobSubcategories || []),
   contactHoursFrom: computed(() => contactHoursFrom.value || ''),
   contactHoursTo: computed(() => contactHoursTo.value || ''),
 }, rules, {
-  silent: false
+  silent: true
 });
 
 // Initialize options
@@ -264,6 +278,12 @@ watch(allCities, (cities) => {
 
 watch(allJobSubcategories, (subcategories) => {
   filterJobSubcategoryOptions.value = subcategories;
+}, { immediate: true });
+
+watch(() => authStore.currentUser, (user) => {
+  if (user && !job.value.createdBy) {
+    job.value.createdBy = user.id;
+  }
 }, { immediate: true });
 
 // Contact hours validation
@@ -290,9 +310,9 @@ watch([contactHoursFrom, contactHoursTo], () => {
   validateContactHours();
   // Update job.contactHours with formatted string
   if (contactHoursFrom.value && contactHoursTo.value && validateContactHours()) {
-    job.value!.contactHours = `${contactHoursFrom.value} - ${contactHoursTo.value}`;
+    job.value.contactHours = `${contactHoursFrom.value} - ${contactHoursTo.value}`;
   } else if (!contactHoursFrom.value || !contactHoursTo.value) {
-    job.value!.contactHours = '';
+    job.value.contactHours = '';
   }
 });
 
@@ -354,22 +374,6 @@ onBeforeMount(async () => {
         }));
       }
     }
-  } else {
-    job.value = {
-      createdBy: authStore.currentUser?.id || '',
-      title: '',
-      description: '',
-      price: undefined,
-      desiredAt: '',
-      desiredNumberOfPeople: undefined,
-      estimatedHours: undefined,
-      jobSubcategories: [],
-      contactHours: '',
-      hidePhone: false,
-      street: '',
-      city: '',
-      zipcode: '',
-    } as unknown as JobsRecord;
   }
   initialLoading.value = false;
 });
@@ -386,9 +390,9 @@ const onSubmit = async () => {
     let success = false;
 
     if (isEdit.value) {
-      success = await jobsStore.updateJob(job.value!, jobImages.value);
+      success = await jobsStore.updateJob(job.value, jobImages.value);
     } else {
-      success = await jobsStore.createJob(job.value!, jobImages.value);
+      success = await jobsStore.createJob(job.value, jobImages.value);
     }
 
     if (success) {

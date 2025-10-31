@@ -1,71 +1,67 @@
 <template>
   <q-page class="q-pa-md page-background-pattern">
-    <div class="row">
-      <div class="col-xs-0 col-sm-1"></div>
-      <div class="col-xs-12 col-sm-10">
-        <div class="text-center q-my-lg">
-          <p class="text-primary text-h4">Användarvillkor och Integritetspolicy</p>
-          <p class="text-grey-7 text-h5">Vi skyddar din integritet och dina uppgifter</p>
+    <div class="row justify-center">
+      <div class="col-12" style="max-width: 800px;">
+        <div class="text-center">
+          <p class="text-primary text-h5">Användarvillkor och Integritetspolicy</p>
+          <p class="text-grey-7 text-h6">Vi skyddar din integritet och dina uppgifter</p>
         </div>
 
-        <div class="row justify-center">
-          <div style="max-width: 900px;">
-            <div class="text-h5 q-mb-md text-primary">Användarvillkor</div>
-            <p class="text-body1 q-mb-md">
-              Genom att använda Lagjobb.se accepterar du våra användarvillkor.
-              <b>Kom ihåg att plattformen är helt gratis att använda - ingen avgift alls.</b>
-            </p>
+        <div class="q-mt-lg">
+          <div class="text-h6 q-mb-md text-primary">Användarvillkor</div>
+          <p class="text-body1 q-mb-md">
+            Genom att använda Lagjobb.se accepterar du våra användarvillkor.
+            <b>Kom ihåg att plattformen är helt gratis att använda - ingen avgift alls.</b>
+          </p>
 
-            <div class="text-h6 q-mt-lg q-mb-sm text-primary">Användning av plattformen</div>
-            <p class="text-body1 q-mb-md">
-              Du är ansvarig för att all information du publicerar är korrekt. Vi förbehåller oss rätten att ta bort
-              innehåll som bryter mot våra regler eller är olagligt, samt att avsluta konton som missbrukar plattformen.
-            </p>
+          <div class="text-h6 q-mt-lg q-mb-sm text-primary">Användning av plattformen</div>
+          <p class="text-body1 q-mb-md">
+            Du är ansvarig för att all information du publicerar är korrekt. Vi förbehåller oss rätten att ta bort
+            innehåll som bryter mot våra regler eller är olagligt, samt att avsluta konton som missbrukar plattformen.
+          </p>
 
-            <div class="text-h6 q-mt-lg q-mb-sm text-primary">Betalningar</div>
-            <p class="text-body1 q-mb-md">
-              Alla betalningar sker direkt mellan uppdragsgivare och grupper. Lagjobb.se är bara en plattform för att
-              koppla ihop er - vi tar ingen del av betalningarna och tar inte ansvar för transaktionerna.
-              Vi rekommenderar att ni dokumenterar avtal skriftligt.
-            </p>
+          <div class="text-h6 q-mt-lg q-mb-sm text-primary">Betalningar</div>
+          <p class="text-body1 q-mb-md">
+            Alla betalningar sker direkt mellan uppdragsgivare och grupper. Lagjobb.se är bara en plattform för att
+            koppla ihop er - vi tar ingen del av betalningarna och tar inte ansvar för transaktionerna.
+            Vi rekommenderar att ni dokumenterar avtal skriftligt.
+          </p>
 
-            <div class="text-h6 q-mt-lg q-mb-sm text-primary">Integritetspolicy</div>
-            <p class="text-body1 q-mb-md">
-              Vi följer gällande dataskyddslagstiftning (GDPR) och skyddar dina personuppgifter.
-            </p>
+          <div class="text-h6 q-mt-lg q-mb-sm text-primary">Integritetspolicy</div>
+          <p class="text-body1 q-mb-md">
+            Vi följer gällande dataskyddslagstiftning (GDPR) och skyddar dina personuppgifter.
+          </p>
 
-            <p class="text-body1 q-mb-md">
-              Vi samlar bara in den information som behövs: namn, e-postadress, telefonnummer (valfritt) och plats.
-              Vi använder uppgifterna för att möjliggöra matchning mellan uppdrag och grupper, och för att kommunicera
-              med dig om din aktivitet på plattformen.
-            </p>
+          <p class="text-body1 q-mb-md">
+            Vi samlar bara in den information som behövs: namn, e-postadress, telefonnummer (valfritt) och plats.
+            Vi använder uppgifterna för att möjliggöra matchning mellan uppdrag och grupper, och för att kommunicera
+            med dig om din aktivitet på plattformen.
+          </p>
 
-            <p class="text-body1 q-mb-md">
-              Vi delar aldrig dina uppgifter med tredje part. Dina kontaktuppgifter delas endast när du visar intresse
-              för ett uppdrag eller publicerar ett uppdrag - och då bara med relevanta användare så att ni kan kontakta
-              varandra.
-            </p>
+          <p class="text-body1 q-mb-md">
+            Vi delar aldrig dina uppgifter med tredje part. Dina kontaktuppgifter delas endast när du visar intresse
+            för ett uppdrag eller publicerar ett uppdrag - och då bara med relevanta användare så att ni kan kontakta
+            varandra.
+          </p>
 
-            <div class="text-h6 q-mt-lg q-mb-sm text-primary">Dina rättigheter</div>
-            <p class="text-body1 q-mb-sm">
-              Enligt GDPR har du alltid rätt att:
-            </p>
-            <ul class="text-body1 q-mb-md">
-              <li>Få tillgång till alla personuppgifter vi har om dig</li>
-              <li>Rätta felaktig eller föråldrad information</li>
-              <li>Begära radering av dina uppgifter (rätt att bli bortglömd)</li>
-              <li>Invända mot vissa typer av databehandling</li>
-              <li>Få en kopia av dina data i ett strukturerat format</li>
-            </ul>
-            <p class="text-body1">
-              För att utöva någon av dessa rättigheter, kontakta oss på <a href="mailto:info@lagjobb.se"
-                class="text-primary">info@lagjobb.se</a>.
-              Vi behandlar alla förfrågningar inom 30 dagar enligt lag.
-            </p>
-          </div>
+          <div class="text-h6 q-mt-lg q-mb-sm text-primary">Dina rättigheter</div>
+          <p class="text-body1 q-mb-sm">
+            Enligt GDPR har du alltid rätt att:
+          </p>
+          <ul class="text-body1 q-mb-md">
+            <li>Få tillgång till alla personuppgifter vi har om dig</li>
+            <li>Rätta felaktig eller föråldrad information</li>
+            <li>Begära radering av dina uppgifter (rätt att bli bortglömd)</li>
+            <li>Invända mot vissa typer av databehandling</li>
+            <li>Få en kopia av dina data i ett strukturerat format</li>
+          </ul>
+          <p class="text-body1">
+            För att utöva någon av dessa rättigheter, kontakta oss på <a href="mailto:info@lagjobb.se"
+              class="text-primary">info@lagjobb.se</a>.
+            Vi behandlar alla förfrågningar inom 30 dagar enligt lag.
+          </p>
         </div>
       </div>
-      <div class="col-xs-0 col-sm-1"></div>
     </div>
   </q-page>
   <q-footer :dark="$q.dark.isActive" class="bg-secondary text-primary q-pa-lg"

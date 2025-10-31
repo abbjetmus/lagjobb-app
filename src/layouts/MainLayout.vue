@@ -68,20 +68,68 @@
 
         <q-separator />
 
-        <q-item v-if="isAuthenticated && currentUser" clickable @click="drawerOpen = false">
-          <q-item-section>
-            <toolbar-user-menu color="primary" />
-          </q-item-section>
-        </q-item>
+        <template v-if="isAuthenticated && currentUser">
+          <q-item v-if="currentUser.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
+            @click="drawerOpen = false; router.push('/mina-grupper')">
+            <q-item-section avatar>
+              <q-icon name="people" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Mina grupper</q-item-label>
+            </q-item-section>
+          </q-item>
 
-        <q-item v-else clickable @click="showSignInSignUpDialog(); drawerOpen = false">
-          <q-item-section avatar>
-            <q-icon name="login" color="primary" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Logga in / Skapa konto</q-item-label>
-          </q-item-section>
-        </q-item>
+          <q-item v-if="currentUser.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
+            @click="drawerOpen = false; router.push('/mina-uppdrag')">
+            <q-item-section avatar>
+              <q-icon name="work" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Mina uppdrag</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item v-if="currentUser.userAccountType === UsersUserAccountTypeOptions.Uppdragsgivare" clickable
+            @click="drawerOpen = false; router.push('/skapade-uppdrag')">
+            <q-item-section avatar>
+              <q-icon name="assignment" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Skapade uppdrag</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable @click="drawerOpen = false; router.push('/installningar')">
+            <q-item-section avatar>
+              <q-icon name="settings" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Inställningar</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-separator />
+
+          <q-item clickable @click="handleLogout(); drawerOpen = false">
+            <q-item-section avatar>
+              <q-icon name="logout" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Logga ut</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
+
+        <template v-else>
+          <q-item clickable @click="showSignInSignUpDialog(); drawerOpen = false">
+            <q-item-section avatar>
+              <q-icon name="login" color="primary" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Logga in / Skapa konto</q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
       </q-list>
     </q-drawer>
 
@@ -142,6 +190,11 @@ const goToNewUppdrag = () => {
     toReturnAfterCancel.value = 'create';
     showSignInSignUpDialog();
   }
+};
+
+const handleLogout = async () => {
+  authStore.signOut();
+  await router.push('/');
 };
 
 onMounted(async () => {

@@ -19,10 +19,18 @@
             <q-input v-model="email" label="E-post" type="email" outlined class="q-mb-md" :error="r$.email.$error"
               error-message="Måste vara en giltig e-postadress" no-error-icon />
 
-            <q-input v-model="password" label="Lösenord" type="password" outlined no-error-icon
-              :error="r$.password.$error" error-message="Måste vara minst 6 tecken långt" />
+            <q-input v-model="password" label="Lösenord" :type="isPassword ? 'password' : 'text'" outlined no-error-icon
+              :error="r$.password.$error" error-message="Måste vara minst 6 tecken långt">
+              <template v-slot:append>
+                <q-icon @click="isPassword = !isPassword" :name="isPassword ? 'visibility_off' : 'visibility'"></q-icon>
+              </template>
+            </q-input>
 
-            <div v-if="error" class="text-negative q-mb-md">{{ error }}</div>
+            <div v-if="error" class="q-mb-md">
+              <div class="text-negative q-mb-md">{{ error }}</div>
+              <q-btn v-if="showResendVerification" outline class="full-width q-mb-sm" color="primary"
+                label="Skicka verifieringslänk igen" :loading="resending" @click="resendVerification" size="md" />
+            </div>
 
             <div class="row justify-between q-my-md">
               <q-btn color="primary" type="submit" :loading="loading">
@@ -65,8 +73,11 @@ const router = useRouter();
 
 const email = ref('');
 const password = ref('');
+const isPassword = ref(true);
 const loading = ref(false);
 const error = ref('');
+const showResendVerification = ref(false);
+const resending = ref(false);
 
 // Validation rules with per-field modifiers
 const rules = {
@@ -108,6 +119,7 @@ const onSubmit = async () => {
 
   loading.value = true;
   error.value = '';
+  showResendVerification.value = false;
 
   try {
     const success = await authStore.signIn(email.value, password.value);
@@ -123,12 +135,40 @@ const onSubmit = async () => {
   } catch (err: unknown) {
     if (err instanceof Error && err.message === 'Email not verified') {
       error.value = 'E-post inte verifierad. Kontrollera din e-post för verifieringslänk.';
+      showResendVerification.value = true;
     } else {
       error.value = 'Ett fel uppstod. Kontrollera dina uppgifter och försök igen.';
+      showResendVerification.value = false;
     }
     console.error(err);
   } finally {
     loading.value = false;
   }
+};
+
+const resendVerification = async () => {
+  resending.value = true;
+  try {
+    const success = await authStore.requestVerification(email.value);
+    if (success) {
+      $q.notify({
+        type: 'positive',
+        message: 'Verifieringslänk har skickats igen!',
+      });
+      showResendVerification.value = false;
+      error.value = '';
+    } else {
+      $q.notify({
+        type: 'negative',
+        message: 'Kunde inte skicka verifieringslänk. Försök igen senare.',
+      });
+    }
+  } catch {
+    $q.notify({
+      type: 'negative',
+      message: 'Ett fel uppstod vid skickande av verifieringslänk.',
+    });
+  }
+  resending.value = false;
 };
 </script>

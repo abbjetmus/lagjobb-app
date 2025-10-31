@@ -1,13 +1,13 @@
 <template>
   <q-page class="page-background-pattern">
     <div class="bg-image">
-      <div class="search-container q-pa-sm">
+      <div class="search-container q-pa-sm" style="border-bottom: 2px solid var(--q-primary)">
         <div class="text-grey-3">
           <div class="text-center text-h5 text-md-h4 q-my-md">
             Registrerade lag, klasser och föreningar
           </div>
 
-          <div class="row">
+          <div class="row" :class="$q.screen.gt.sm ? 'q-pb-xl' : 'q-pb-md'">
             <q-select ref="cityRef" style="min-width: 300px;" v-model="selectedCities" :options="filterCityOptions"
               use-chips use-input multiple outlined @filter="filterCityFn" input-debounce="0" hide-dropdown-icon
               label="Välj orter..." bg-color="secondary" option-label="title" option-value="id" emit-value map-options
@@ -33,6 +33,11 @@
                 <q-icon name="group" />
               </template>
             </q-select>
+
+            <q-btn unelevated color="primary" icon="search" @click="loadGroups()"
+              class="col-12 col-md-1 q-mt-sm q-mb-xs" square />
+            <q-btn unelevated label="visa alla grupper" color="primary" @click="clearFilters()"
+              class="col-12 col-md-1 q-ml-md-sm q-mt-sm q-mb-xs" style="min-width: 120px; margin-left: 1px;" square />
           </div>
         </div>
       </div>
@@ -169,6 +174,11 @@ const loadGroups = async () => {
   }
 };
 
+const clearFilters = () => {
+  selectedCities.value = [];
+  selectedGroupTypes.value = [];
+};
+
 onMounted(async () => {
   if (jobsStore.counties.length === 0) {
     await jobsStore.getAllCounties();
@@ -190,7 +200,6 @@ onMounted(async () => {
 .bg-image {
   background: url("../../assets/soccer-team.jpg") no-repeat center center fixed;
   background-size: cover;
-  height: 200px;
   overflow: hidden;
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
     url("../../assets/soccer-team.jpg");
@@ -198,7 +207,6 @@ onMounted(async () => {
 
 .search-container {
   max-width: 1000px !important;
-  height: 200px;
   margin: 0 auto;
 }
 </style>
