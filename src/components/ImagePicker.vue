@@ -41,7 +41,7 @@ const imagesToShow = computed(() => {
 
 const getImageUrl = (image: Attachment) => {
   if (image.fromServer) {
-    return `${process.env.PB}/api/files/${collectionName.value}/${collectionItemId.value}/${image.name}`;
+    return `${process.env.PB_URL}/api/files/${collectionName.value}/${collectionItemId.value}/${image.name}`;
   } else {
     return URL.createObjectURL(image.file);
   }

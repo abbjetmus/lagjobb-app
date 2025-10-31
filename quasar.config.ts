@@ -4,9 +4,11 @@
 import { defineConfig } from '#q-app/wrappers';
 import dotenv from 'dotenv';
 
-const env = dotenv.config({
-  path: `.env.${process.env.ENV_FILE}`,
-}).parsed;
+const env = process.env.ENV_FILE
+  ? dotenv.config({
+    path: `.env.${process.env.ENV_FILE}`,
+  }).parsed
+  : null;
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -48,8 +50,8 @@ export default defineConfig((/* ctx */) => {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
       env: {
-        PB_URL: process.env.PB_URL || 'http://localhost:8090',
-        APP_DESCRIPTION: process.env.APP_DESCRIPTION || 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig!',
+        PB_URL: env?.PB_URL || process.env.PB_URL || 'http://localhost:8090',
+        APP_DESCRIPTION: env?.APP_DESCRIPTION || process.env.APP_DESCRIPTION || 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig!',
       },
 
       // Variables injected into index.html (see <%= %> tokens there)

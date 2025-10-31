@@ -1,8 +1,8 @@
 {
   "name": "lagjobb-app",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Quasar App",
+  "description": "Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig!",
+  "productName": "Lagjobb",
   "author": "abbjetmus <jeton.mustini@gmail.com>",
   "type": "module",
   "private": true,
