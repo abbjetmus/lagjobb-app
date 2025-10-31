@@ -48,8 +48,8 @@ const authStore = useAuth();
 const status = ref<'loading' | 'success' | 'error'>('loading');
 const errorMessage = ref('');
 
-const goToLogin = () => {
-  router.replace('/');
+const goToLogin = async () => {
+  await router.replace('/');
 };
 
 onMounted(async () => {
@@ -73,7 +73,7 @@ onMounted(async () => {
       status.value = 'error';
       errorMessage.value = 'Ogiltig eller utgången verifieringslänk.';
     }
-  } catch (error) {
+  } catch {
     status.value = 'error';
     errorMessage.value = 'Ett fel uppstod vid verifiering.';
   }

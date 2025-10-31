@@ -65,12 +65,12 @@ const cancel = () => {
   nameValue.value = props.currentName;
 };
 
-const update = () => {
-  formRef.value?.validate().then((success) => {
-    if (success) {
-      emit('updateName', nameValue.value.trim());
-      cancel();
-    }
-  });
+const update = async () => {
+  const result = await formRef.value?.validate();
+  if (result) {
+    emit('updateName', nameValue.value.trim());
+    cancel();
+  }
+  return result;
 };
 </script>

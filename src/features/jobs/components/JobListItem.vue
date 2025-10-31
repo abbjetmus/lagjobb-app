@@ -1,5 +1,5 @@
 <template>
-  <q-item class="q-px-md q-py-md min-sm-py-lg " clickable @click="$emit('click', job)">
+  <q-item class="q-px-md q-py-md min-sm-py-lg " clickable>
     <q-item-section v-if="job.images && job.images[0]" side class="q-pa-none q-ma-none lt-sm-none"
       style="padding: 0px; margin: 0px;">
       <img height="180px" width="180px" style="object-fit: cover; border-radius: 4px;"
@@ -53,10 +53,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  click: [job: WithId<JobsRecord>];
-}>();
 
 const getImageUrl = (imageName: string) => {
   return pb.files.getURL(props.job, imageName);

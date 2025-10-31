@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';

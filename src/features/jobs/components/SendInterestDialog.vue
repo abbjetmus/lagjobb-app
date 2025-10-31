@@ -35,14 +35,14 @@
 import { ref, computed } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import { useQuasar } from 'quasar';
-import { useJobs } from 'src/features/jobs/jobsStore';
-import { useAuth } from 'src/stores/auth';
+import { useInterestRequests } from 'src/features/interestRequests/interestRequestsStore';
+import { useAuth } from 'src/features/auth/authStore';
 import { InterestRequestsStatusOptions, type JobsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import type { GroupsRecord, InterestRequestsRecord } from 'app/pocketbase-types';
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
-const jobsStore = useJobs();
+const interestRequestsStore = useInterestRequests();
 const $q = useQuasar();
 const authStore = useAuth();
 
@@ -71,7 +71,7 @@ const sendInterest = async () => {
   if (!props.job || !authStore.currentUser || !selectedGroupId.value) return;
 
   sendingInterest.value = true;
-  const success = await jobsStore.sendInterestRequest({
+  const success = await interestRequestsStore.sendInterestRequest({
     id: '',
     job: props.job.id,
     requestMessage: interestMessage.value,

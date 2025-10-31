@@ -67,12 +67,12 @@ const cancel = () => {
   emailValue.value = props.currentEmail;
 };
 
-const update = () => {
-  formRef.value?.validate().then((success) => {
-    if (success) {
-      emit('updateEmail', emailValue.value.trim());
-      cancel();
-    }
-  });
+const update = async () => {
+  const result = await formRef.value?.validate();
+  if (result) {
+    emit('updateEmail', emailValue.value.trim());
+    cancel();
+  }
+  return result;
 };
 </script>

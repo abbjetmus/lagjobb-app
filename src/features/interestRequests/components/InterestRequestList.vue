@@ -30,8 +30,7 @@
           <q-card-section class="q-pa-none q-ma-none">
             <q-list separator>
               <interest-request-list-item v-for="request in declinedRequests" :key="request.id"
-                :interest-request="request" :selected="selectedId === request.id"
-                @click="$emit('select', request.id)" />
+                :interest-request="request" :selected="selectedId === request.id" @click="emitSelect(request.id)" />
             </q-list>
           </q-card-section>
         </q-card>
@@ -42,8 +41,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useJobs } from 'src/features/jobs/jobsStore';
-import type { InterestRequestsRecord } from 'app/pocketbase-types';
+import { useInterestRequests } from 'src/features/interestRequests/interestRequestsStore';
+import type { GroupsRecord, InterestRequestsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import { InterestRequestsStatusOptions } from 'app/pocketbase-types';
 import InterestRequestListItem from './InterestRequestListItem.vue';
@@ -58,12 +57,16 @@ const emit = defineEmits<{
   select: [id: string];
 }>();
 
-const jobsStore = useJobs();
-const interestRequests = ref<(WithId<InterestRequestsRecord> & { expand?: { group?: any } })[]>([]);
+const emitSelect = (id: string) => {
+  emit('select', id);
+};
+
+const interestRequestsStore = useInterestRequests();
+const interestRequests = ref<(WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord> } })[]>([]);
 
 onMounted(async () => {
-  const requests = await jobsStore.getInterestRequestsForJob(props.jobId);
-  interestRequests.value = requests as (WithId<InterestRequestsRecord> & { expand?: { group?: any } })[];
+  const requests = await interestRequestsStore.getInterestRequestsForJob(props.jobId);
+  interestRequests.value = requests as (WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord> } })[];
 });
 
 const approvedRequests = computed(() =>

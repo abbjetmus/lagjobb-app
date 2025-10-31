@@ -20,7 +20,17 @@
 import type { GroupsRecord } from 'app/pocketbase-types';
 
 defineProps<{
-  r?: any;
+  r?: {
+    groupCategoryName?: {
+      $error: boolean;
+    };
+    groupName?: {
+      $error: boolean;
+    };
+    sectionName?: {
+      $error: boolean;
+    };
+  };
 }>();
 
 const model = defineModel<GroupsRecord>({ required: true });

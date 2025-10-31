@@ -4,7 +4,7 @@ import type { CountiesRecord, InterestRequestsRecord, JobCategoriesRecord, Inter
 import { Collections, type JobsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import type { CountiesExpand, JobCategoriesExpand, JobsExpand } from 'app/expanded-pocketbase-types';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import type { Attachment } from 'src/models/attachment';
 import { FileAction } from 'src/models/enums';
 

@@ -181,7 +181,10 @@ export const useAuth = defineStore('auth-module', {
       return pb.collection(Collections.Users).update(this.authModel!.id, {
         'avatar': image,
       }).then((res) => {
-        this.currentUser!.avatar = (res as unknown as UsersRecord).avatar ?? ''
+        const avatar = (res as unknown as UsersRecord).avatar
+        if (avatar !== undefined) {
+          this.currentUser!.avatar = avatar
+        }
         return true
       }).catch(e => {
         console.error(e)

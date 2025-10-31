@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { QForm } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAuth } from 'src/features/auth/authStore';
 import { useRegle } from '@regle/core';
 import { required, minLength, sameAs } from '@regle/rules';
@@ -145,8 +145,8 @@ const onSubmit = async () => {
   }
 };
 
-const goToLogin = () => {
-  router.replace('/');
+const goToLogin = async () => {
+  await router.replace('/');
 };
 </script>
 

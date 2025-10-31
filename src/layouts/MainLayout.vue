@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import { useQuasar } from 'quasar';
 import ToolbarUserMenu from 'src/components/ToolbarUserMenuComponent.vue';
 import SignInSignUpDialog from 'src/features/auth/components/SignInSignUpDialog.vue';

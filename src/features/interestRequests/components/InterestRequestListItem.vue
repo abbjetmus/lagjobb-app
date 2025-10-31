@@ -15,8 +15,8 @@
           <span class="block text-h6 text-weight-regular" style="line-height: 1.0;">
             {{ group?.groupName || 'Okänd grupp' }}
           </span>
-          <q-rating v-if="group?.rating" :model-value="group.rating" max="5" size="1.2em" color="yellow"
-            icon="star_border" icon-selected="star" icon-half="star_half" no-dimming readonly />
+          <!-- <q-rating v-if="group?.rating" :model-value="group.rating" max="5" size="1.2em" color="yellow"
+            icon="star_border" icon-selected="star" icon-half="star_half" no-dimming readonly /> -->
         </div>
         <div v-if="group?.image" class="lt-sm-none">
           <img height="80px" width="100px" style="object-fit: contain;" :src="getImageUrl(group.image)" />
@@ -32,11 +32,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { pb } from 'src/boot/pocketbase';
-import type { InterestRequestsRecord } from 'app/pocketbase-types';
+import type { GroupsRecord, InterestRequestsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 
 interface Props {
-  interestRequest: WithId<InterestRequestsRecord> & { expand?: { group?: any } };
+  interestRequest: WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord> } };
   selected: boolean;
 }
 

@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import InterestRequestList from './components/InterestRequestList.vue';
 import InterestRequestProcessStepper from './components/InterestRequestProcessStepper.vue';
@@ -51,7 +51,7 @@ const isUppdragsutforare = computed(() =>
   authStore.currentUser?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare
 );
 
-onMounted(async () => {
+onMounted(() => {
   loading.value = false;
 });
 </script>

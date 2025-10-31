@@ -59,16 +59,16 @@ import AssociationGroupForm from './components/AssociationGroupForm.vue';
 import OrganizationGroupForm from './components/OrganizationGroupForm.vue';
 import { GroupsGroupTypeOptions, Collections, type GroupsRecord } from 'app/pocketbase-types';
 import ImageThumbnail from 'src/components/ImageThumbnail.vue';
-import { useGroups } from './groupsStore';
-import { useJobs } from '../jobs/jobsStore';
-import { useAuth } from 'src/stores/auth';
+import { useGroups } from 'src/features/groups/groupsStore';
+import { useJobs } from 'src/features/jobs/jobsStore';
+import { useAuth } from 'src/features/auth/authStore';
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuth();
 const groupsStore = useGroups();
 const jobsStore = useJobs();
 const $q = useQuasar();
-const authStore = useAuth();
 const loading = ref(false);
 const initialLoading = ref(true);
 const currentImageUrl = ref<string | null>(null);
@@ -81,7 +81,7 @@ const componentMap: Record<GroupsGroupTypeOptions, Component> = {
   [GroupsGroupTypeOptions.Organisation]: OrganizationGroupForm,
 };
 
-const group = ref<GroupsRecord>({
+const group = ref<Omit<GroupsRecord, 'created' | 'updated'> | GroupsRecord>({
   id: '',
   createdBy: authStore.currentUser?.id || '',
   groupType: GroupsGroupTypeOptions.Lag,
@@ -90,7 +90,6 @@ const group = ref<GroupsRecord>({
   description: '',
   city: '',
   verified: false,
-  image: '',
 });
 
 const groupImage = ref<File | null>(null);

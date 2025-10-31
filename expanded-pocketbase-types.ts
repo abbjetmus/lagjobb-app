@@ -1,5 +1,5 @@
 import type { WithId } from "src/models/withIdType";
-import type { UsersRecord, JobSubcategoriesRecord, CitiesRecord } from "./pocketbase-types";
+import type { UsersRecord, JobSubcategoriesRecord, CitiesRecord, InterestRequestsRecord, GroupsRecord, JobsRecord } from "./pocketbase-types";
 
 export interface JobsExpand {
   jobSubcategories: WithId<JobSubcategoriesRecord>[];
@@ -19,3 +19,10 @@ export interface GroupsExpand {
   city: WithId<CitiesRecord>;
   createdBy: WithId<UsersRecord>;
 }
+
+export type InterestRequestWithExpand = WithId<InterestRequestsRecord> & {
+  expand?: {
+    group?: WithId<GroupsRecord, GroupsExpand>;
+    job?: WithId<JobsRecord> & { expand?: JobsExpand };
+  };
+};

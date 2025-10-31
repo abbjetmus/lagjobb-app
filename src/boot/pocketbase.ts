@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import PocketBase from 'pocketbase';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 
 const pb = new PocketBase(process.env.PB_URL || 'http://localhost:8090');
 

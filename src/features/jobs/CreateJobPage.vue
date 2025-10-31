@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeMount, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import { useQuasar } from 'quasar';
 import { useRegle } from '@regle/core';

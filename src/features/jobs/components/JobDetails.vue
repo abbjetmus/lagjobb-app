@@ -75,12 +75,12 @@
         </div>
       </q-card>
 
-      <q-card flat class="col bg-transparent">
+      <q-card flat class="col bg-transparent" v-if="job.latitude && job.longitude">
         <q-card-section>
           <div class="text-h6">Plats</div>
           <div>{{ job.street }}, {{ job.zipcode }} {{ job.expand?.city?.title }}</div>
-          <leaflet-map :lat="job.latitude" :lng="job.longitude" :zoom="15"
-            :markers="[{ lat: job.latitude, lng: job.longitude, title: job.title || 'Jobb' }]" />
+          <leaflet-map :lat="job.latitude!" :lng="job.longitude!" :zoom="15"
+            :markers="[{ lat: job.latitude!, lng: job.longitude!, title: job.title || 'Jobb' }]" />
         </q-card-section>
       </q-card>
     </div>
@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { pb } from 'src/boot/pocketbase';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import type { JobsRecord } from 'app/pocketbase-types';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import { useQuasar } from 'quasar';

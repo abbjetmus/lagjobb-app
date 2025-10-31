@@ -92,7 +92,7 @@ import JobListItem from 'src/features/jobs/components/JobListItem.vue';
 import type { WithId } from 'src/models/withIdType';
 import type { JobsRecord } from 'app/pocketbase-types';
 import { QSelect } from 'quasar';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import { storeToRefs } from 'pinia';
 import type { JobsExpand } from 'app/expanded-pocketbase-types';
 const router = useRouter();

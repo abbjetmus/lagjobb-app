@@ -72,24 +72,25 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useJobs } from 'src/features/jobs/jobsStore';
+import { useInterestRequests } from 'src/features/interestRequests/interestRequestsStore';
 import { useGroups } from 'src/features/groups/groupsStore';
-import { useAuth } from 'src/stores/auth';
-import type { InterestRequestsRecord } from 'app/pocketbase-types';
+import { useAuth } from 'src/features/auth/authStore';
+import type { GroupsRecord, InterestRequestsRecord, JobsRecord } from 'app/pocketbase-types';
 import { InterestRequestsStatusOptions } from 'app/pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
 import type { WithId } from 'src/models/withIdType';
+import type { JobsExpand } from 'app/expanded-pocketbase-types';
 
 interface Props {
   jobId: string;
 }
 
 const props = defineProps<Props>();
-const jobsStore = useJobs();
+const interestRequestsStore = useInterestRequests();
 const groupsStore = useGroups();
 const authStore = useAuth();
 
-const interestRequest = ref<WithId<InterestRequestsRecord> & { expand?: { group?: any; job?: any } } | null>(null);
+const interestRequest = ref<WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord>; job?: WithId<JobsRecord> & { expand?: JobsExpand } } } | null>(null);
 const reviewMessage = ref('');
 const rating = ref(0);
 
@@ -115,7 +116,7 @@ const responseMessage = computed(() => interestRequest.value?.responseMessage ||
 const jobCreatorName = computed(() => {
   const job = interestRequest.value?.expand?.job;
   if (!job?.expand?.createdBy) return 'Uppdragsgivare';
-  return job.expand.createdBy.name || 'Uppdragsgivare';
+  return job.expand.createdBy?.name || 'Uppdragsgivare';
 });
 
 const jobCreatorPhone = computed(() => {
@@ -179,9 +180,9 @@ const loadInterestRequest = async () => {
   if (myGroups.length === 0) return;
 
   for (const group of myGroups) {
-    const request = await jobsStore.getInterestRequestForJobAndGroup(props.jobId, group.id);
+    const request = await interestRequestsStore.getInterestRequestForJobAndGroup(props.jobId, group.id);
     if (request) {
-      interestRequest.value = request as WithId<InterestRequestsRecord> & { expand?: { group?: any; job?: any } };
+      interestRequest.value = request as WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord>; job?: WithId<JobsRecord> & { expand?: JobsExpand } } };
       break;
     }
   }
@@ -189,7 +190,7 @@ const loadInterestRequest = async () => {
 
 const completed = async () => {
   if (!interestRequest.value) return;
-  const success = await jobsStore.updateInterestRequest(interestRequest.value.id, {
+  const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     completedAt: new Date().toISOString(),
   });
   if (success) {
@@ -199,7 +200,7 @@ const completed = async () => {
 
 const done = async () => {
   if (!interestRequest.value) return;
-  const success = await jobsStore.updateInterestRequest(interestRequest.value.id, {
+  const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     doneAt: new Date().toISOString(),
   });
   if (success) {

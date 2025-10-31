@@ -3,7 +3,7 @@ import { pb } from 'src/boot/pocketbase'
 import type { GroupsRecord } from 'app/pocketbase-types';
 import { Collections } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
-import { useAuth } from 'src/stores/auth';
+import { useAuth } from 'src/features/auth/authStore';
 import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 
 interface GroupsState {
@@ -48,7 +48,7 @@ export const useGroups = defineStore('groups-module', {
         return false
       })
     },
-    async createGroup(group: GroupsRecord, image?: File | null): Promise<boolean> {
+    async createGroup(group: Omit<GroupsRecord, 'created' | 'updated'>, image?: File | null): Promise<boolean> {
       const groupToCreate = {
         ...group,
         ...(image && { image }),
@@ -60,7 +60,7 @@ export const useGroups = defineStore('groups-module', {
         return false
       })
     },
-    async updateGroup(group: GroupsRecord, image?: File | null): Promise<boolean> {
+    async updateGroup(group: Omit<GroupsRecord, 'created' | 'updated'> | GroupsRecord, image?: File | null): Promise<boolean> {
       const groupToUpdate = {
         ...group,
         ...(image && { image }),

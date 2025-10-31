@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <div class="text-h4 q-mb-md">Leaflet Map Test</div>
-    
+
     <q-card class="q-mb-md">
       <q-card-section>
         <div class="text-h6 q-mb-sm">Map Controls</div>
@@ -128,7 +128,7 @@ const markers = ref([
 const addRandomMarker = () => {
   const randomLat = (Math.random() - 0.5) * 20 + 46.05
   const randomLng = (Math.random() - 0.5) * 20 + 11.05
-  
+
   markers.value.push({
     lat: randomLat,
     lng: randomLng,
@@ -145,7 +145,7 @@ const removeMarker = (index: number) => {
   markers.value.splice(index, 1)
 }
 
-const centerOnMarker = (marker: any) => {
+const centerOnMarker = (marker: { lat: number; lng: number }) => {
   mapLat.value = marker.lat
   mapLng.value = marker.lng
   mapZoom.value = 10

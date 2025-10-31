@@ -4,29 +4,37 @@
       :class="indexZoomed !== void 0 ? 'image-gallery__blinder--active' : void 0" @click="zoomImage()" />
 
     <div class="row justify-start q-mx-auto scroll relative-position" style="max-width: 80vw; max-height: 80vh">
-      <q-img v-for="(src, index) in images" :key="index" :ref="el => { thumbRef[index] = el }"
+      <q-img v-for="(src, index) in images" :key="index" :ref="el => setThumbRef(el, index)"
         class="image-gallery__image q-mr-md" :style="index === indexZoomed ? 'opacity: 0.3' : void 0" :src="src"
         @click="zoomImage(index)" />
     </div>
 
     <q-img ref="fullRef" class="image-gallery__image image-gallery__image-full fixed-center"
-      :class="indexZoomed !== void 0 ? 'image-gallery__image-full--active' : void 0" :src="images[indexZoomed]"
-      @load="imgLoadedResolve" @error="imgLoadedReject" @click="zoomImage()" />
+      :class="indexZoomed !== void 0 ? 'image-gallery__image-full--active' : void 0"
+      :src="indexZoomed !== undefined ? images[indexZoomed] : ''" @load="imgLoadedResolve" @error="imgLoadedReject"
+      @click="zoomImage()" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onBeforeUpdate } from 'vue'
 import { morph } from 'quasar'
+import type { ComponentPublicInstance } from 'vue'
 
 interface Props {
   images: string[]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
-const thumbRef = ref([])
-const fullRef = ref(null)
+const thumbRef = ref<(ComponentPublicInstance | null)[]>([])
+const fullRef = ref<ComponentPublicInstance | null>(null)
+
+const setThumbRef = (el: Element | ComponentPublicInstance | null, index: number) => {
+  if (el && '$el' in el) {
+    thumbRef.value[index] = el
+  }
+}
 
 const indexZoomed = ref<number | undefined>(undefined)
 const imgLoaded = {
@@ -45,13 +53,12 @@ function imgLoadedReject() {
 
 function zoomImage(index?: number) {
   const indexZoomedState = indexZoomed.value
-  let cancel: (() => boolean) | undefined = undefined
 
   imgLoaded.reject()
 
   const zoom = () => {
     if (index !== undefined && index !== indexZoomedState) {
-      imgLoaded.promise = new Promise((resolve, reject) => {
+      imgLoaded.promise = new Promise<void>((resolve, reject) => {
         imgLoaded.resolve = () => {
           imgLoaded.resolve = () => { }
           imgLoaded.reject = () => { }
@@ -62,49 +69,58 @@ function zoomImage(index?: number) {
           imgLoaded.resolve = () => { }
           imgLoaded.reject = () => { }
 
-          reject()
+          reject(new Error())
         }
       })
 
-      cancel = morph({
-        from: thumbRef.value[index].$el,
-        to: fullRef.value.$el,
-        onToggle: () => {
-          indexZoomed.value = index
-        },
-        waitFor: imgLoaded.promise,
-        duration: 400,
-        hideFromClone: true,
-        onEnd: (end: string) => {
-          if (end === 'from' && indexZoomed.value === index) {
-            indexZoomed.value = undefined
+      const thumbEl = thumbRef.value[index]?.$el
+      const fullEl = fullRef.value?.$el
+
+      if (thumbEl && fullEl) {
+        morph({
+          from: thumbEl,
+          to: fullEl,
+          onToggle: () => {
+            indexZoomed.value = index
+          },
+          waitFor: imgLoaded.promise,
+          duration: 400,
+          hideFromClone: true,
+          onEnd: (end: string) => {
+            if (end === 'from' && indexZoomed.value === index) {
+              indexZoomed.value = undefined
+            }
           }
-        }
-      })
+        })
+      }
     }
   }
 
-  if (
-    indexZoomedState !== undefined &&
-    (cancel === undefined || cancel() === false)
-  ) {
-    morph({
-      from: fullRef.value.$el,
-      to: thumbRef.value[indexZoomedState].$el,
-      onToggle: () => {
-        indexZoomed.value = undefined
-      },
-      duration: 200,
-      keepToClone: true,
-      onEnd: zoom
-    })
+  if (indexZoomedState !== undefined) {
+    const fullEl = fullRef.value?.$el
+    const thumbEl = thumbRef.value[indexZoomedState]?.$el
+
+    if (fullEl && thumbEl) {
+      morph({
+        from: fullEl,
+        to: thumbEl,
+        onToggle: () => {
+          indexZoomed.value = undefined
+        },
+        duration: 200,
+        keepToClone: true,
+        onEnd: zoom
+      })
+    }
+    else {
+      zoom()
+    }
   }
   else {
     zoom()
   }
 }
 
-// Make sure to reset the dynamic refs before each update.
 onBeforeUpdate(() => {
   thumbRef.value = []
 })

@@ -24,13 +24,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useQuasar } from 'quasar';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import { storeToRefs } from 'pinia';
 import JobListItem from './components/JobListItem.vue';
 
 const jobsStore = useJobs();
-const $q = useQuasar();
 
 const { myJobs } = storeToRefs(jobsStore);
 const loading = ref(true);

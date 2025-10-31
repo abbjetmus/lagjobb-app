@@ -80,16 +80,15 @@ const cancel = () => {
   confirmPassword.value = '';
 };
 
-const update = () => {
-  formRef.value?.validate().then((success) => {
-    if (success) {
-      emit('updatePassword', {
-        oldPassword: oldPassword.value,
-        password: newPassword.value,
-        passwordConfirm: confirmPassword.value,
-      });
-      cancel();
-    }
-  });
+const update = async () => {
+  const result = await formRef.value?.validate();
+  if (result) {
+    emit('updatePassword', {
+      oldPassword: oldPassword.value,
+      password: newPassword.value,
+      passwordConfirm: confirmPassword.value,
+    });
+    cancel();
+  }
 };
 </script>

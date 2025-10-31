@@ -13,10 +13,17 @@
 </template>
 
 <script setup lang="ts">
-import { GroupsRecord } from 'app/pocketbase-types';
+import type { GroupsRecord } from 'app/pocketbase-types';
 
 defineProps<{
-  r?: any;
+  r?: {
+    groupName?: {
+      $error: boolean;
+    };
+    sectionName?: {
+      $error: boolean;
+    };
+  };
 }>();
 
 const model = defineModel<GroupsRecord>({ required: true });
