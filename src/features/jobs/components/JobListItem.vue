@@ -1,122 +1,69 @@
 <template>
-  <q-item class="q-px-md q-py-md min-sm-py-lg " clickable>
-    <q-item-section v-if="job.images && job.images[0]" side class="q-pa-none q-ma-none lt-sm-none"
-      style="padding: 0px; margin: 0px;">
-      <img height="180px" width="180px" style="object-fit: cover; border-radius: 4px;"
-        :src="getImageUrl(job.images[0]!)" />
-    </q-item-section>
-
-    <q-item-section class="lj-column lj-items-start lj-justify-center min-md-justify-around">
-      <q-item-label>
-        <div class="text-h6 text-weight-regular" style="line-height: 1.2;">
-          {{ job.title }}
+  <q-item class="q-pa-none q-ma-none">
+    <q-card class="full-width bg-transparent" flat clickable>
+      <q-card-section :horizontal="$q.screen.gt.xs" class="q-pa-none q-ma-none">
+        <div v-if="job.images && job.images[0]" class="rounded-borders overflow-hidden flex-shrink" :style="imageStyle">
+          <img class="full-width full-height" style="object-fit: cover;" :src="getImageUrl(job.images[0]!)" />
         </div>
-        <div class="text-caption text-grey q-mt-xs">
-          {{ formatDate(job.created || '') }}
-        </div>
-      </q-item-label>
-
-      <div v-if="job.images && job.images[0]" class="gt-xs-none q-mt-sm">
-        <img height="120px" width="150px" style="object-fit: cover; border-radius: 4px;"
-          :src="getImageUrl(job.images[0]!)" />
-      </div>
-
-      <q-item-label v-if="job.description" class="text-body2 text-grey-8 q-mt-sm">
-        {{ truncate(job.description, 100) }}
-      </q-item-label>
-
-      <q-item-label class="text-body1 text-grey-7 lj-column min-md-row min-md-gap-lg q-mt-xs">
-        <span v-if="job.price" class="text-bold text-primary">
-          <q-icon name="attach_money" size="sm" />
-          {{ job.price }} kr
-        </span>
-        <span v-if="job.estimatedHours" class="q-ml-md-min-none">
-          <q-icon name="schedule" size="sm" />
-          {{ job.estimatedHours }}h
-        </span>
-        <span v-if="job.city" class="q-ml-md-min-none">
-          <q-icon name="location_on" size="sm" />
-          {{ job.city }}
-        </span>
-      </q-item-label>
-    </q-item-section>
+        <q-card-section class="column justify-center">
+          <div class="text-h6 text-weight-regular" style="line-height: 1.2;">
+            {{ job.title }}
+          </div>
+          <div class="text-caption text-grey q-mt-xs">
+            {{ formatDateTime(new Date(job.desiredAt ?? '')) }}
+          </div>
+          <div v-if="job.description" class="text-body2 text-grey-8 q-mt-sm gt-xs">
+            {{ truncate(job.description, 100) }}
+          </div>
+          <div class="text-body1 text-grey-7 row items-center q-gutter-sm q-mt-xs">
+            <span v-if="job.price" class="inline-flex items-center text-bold text-green">
+              {{ job.price }} kr
+            </span>
+            <span v-if="job.price && (job.estimatedHours || job.expand?.city?.title)" class="text-grey-5">•</span>
+            <span v-if="job.estimatedHours" class="inline-flex items-center">
+              <q-icon name="schedule" size="sm" />
+              {{ job.estimatedHours }}h
+            </span>
+            <span v-if="job.estimatedHours && job.expand?.city?.title" class="text-grey-5">•</span>
+            <span v-if="job.expand?.city?.title" class="inline-flex items-center">
+              <q-icon name="location_on" size="sm" />
+              {{ job.expand.city.title }}
+            </span>
+          </div>
+        </q-card-section>
+      </q-card-section>
+    </q-card>
   </q-item>
 </template>
 
 <script setup lang="ts">
+import { useQuasar } from 'quasar';
+import { computed } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
 import type { JobsRecord } from 'app/pocketbase-types';
+import type { JobsExpand } from 'app/expanded-pocketbase-types';
+import { formatDateTime } from 'src/utils/dateUtils';
 
 interface Props {
-  job: WithId<JobsRecord>;
+  job: WithId<JobsRecord, JobsExpand>;
 }
 
 const props = defineProps<Props>();
+const $q = useQuasar();
 
 const getImageUrl = (imageName: string) => {
   return pb.files.getURL(props.job, imageName);
-};
-
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('sv-SE');
 };
 
 const truncate = (text: string, length: number) => {
   if (!text) return '';
   return text.length > length ? text.substring(0, length) + '...' : text;
 };
+
+const imageStyle = computed(() => {
+  return $q.screen.gt.xs
+    ? { width: '320px', height: '220px' }
+    : { width: '100%', height: '180px' };
+});
 </script>
-
-<style scoped>
-.lj-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.lj-items-start {
-  align-items: flex-start;
-}
-
-.lj-justify-center {
-  justify-content: center;
-}
-
-.lj-gap-sm {
-  gap: 0.5rem;
-}
-
-@media (min-width: 768px) {
-  .min-md-justify-around {
-    justify-content: space-around;
-  }
-
-  .min-md-row {
-    flex-direction: row;
-  }
-
-  .min-md-gap-lg {
-    gap: 1rem;
-  }
-
-  .q-ml-md-min-none {
-    margin-left: 0;
-  }
-}
-
-@media (max-width: 599px) {
-  .gt-xs-none {
-    display: none;
-  }
-}
-
-@media (min-width: 600px) {
-  .lt-sm-none {
-    display: none;
-  }
-}
-
-.q-ml-md-min-none {
-  margin-left: 0.5rem;
-}
-</style>

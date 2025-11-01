@@ -15,9 +15,6 @@
       <div class="q-pa-md">
         <job-details :job="job" />
       </div>
-      <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">
-        <q-btn fab icon="add" color="primary" to="/skapa-uppdrag" />
-      </q-page-sticky>
     </div>
   </q-page>
 </template>

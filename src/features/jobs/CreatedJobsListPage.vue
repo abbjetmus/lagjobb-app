@@ -1,5 +1,5 @@
 <template>
-  <q-page class="full-height page-background-pattern" style="display: flex; flex-direction: column;">
+  <q-page class="page-background-pattern">
     <div v-if="!$q.platform.is.mobile" class="row items-center q-pa-sm bg-primary">
       <q-btn unelevated color="secondary" text-color="primary" icon="add" label="Skapa uppdrag" to="/skapa-uppdrag" />
       <q-space />

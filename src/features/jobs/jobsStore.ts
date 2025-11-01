@@ -14,7 +14,7 @@ interface JobsState {
   savedJobs: WithId<JobsRecord>[],
   categories: (WithId<JobCategoriesRecord> & { expand?: JobCategoriesExpand })[],
   counties: (WithId<CountiesRecord> & { expand?: CountiesExpand })[],
-  createdJobs: WithId<JobsRecord>[],
+  createdJobs: (WithId<JobsRecord> & { expand?: JobsExpand })[],
 }
 
 export const useJobs = defineStore('jobs-module', {
@@ -101,8 +101,9 @@ export const useJobs = defineStore('jobs-module', {
       return pb.collection(Collections.Jobs).getFullList({
         filter: `createdBy="${authStore.currentUser?.id}"`,
         sort: '-created',
+        expand: 'city',
       }).then(res => {
-        this.createdJobs = res as unknown as WithId<JobsRecord>[]
+        this.createdJobs = res as unknown as (WithId<JobsRecord> & { expand?: JobsExpand })[]
         return true
       }).catch(e => {
         console.error('Load created jobs error:', e)
