@@ -57,7 +57,7 @@ import TeamGroupForm from './components/TeamGroupForm.vue';
 import ClassGroupForm from './components/ClassGroupForm.vue';
 import AssociationGroupForm from './components/AssociationGroupForm.vue';
 import OrganizationGroupForm from './components/OrganizationGroupForm.vue';
-import { GroupsGroupTypeOptions, Collections, type GroupsRecord } from 'app/pocketbase-types';
+import { GroupsGroupTypeOptions, GroupsPublicationStatusOptions, Collections, type GroupsRecord } from 'app/pocketbase-types';
 import ImageThumbnail from 'src/components/ImageThumbnail.vue';
 import { useGroups } from 'src/features/groups/groupsStore';
 import { useJobs } from 'src/features/jobs/jobsStore';
@@ -90,6 +90,7 @@ const group = ref<Omit<GroupsRecord, 'created' | 'updated'> | GroupsRecord>({
   description: '',
   city: '',
   verified: false,
+  publicationStatus: GroupsPublicationStatusOptions.Granskning,
 });
 
 const groupImage = ref<File | null>(null);

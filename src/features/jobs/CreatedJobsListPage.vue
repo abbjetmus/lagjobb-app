@@ -25,7 +25,8 @@
     </div>
 
     <q-list v-else class="q-ma-md">
-      <job-list-item v-for="item in createdJobs" :key="item.id" :job="item" :to="`/skapade-uppdrag/${item.id}`" />
+      <job-list-item v-for="item in createdJobs" :key="item.id" :job="item" :show-status="true"
+        :to="`/skapade-uppdrag/${item.id}`" />
     </q-list>
 
     <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">

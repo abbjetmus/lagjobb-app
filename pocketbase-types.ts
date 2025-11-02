@@ -126,6 +126,13 @@ export enum GroupsGroupTypeOptions {
 	"Förening" = "Förening",
 	"Organisation" = "Organisation",
 }
+
+export enum GroupsPublicationStatusOptions {
+	"Granskning" = "Granskning",
+	"Publicerad" = "Publicerad",
+	"Uppdatering" = "Uppdatering",
+	"Nekad" = "Nekad",
+}
 export type GroupsRecord = {
 	city: RecordIdString
 	created: IsoAutoDateString
@@ -138,6 +145,7 @@ export type GroupsRecord = {
 	id: string
 	image?: FileNameString
 	jobs?: RecordIdString
+	publicationStatus?: GroupsPublicationStatusOptions
 	sectionName?: string
 	updated: IsoAutoDateString
 	verified?: boolean
@@ -168,9 +176,9 @@ export type InterestRequestsRecord = {
 
 export enum InterestRequestsJobsViewStatusOptions {
 	"Granskning" = "Granskning",
-	"Godkänd" = "Godkänd",
 	"Publicerad" = "Publicerad",
-	"Genomförd" = "Genomförd",
+	"Nekad" = "Nekad",
+	"Uppdatering" = "Uppdatering",
 }
 export type InterestRequestsJobsViewRecord = {
 	assignedGroup?: RecordIdString
@@ -214,11 +222,11 @@ export type JobSubcategoriesRecord = {
 	updated: IsoAutoDateString
 }
 
-export enum JobsStatusOptions {
+export enum JobsPublicationStatusOptions {
 	"Granskning" = "Granskning",
-	"Godkänd" = "Godkänd",
 	"Publicerad" = "Publicerad",
-	"Genomförd" = "Genomförd",
+	"Nekad" = "Nekad",
+	"Uppdatering" = "Uppdatering",
 }
 export type JobsRecord = {
 	assignedGroup?: RecordIdString
@@ -237,7 +245,7 @@ export type JobsRecord = {
 	latitude?: number
 	longitude?: number
 	price?: number
-	status?: JobsStatusOptions
+	publicationStatus?: JobsPublicationStatusOptions
 	street: string
 	title?: string
 	updated: IsoAutoDateString

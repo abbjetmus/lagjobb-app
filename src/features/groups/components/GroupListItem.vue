@@ -1,6 +1,6 @@
 <template>
-  <q-item class="q-pa-none q-ma-none">
-    <q-card class="full-width bg-transparent" flat clickable :to="props.to" @click="emit('click', props.group)">
+  <q-item class="q-pa-none q-ma-none" clickable>
+    <q-card class="full-width bg-transparent" flat>
       <q-card-section :horizontal="$q.screen.gt.xs" class="q-pa-none q-ma-none">
         <div v-if="props.group.image" class="rounded-borders overflow-hidden flex-shrink" :style="imageStyle">
           <img class="full-width full-height" style="object-fit: cover;" :src="getImageUrl(props.group.image)" />
@@ -16,6 +16,12 @@
             {{ truncate(props.group.description, 100) }}
           </div>
           <div class="text-body1 text-grey-7 row items-center q-gutter-sm q-mt-xs">
+            <q-chip v-if="showStatus && props.group.publicationStatus"
+              :color="getStatusColor(props.group.publicationStatus)" text-color="white" size="sm">
+              {{ props.group.publicationStatus }}
+            </q-chip>
+            <span v-if="showStatus && props.group.publicationStatus && props.group.verified"
+              class="text-grey-5">•</span>
             <q-chip v-if="props.group.verified" color="positive" text-color="white" size="sm">
               Verifierad
             </q-chip>
@@ -24,10 +30,10 @@
               <q-icon name="group" size="sm" />
               {{ props.group.groupType }}
             </span>
-            <span v-if="props.group.groupType && props.group.city" class="text-grey-5">•</span>
-            <span v-if="props.group.city" class="inline-flex items-center">
+            <span v-if="props.group.groupType && props.group.expand?.city?.title" class="text-grey-5">•</span>
+            <span v-if="props.group.expand?.city?.title" class="inline-flex items-center">
               <q-icon name="location_on" size="sm" />
-              {{ props.group.city }}
+              {{ props.group.expand.city.title }}
             </span>
           </div>
         </q-card-section>
@@ -41,19 +47,18 @@ import { useQuasar } from 'quasar';
 import { computed } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
-import type { GroupsRecord } from 'app/pocketbase-types';
+import type { GroupsRecord, GroupsPublicationStatusOptions } from 'app/pocketbase-types';
+import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 
 interface Props {
-  group: WithId<GroupsRecord>;
-  to?: string;
+  group: WithId<GroupsRecord, GroupsExpand>;
+  showStatus?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  showStatus: false,
+});
 const $q = useQuasar();
-
-const emit = defineEmits<{
-  click: [group: WithId<GroupsRecord>];
-}>();
 
 const getImageUrl = (imageName: string) => {
   return pb.files.getURL(props.group, imageName);
@@ -73,4 +78,19 @@ const imageStyle = computed(() => {
     ? { width: '320px', height: '220px' }
     : { width: '100%', height: '180px' };
 });
+
+const getStatusColor = (status?: GroupsPublicationStatusOptions) => {
+  switch (status) {
+    case 'Publicerad':
+      return 'positive';
+    case 'Granskning':
+      return 'warning';
+    case 'Uppdatering':
+      return 'info';
+    case 'Nekad':
+      return 'negative';
+    default:
+      return 'grey';
+  }
+};
 </script>

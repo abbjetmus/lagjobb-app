@@ -39,12 +39,28 @@ export const useJobs = defineStore('jobs-module', {
       return pb.collection(Collections.JobCategories).getFullList({ expand: "jobSubcategories_via_category" }).then(res => {
         this.categories = res as unknown as (WithId<JobCategoriesRecord> & { expand?: JobCategoriesExpand })[]
         return true
+      }).catch(e => {
+        if (e && typeof e === 'object' && 'message' in e &&
+          (e.message === 'signal is aborted without reason' || e.message?.toString().includes('autocancelled'))) {
+          // Request was cancelled by PocketBase, return true if we already have categories
+          return this.categories.length > 0
+        }
+        console.error('Get all job categories error:', e)
+        return false
       })
     },
     async getAllCounties(): Promise<boolean> {
       return pb.collection(Collections.Counties).getFullList({ expand: "cities_via_county" }).then(res => {
         this.counties = res as unknown as (WithId<CountiesRecord> & { expand?: CountiesExpand })[]
         return true
+      }).catch(e => {
+        if (e && typeof e === 'object' && 'message' in e &&
+          (e.message === 'signal is aborted without reason' || e.message?.toString().includes('autocancelled'))) {
+          // Request was cancelled by PocketBase, return true if we already have counties
+          return this.counties.length > 0
+        }
+        console.error('Get all counties error:', e)
+        return false
       })
     },
     async createJob(job: JobsRecord, images: Attachment[]): Promise<boolean> {
@@ -147,6 +163,57 @@ export const useJobs = defineStore('jobs-module', {
       }).catch(e => {
         console.error('Update interest request error:', e)
         return false
+      })
+    },
+    async searchJobs(options: {
+      subcategoryIds?: string[];
+      cityIds?: string[];
+      page?: number;
+      pageSize?: number;
+    }): Promise<{ items: (WithId<JobsRecord> & { expand?: JobsExpand })[]; totalPages: number; page: number; perPage: number; totalItems: number }> {
+      const filters: string[] = [];
+
+      filters.push('publicationStatus = "Publicerad"');
+
+      if (options.subcategoryIds && options.subcategoryIds.length > 0) {
+        const subcategoryFilters = options.subcategoryIds.map(id => `jobSubcategories ~ "${id}"`).join(' || ');
+        filters.push(`(${subcategoryFilters})`);
+      }
+
+      if (options.cityIds && options.cityIds.length > 0) {
+        const cityFilters = options.cityIds.map(id => `city = "${id}"`).join(' || ');
+        filters.push(`(${cityFilters})`);
+      }
+
+      const filterString = filters.join(' && ');
+
+      const page = options.page || 1;
+      const pageSize = options.pageSize || 50;
+
+      console.log('Search jobs filter:', filterString);
+
+      return pb.collection(Collections.Jobs).getList(page, pageSize, {
+        filter: filterString,
+        sort: '-created',
+        expand: 'city',
+      }).then(res => {
+        console.log('Search jobs result:', res.items.length, 'items');
+        return {
+          items: res.items as unknown as (WithId<JobsRecord> & { expand?: JobsExpand })[],
+          totalPages: res.totalPages,
+          page: res.page,
+          perPage: res.perPage,
+          totalItems: res.totalItems,
+        }
+      }).catch(e => {
+        console.error('Search jobs error:', e)
+        return {
+          items: [],
+          totalPages: 1,
+          page: 1,
+          perPage: pageSize,
+          totalItems: 0,
+        }
       })
     }
   }

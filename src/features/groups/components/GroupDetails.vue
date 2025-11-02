@@ -1,5 +1,5 @@
 <template>
-  <div class="row q-col-gutter-md">
+  <div class="row">
     <div class="col-xs-12 col-md-8">
       <q-card flat class="bg-transparent">
         <q-card-section v-if="group.image">
@@ -9,8 +9,12 @@
 
         <q-card-section>
           <div class="text-h4">{{ group.groupName }}</div>
-          <div class="row items-center q-mt-sm">
-            <q-chip v-if="group.verified" color="positive" text-color="white" size="sm" class="q-mr-sm">
+          <div class="row items-center q-mt-sm q-gutter-sm">
+            <q-chip v-if="showStatus && group.publicationStatus" :color="getStatusColor(group.publicationStatus)"
+              text-color="white" size="sm">
+              {{ group.publicationStatus }}
+            </q-chip>
+            <q-chip v-if="group.verified" color="positive" text-color="white" size="sm">
               Verifierad
             </q-chip>
             <div class="text-caption text-grey">
@@ -19,7 +23,7 @@
           </div>
         </q-card-section>
 
-        <q-separator />
+        <q-separator class="q-mx-md" />
 
         <q-card-section v-if="group.description">
           <div class="text-h6 q-mb-sm">Beskrivning</div>
@@ -41,7 +45,7 @@
       </q-card>
     </div>
 
-    <div class="column col-xs-12 col-md-4 q-gutter-md">
+    <div class="column col-xs-12 col-md-4">
       <q-card class="col-auto bg-transparent" flat>
         <q-card-section>
           <div class="text-h6 q-mb-sm">Information</div>
@@ -60,15 +64,33 @@
 <script setup lang="ts">
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
-import type { GroupsRecord } from 'app/pocketbase-types';
+import type { GroupsRecord, GroupsPublicationStatusOptions } from 'app/pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
 import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   group: WithId<GroupsRecord, GroupsExpand>;
-}>();
+  showStatus?: boolean;
+}>(), {
+  showStatus: false,
+});
 
 const getImageUrl = (imageName: string) => {
   return pb.files.getURL(props.group, imageName);
+};
+
+const getStatusColor = (status?: GroupsPublicationStatusOptions) => {
+  switch (status) {
+    case 'Publicerad':
+      return 'positive';
+    case 'Granskning':
+      return 'warning';
+    case 'Uppdatering':
+      return 'info';
+    case 'Nekad':
+      return 'negative';
+    default:
+      return 'grey';
+  }
 };
 </script>

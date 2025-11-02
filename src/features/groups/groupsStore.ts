@@ -7,7 +7,7 @@ import { useAuth } from 'src/features/auth/authStore';
 import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 
 interface GroupsState {
-  myGroups: WithId<GroupsRecord>[],
+  myGroups: WithId<GroupsRecord, GroupsExpand>[],
   allGroups: WithId<GroupsRecord>[],
 }
 
@@ -40,8 +40,9 @@ export const useGroups = defineStore('groups-module', {
       return pb.collection(Collections.Groups).getFullList({
         filter: `createdBy="${authStore.currentUser.id}"`,
         sort: '-created',
+        expand: 'city',
       }).then(res => {
-        this.myGroups = res as unknown as WithId<GroupsRecord>[]
+        this.myGroups = res as unknown as WithId<GroupsRecord, GroupsExpand>[]
         return true
       }).catch(e => {
         console.error('Load my groups error:', e)

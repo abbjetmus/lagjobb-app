@@ -4,12 +4,18 @@
       <q-card flat class="bg-transparent">
         <q-card-section>
           <div class="text-h4">{{ job.title }}</div>
-          <div class="text-caption text-grey q-mt-sm">
-            Publicerad: {{ formatDateTime(new Date(job.created ?? '')) }}
+          <div class="row items-center q-mt-sm q-gutter-sm">
+            <q-chip v-if="showStatus && job.publicationStatus" :color="getStatusColor(job.publicationStatus)"
+              text-color="white" size="sm">
+              {{ job.publicationStatus }}
+            </q-chip>
+            <div class="text-caption text-grey">
+              Publicerad: {{ formatDateTime(new Date(job.created ?? '')) }}
+            </div>
           </div>
         </q-card-section>
 
-        <q-separator />
+        <q-separator class="q-mx-md" />
 
         <q-card-section>
           <div class="text-h6 q-mb-sm">Beskrivning</div>
@@ -47,7 +53,7 @@
       </q-card>
     </div>
 
-    <div class="column col-xs-12 col-md-4 q-gutter-md">
+    <div class="column col-xs-12 col-md-4">
       <q-card class="col-auto bg-transparent" flat>
         <q-card-section>
           <div class="text-h6 q-mb-sm">Kontakt</div>
@@ -91,7 +97,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import { useAuth } from 'src/features/auth/authStore';
-import type { JobsRecord } from 'app/pocketbase-types';
+import type { JobsRecord, JobsPublicationStatusOptions } from 'app/pocketbase-types';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import { useQuasar } from 'quasar';
 import type { WithId } from 'src/models/withIdType';
@@ -107,9 +113,12 @@ const authStore = useAuth();
 const groupsStore = useGroups();
 const $q = useQuasar();
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   job: WithId<JobsRecord> & { expand?: JobsExpand };
-}>();
+  showStatus?: boolean;
+}>(), {
+  showStatus: false,
+});
 
 const userGroups = ref<WithId<GroupsRecord>[]>([]);
 
@@ -132,6 +141,21 @@ const showSendInterestDialog = () => {
       groups: userGroups.value,
     },
   });
+};
+
+const getStatusColor = (status?: JobsPublicationStatusOptions) => {
+  switch (status) {
+    case 'Publicerad':
+      return 'positive';
+    case 'Granskning':
+      return 'warning';
+    case 'Uppdatering':
+      return 'info';
+    case 'Nekad':
+      return 'negative';
+    default:
+      return 'grey';
+  }
 };
 
 onMounted(async () => {

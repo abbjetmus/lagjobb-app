@@ -3,7 +3,7 @@
     <div class="bg-image">
       <div class="search-container q-pa-sm" style="border-bottom: 2px solid var(--q-primary)">
         <div class="text-grey-3">
-          <div class="text-center text-h5 text-md-h4 q-my-md">
+          <div class="text-center text-h6 text-md-h4 q-my-md">
             Registrerade lag, klasser och föreningar
           </div>
 
@@ -55,7 +55,7 @@
     </div>
 
     <q-list v-else separator class="q-pa-md">
-      <group-list-item v-for="group in groups" :key="group.id" :group="group" :to="`/grupp/${group.id}`" />
+      <group-list-item v-for="group in groups" :key="group.id" :group="group" @click="goToGroup(group.id as string)" />
     </q-list>
   </q-page>
 </template>
@@ -67,15 +67,17 @@ import { pb } from 'src/boot/pocketbase';
 import { Collections, GroupsGroupTypeOptions } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import type { GroupsRecord } from 'app/pocketbase-types';
+import type { GroupsExpand } from 'app/expanded-pocketbase-types';
 import GroupListItem from './components/GroupListItem.vue';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import { QSelect } from 'quasar';
+import { useRouter } from 'vue-router';
 
 const route = useRoute();
 const jobsStore = useJobs();
-
-const groups = ref<WithId<GroupsRecord>[]>([]);
-const loading = ref(true);
+const router = useRouter();
+const groups = ref<WithId<GroupsRecord, GroupsExpand>[]>([]);
+const loading = ref(false);
 const selectedCities = ref<string[]>([]);
 const selectedGroupTypes = ref<GroupsGroupTypeOptions[]>([]);
 const cityRef = ref<QSelect | null>(null);
@@ -116,10 +118,6 @@ watch(allCities, (cities) => {
   filterCityOptions.value = cities;
 }, { immediate: true });
 
-watch([selectedCities, selectedGroupTypes], () => {
-  void loadGroups();
-}, { deep: true });
-
 watch(() => route.query.groupType, (groupType) => {
   if (groupType && typeof groupType === 'string') {
     const groupTypeValue = groupTypeOptions.find(opt => opt.label === groupType);
@@ -159,14 +157,17 @@ const loadGroups = async () => {
       filters.push(`(${groupTypeFilter})`);
     }
 
+    filters.push('publicationStatus = "Publicerad"');
+
     const filter = filters.length > 0 ? filters.join(' && ') : undefined;
 
     const records = await pb.collection(Collections.Groups).getList(1, 50, {
       ...(filter && { filter }),
       sort: '-created',
+      expand: 'city',
     });
 
-    groups.value = records.items as unknown as WithId<GroupsRecord>[];
+    groups.value = records.items as unknown as WithId<GroupsRecord, GroupsExpand>[];
   } catch (error) {
     console.error('Load groups error:', error);
   } finally {
@@ -177,6 +178,11 @@ const loadGroups = async () => {
 const clearFilters = () => {
   selectedCities.value = [];
   selectedGroupTypes.value = [];
+  void loadGroups();
+};
+
+const goToGroup = async (groupId: string) => {
+  await router.push(`/grupp/${groupId}`);
 };
 
 onMounted(async () => {
@@ -189,6 +195,7 @@ onMounted(async () => {
     const groupTypeValue = groupTypeOptions.find(opt => opt.label === groupTypeFromQuery);
     if (groupTypeValue) {
       selectedGroupTypes.value = [groupTypeValue.value];
+      void loadGroups();
     }
   } else {
     void loadGroups();

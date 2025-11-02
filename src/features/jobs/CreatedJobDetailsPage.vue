@@ -13,7 +13,7 @@
         <q-space />
       </div>
       <div class="q-pa-md">
-        <job-details :job="job" />
+        <job-details :job="job" :show-status="true" />
       </div>
     </div>
   </q-page>

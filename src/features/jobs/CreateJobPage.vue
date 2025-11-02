@@ -111,6 +111,7 @@ import { useQuasar } from 'quasar';
 import { useRegle } from '@regle/core';
 import { required, maxLength } from '@regle/rules';
 import type { JobsRecord } from 'app/pocketbase-types';
+import { JobsPublicationStatusOptions } from 'app/pocketbase-types';
 import type { Attachment } from 'src/models/attachment';
 import { FileAction } from 'src/models/enums';
 import CustomDateTime from 'src/components/CustomDateTime.vue';
@@ -139,6 +140,7 @@ const job = ref<JobsRecord>({
   street: '',
   city: '',
   zipcode: '',
+  publicationStatus: JobsPublicationStatusOptions.Granskning,
 } as unknown as JobsRecord);
 
 // City selection

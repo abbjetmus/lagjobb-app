@@ -6,7 +6,7 @@
           <div class="row items-center">
             <div class="col-xs-0 col-1"></div>
             <div class="col-xs-12 col-10">
-              <div class="text-center text-h5 text-md-h4 q-my-md text-secondary">
+              <div class="text-center text-h6 text-md-h4 q-my-md text-secondary">
                 Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar
               </div>
 
@@ -76,17 +76,17 @@
       <job-list-item v-for="item in uppdrag" :key="item.id" :job="item" @click="goToUppdrag(item)" />
     </q-list>
 
-    <div v-if="!loading && uppdrag.length > 0" class="q-pa-lg flex flex-center">
+    <q-page-sticky v-if="!loading && uppdrag.length > 0" position="bottom" :offset="[0, 18]">
       <q-pagination v-model="current" :max="totalPages" direction-links boundary-links icon-first="skip_previous"
-        icon-last="skip_next" icon-prev="fast_rewind" icon-next="fast_forward" />
-    </div>
+        icon-last="skip_next" icon-prev="fast_rewind" icon-next="fast_forward" color="primary"
+        class="q-pa-sm rounded-borders" />
+    </q-page-sticky>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { pb } from 'src/boot/pocketbase';
+import { useRouter, useRoute } from 'vue-router';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import JobListItem from 'src/features/jobs/components/JobListItem.vue';
 import type { WithId } from 'src/models/withIdType';
@@ -96,6 +96,7 @@ import { useAuth } from 'src/features/auth/authStore';
 import { storeToRefs } from 'pinia';
 import type { JobsExpand } from 'app/expanded-pocketbase-types';
 const router = useRouter();
+const route = useRoute();
 const jobsStore = useJobs();
 const authStore = useAuth();
 const { currentUser } = storeToRefs(authStore);
@@ -107,6 +108,9 @@ const selectedSubcategories = ref<string[]>([]);
 const selectedCities = ref<string[]>([]);
 const current = ref(1);
 const totalPages = ref(1);
+const isUpdatingQuery = ref(false);
+const isInitializing = ref(true);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const allCities = computed(() => {
   const citiesMap = new Map<string, { id: string; title: string; county: string }>();
@@ -165,30 +169,113 @@ watch(allJobSubcategories, (subcategories) => {
   filterJobsOptions.value = subcategories;
 }, { immediate: true });
 
+watch([selectedCities, selectedSubcategories], () => {
+  if (!isUpdatingQuery.value && !isInitializing.value) {
+    current.value = 1;
+    updateQueryParams();
+    debouncedSearch();
+  }
+});
+
+watch(() => route.query, (newQuery) => {
+  if (!isUpdatingQuery.value && !isInitializing.value) {
+    isUpdatingQuery.value = true;
+    loadFromQueryParams(newQuery as Record<string, string | string[] | null>);
+    isUpdatingQuery.value = false;
+    debouncedSearch();
+  }
+});
+
+const updateQueryParams = () => {
+  const filters: Record<string, string> = {};
+
+  if (current.value > 1) {
+    filters.page = current.value.toString();
+  }
+
+  selectedCities.value.forEach(cityId => {
+    const city = allCities.value.find(c => c.id === cityId);
+    if (city) {
+      filters['city' + cityId] = city.title;
+    }
+  });
+
+  selectedSubcategories.value.forEach(subId => {
+    const sub = allJobSubcategories.value.find(s => s.id === subId);
+    if (sub) {
+      filters['uppdrag' + subId] = sub.title;
+    }
+  });
+
+  isUpdatingQuery.value = true;
+  router.replace({ path: route.path, query: filters }).catch(() => { }).finally(() => {
+    isUpdatingQuery.value = false;
+  });
+};
+
+const loadFromQueryParams = (query: Record<string, string | string[] | null>) => {
+  const cityIds: string[] = [];
+  const subcategoryIds: string[] = [];
+
+  for (const key in query) {
+    const value = query[key];
+    if (value == null) continue;
+
+    if (key.startsWith('city')) {
+      const id = key.replace('city', '');
+      const city = allCities.value.find(c => c.id === id);
+      if (city && !cityIds.includes(id)) {
+        cityIds.push(id);
+      }
+    } else if (key.startsWith('uppdrag')) {
+      const id = key.replace('uppdrag', '');
+      const sub = allJobSubcategories.value.find(s => s.id === id);
+      if (sub && !subcategoryIds.includes(id)) {
+        subcategoryIds.push(id);
+      }
+    } else if (key === 'page') {
+      const page = Number(value);
+      if (!isNaN(page) && page > 0) {
+        current.value = page;
+      }
+    }
+  }
+
+  selectedCities.value = cityIds;
+  selectedSubcategories.value = subcategoryIds;
+};
+
+const debouncedSearch = () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  searchTimeout = setTimeout(() => {
+    void searchUppdrag();
+  }, 300);
+};
+
 const searchUppdrag = async () => {
+  if (loading.value) {
+    return;
+  }
+
   loading.value = true;
   try {
-    const filters: string[] = [];
-
-    if (selectedSubcategories.value.length > 0) {
-      const subcategoryFilters = selectedSubcategories.value.map(id => `jobSubcategory = "${id}"`).join(' || ');
-      filters.push(`(${subcategoryFilters})`);
-    }
-
-    if (selectedCities.value.length > 0) {
-      const cityFilters = selectedCities.value.map(id => `city = "${id}"`).join(' || ');
-      filters.push(`(${cityFilters})`);
-    }
-
-    const filterString = filters.length > 0 ? filters.join(' && ') : '';
-
-    const records = await pb.collection('jobs').getList(1, 50, {
-      ...(filterString && { filter: filterString }),
-      sort: '-created',
+    const result = await jobsStore.searchJobs({
+      subcategoryIds: selectedSubcategories.value,
+      cityIds: selectedCities.value,
+      page: current.value,
+      pageSize: 50,
     });
 
-    uppdrag.value = records.items as unknown as (WithId<JobsRecord> & { expand?: JobsExpand })[];
-  } catch (error) {
+    uppdrag.value = result.items;
+    totalPages.value = result.totalPages;
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'message' in error &&
+      (error.message === 'signal is aborted without reason' || error.message?.toString().includes('autocancelled'))) {
+      // Request was cancelled by PocketBase, ignore
+      return;
+    }
     console.error('Search error:', error);
   } finally {
     loading.value = false;
@@ -198,7 +285,8 @@ const searchUppdrag = async () => {
 const clearFilters = () => {
   selectedSubcategories.value = [];
   selectedCities.value = [];
-  void searchUppdrag();
+  current.value = 1;
+  updateQueryParams();
 };
 
 const goToUppdrag = async (job: WithId<JobsRecord> & { expand?: JobsExpand }) => {
@@ -235,8 +323,45 @@ const filterJobsFn = (val: string, update: (fn: () => void) => void) => {
   });
 };
 
-onMounted(() => {
-  void searchUppdrag();
+watch(current, () => {
+  if (!isInitializing.value) {
+    updateQueryParams();
+    debouncedSearch();
+  }
+});
+
+onMounted(async () => {
+  try {
+    await jobsStore.getAllCounties();
+  } catch (error) {
+    // Ignore cancellation errors
+    if (error && typeof error === 'object' && 'message' in error &&
+      !error.message?.toString().includes('autocancelled')) {
+      console.error('Get counties error:', error);
+    }
+  }
+
+  try {
+    await jobsStore.getAllJobCategories();
+  } catch (error) {
+    // Ignore cancellation errors
+    if (error && typeof error === 'object' && 'message' in error &&
+      !error.message?.toString().includes('autocancelled')) {
+      console.error('Get job categories error:', error);
+    }
+  }
+
+  if (Object.keys(route.query).length > 0) {
+    loadFromQueryParams(route.query as Record<string, string | string[] | null>);
+  }
+
+  try {
+    await searchUppdrag();
+  } catch {
+    // Error handling already in searchUppdrag
+  } finally {
+    isInitializing.value = false;
+  }
 });
 </script>
 
@@ -251,7 +376,6 @@ onMounted(() => {
 
 .search-container {
   max-width: 1000px !important;
-  height: 200px;
   margin: 0 auto;
 }
 </style>

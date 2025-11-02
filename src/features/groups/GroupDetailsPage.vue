@@ -1,11 +1,11 @@
 <template>
-  <q-page class="q-pa-md page-background-pattern">
+  <q-page class="page-background-pattern" :class="{ 'q-pa-md': $q.screen.gt.xs }">
     <div v-if="loading" class="row justify-center q-pa-xl">
       <q-spinner color="secondary" size="3em" />
     </div>
 
     <div v-else-if="group">
-      <div class="q-pa-md">
+      <div>
         <group-details :group="group" />
       </div>
     </div>

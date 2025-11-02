@@ -173,12 +173,18 @@ watch(allJobSubcategories, (subcategories) => {
 const search = () => {
   const filters: Record<string, string> = {};
 
-  selectedCities.value.forEach(city => {
-    filters['city' + city] = city;
+  selectedCities.value.forEach(cityId => {
+    const city = allCities.value.find(c => c.id === cityId);
+    if (city) {
+      filters['city' + cityId] = city.title;
+    }
   });
 
-  selectedSubcategories.value.forEach(uppdrag => {
-    filters['uppdrag' + uppdrag] = uppdrag;
+  selectedSubcategories.value.forEach(subId => {
+    const sub = allJobSubcategories.value.find(s => s.id === subId);
+    if (sub) {
+      filters['uppdrag' + subId] = sub.title;
+    }
   });
 
   router.push({ path: '/sok-uppdrag', query: filters }).catch(() => { });

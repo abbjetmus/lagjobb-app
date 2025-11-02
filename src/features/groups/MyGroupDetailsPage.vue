@@ -21,7 +21,7 @@
       </div>
 
       <div class="q-pa-md">
-        <group-details :group="group" />
+        <group-details :group="group" :show-status="true" />
       </div>
 
       <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">
