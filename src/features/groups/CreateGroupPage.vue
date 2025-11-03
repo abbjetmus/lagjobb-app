@@ -200,6 +200,10 @@ onBeforeMount(async () => {
     const id = route.params.id as string;
     try {
       group.value = await pb.collection(Collections.Groups).getOne<GroupsRecord>(id) as unknown as GroupsRecord;
+
+      if (group.value.image) {
+        currentImageUrl.value = pb.files.getURL(group.value, group.value.image);
+      }
     } catch (error) {
       console.error('Load group error:', error);
       $q.notify({

@@ -6,7 +6,7 @@
       <div v-for="(image, index) in imagesToShow" :key="index" class="col-12 col-sm-6 col-md-4">
         <q-card flat bordered class="image-card">
           <q-img :src="getImageUrl(image)" :ratio="16 / 9" spinner-color="primary" spinner-size="82px" />
-          <q-btn flat dense icon="more_vert" class="menu-button">
+          <q-btn dense unelevated icon="more_vert" class="menu-button" color="secondary">
             <q-menu style="width: 240px">
               <q-list style="min-width: 100px" bordered>
                 <q-item clickable v-close-popup @click="removeImage(image)">
@@ -25,6 +25,7 @@
 import { toRefs, computed } from 'vue';
 import { FileAction } from 'src/models/enums';
 import type { Attachment } from 'src/models/attachment';
+import { pb } from 'src/boot/pocketbase';
 
 const images = defineModel('images', { required: true, type: Array<Attachment> });
 
@@ -40,8 +41,13 @@ const imagesToShow = computed(() => {
 });
 
 const getImageUrl = (image: Attachment) => {
-  if (image.fromServer) {
-    return `${process.env.PB_URL}/api/files/${collectionName.value}/${collectionItemId.value}/${image.name}`;
+  if (image.fromServer && collectionItemId.value) {
+    const record = {
+      id: collectionItemId.value,
+      collectionName: collectionName.value,
+      collectionId: ''
+    };
+    return pb.files.getURL(record, image.name);
   } else {
     return URL.createObjectURL(image.file);
   }
@@ -102,11 +108,6 @@ const pickImage = () => {
   top: 8px;
   right: 8px;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.7);
   /* border-radius: 50%; */
-}
-
-.menu-button:hover {
-  background: rgba(255, 255, 255, 0.9);
 }
 </style>

@@ -6,7 +6,8 @@
 
     <div v-else-if="job">
       <div v-if="!$q.platform.is.mobile" class="row items-center q-pa-md bg-primary q-gutter-md">
-        <q-btn unelevated color="secondary" text-color="primary" icon="edit" label="Redigera" to="/skapa-uppdrag" />
+        <q-btn unelevated color="secondary" text-color="primary" icon="edit" label="Redigera"
+          :to="`/redigera-uppdrag/${jobId}`" />
         <q-btn unelevated color="secondary" text-color="primary" icon="question_answer" label="Förfrågningar"
           :to="`/interest-requests?jobId=${jobId}`" />
         <q-btn unelevated color="secondary" text-color="primary" icon="more_vert">
