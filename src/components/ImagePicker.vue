@@ -1,12 +1,12 @@
 <template>
-  <q-btn unelevated color="secondary" class="full-width" icon="image" label="Välj bilder att lägga till"
-    @click="pickImage" style="height: 60px;" />
+  <q-btn unelevated color="secondary" text-color="primary" class="full-width" icon="image"
+    label="Välj bilder att lägga till" @click="pickImage" style="height: 60px;" />
   <div v-if="images && images.length > 0" class="full-width q-mt-md">
     <div class="row q-col-gutter-md">
       <div v-for="(image, index) in imagesToShow" :key="index" class="col-12 col-sm-6 col-md-4">
         <q-card flat bordered class="image-card">
           <q-img :src="getImageUrl(image)" :ratio="16 / 9" spinner-color="primary" spinner-size="82px" />
-          <q-btn dense unelevated icon="more_vert" class="menu-button" color="secondary">
+          <q-btn dense unelevated icon="more_vert" class="menu-button" color="secondary" text-color="primary">
             <q-menu style="width: 240px">
               <q-list style="min-width: 100px" bordered>
                 <q-item clickable v-close-popup @click="removeImage(image)">
