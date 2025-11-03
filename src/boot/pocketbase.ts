@@ -1,6 +1,8 @@
 import { boot } from 'quasar/wrappers';
 import PocketBase from 'pocketbase';
 import { useAuth } from 'src/features/auth/authStore';
+import type { WithId } from 'src/models/withIdType';
+import type { UsersRecord } from 'app/pocketbase-types';
 
 const pb = new PocketBase(process.env.PB_URL || 'http://localhost:8090');
 
@@ -11,9 +13,7 @@ export default boot(async ({ router, store }) => {
   await new Promise<void>((resolve) => {
     pb.authStore.onChange(() => {
       authStore.authModel = pb.authStore.record;
-      if (pb.authStore.isValid) {
-        void authStore.getUser();
-      }
+      authStore.currentUser = pb.authStore.record as unknown as WithId<UsersRecord>;
       resolve();
     }, true);
   });

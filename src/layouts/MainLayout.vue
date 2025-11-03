@@ -22,7 +22,7 @@
             <q-tooltip>{{ $q.dark.isActive ? 'Växla till ljust läge' : 'Växla till mörkt läge' }}</q-tooltip>
           </q-toggle>
 
-          <toolbar-user-menu color="primary" v-if="isAuthenticated && currentUser" />
+          <toolbar-user-menu color="primary" v-if="authStore.isAuthenticated && currentUser" />
 
           <q-btn v-else outline @click="showSignInSignUpDialog()" color="primary">
             <span>Logga in / Skapa konto</span>
@@ -68,7 +68,7 @@
 
         <q-separator />
 
-        <template v-if="isAuthenticated && currentUser">
+        <template v-if="authStore.isAuthenticated && currentUser">
           <q-item v-if="currentUser.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare" clickable
             @click="drawerOpen = false; router.push('/mina-grupper')">
             <q-item-section avatar>
@@ -149,11 +149,14 @@ import ToolbarUserMenu from 'src/components/ToolbarUserMenuComponent.vue';
 import SignInSignUpDialog from 'src/features/auth/components/SignInSignUpDialog.vue';
 import { useJobs } from 'src/features/jobs/jobsStore';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
+import { storeToRefs } from 'pinia';
 
 const router = useRouter();
 const authStore = useAuth();
 const jobsStore = useJobs();
 const $q = useQuasar();
+
+const { currentUser } = storeToRefs(authStore);
 
 const darkMode = ref($q.dark.isActive);
 
@@ -170,8 +173,6 @@ watch(() => $q.dark.isActive, (val) => {
 const toReturnAfterCancel = ref('');
 const drawerOpen = ref(false);
 
-const isAuthenticated = computed(() => authStore.isAuthenticated);
-const currentUser = computed(() => authStore.currentUser);
 const isUppdragsutforare = computed(() => currentUser.value?.userAccountType === UsersUserAccountTypeOptions.Uppdragsutförare);
 const showSignInSignUpDialog = () => {
   $q.dialog({
@@ -184,7 +185,7 @@ const showSignInSignUpDialog = () => {
 };
 
 const goToNewUppdrag = () => {
-  if (isAuthenticated.value) {
+  if (authStore.isAuthenticated) {
     router.push('/skapa-uppdrag').catch(() => { });
   } else {
     toReturnAfterCancel.value = 'create';

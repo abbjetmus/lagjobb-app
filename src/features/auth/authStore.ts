@@ -29,7 +29,7 @@ export const useAuth = defineStore('auth-module', {
   },
   getters: {
     isAuthenticated(): boolean {
-      return pb.authStore.isValid
+      return this.currentUser !== null;
     }
   },
   actions: {
@@ -85,11 +85,13 @@ export const useAuth = defineStore('auth-module', {
     },
     async signIn(emailUsername: string, password: string): Promise<boolean> {
       return pb.collection(Collections.Users).authWithPassword(emailUsername, password).then((authData) => {
-        // Check if user is verified
         if (!authData.record.verified) {
           this.signOut();
           throw new Error("Email not verified");
         }
+        console.log('authData', authData);
+        this.authModel = authData.record as AuthModel;
+        this.currentUser = authData.record as unknown as WithId<UsersRecord>;
         return true
       })
         .catch((error) => {
@@ -157,18 +159,6 @@ export const useAuth = defineStore('auth-module', {
         console.error("Error getting user:", error);
         return null;
       })
-    },
-    async getUser(): Promise<boolean> {
-      try {
-        const userId = this.authModel?.id;
-        const user = await pb.collection(Collections.Users).getOne(userId!, {
-        });
-        this.currentUser = user as unknown as WithId<UsersRecord>
-        return true
-      } catch (error) {
-        console.error("Error getting user:", error);
-        return false;
-      }
     },
     signOut() {
       pb.authStore.clear();

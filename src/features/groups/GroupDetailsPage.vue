@@ -5,9 +5,7 @@
     </div>
 
     <div v-else-if="group">
-      <div>
-        <group-details :group="group" />
-      </div>
+      <group-details :group="group" />
     </div>
   </q-page>
 </template>

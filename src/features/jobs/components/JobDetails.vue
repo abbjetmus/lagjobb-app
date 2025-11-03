@@ -60,14 +60,11 @@
           <div class="q-mb-sm">
             <q-icon name="person" /> {{ job.expand?.createdBy?.name }}
           </div>
-          <div class="q-mb-sm">
-            <q-icon name="email" /> {{ job.expand?.createdBy?.email }}
-          </div>
-          <div v-if="!job.hidePhone && job.expand?.createdBy?.phone" class="q-mb-sm">
-            <q-icon name="phone" /> {{ job.expand?.createdBy?.phone }}
-          </div>
           <div v-if="job.contactHours" class="q-mb-sm text-caption">
             Kontakttider: {{ job.contactHours }}
+          </div>
+          <div class="text-caption text-grey q-mt-sm">
+            Kontaktuppgifter visas endast till gruppen som tilldelas uppdraget.
           </div>
         </q-card-section>
 

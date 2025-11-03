@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useAuth } from 'src/features/auth/authStore';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
@@ -120,19 +120,6 @@ const router = useRouter();
 const { currentUser } = storeToRefs(authStore);
 const loading = ref(false);
 
-onMounted(async () => {
-  loading.value = true;
-
-  if (!authStore.authModel && pb.authStore.record) {
-    authStore.authModel = pb.authStore.record;
-  }
-
-  if (!currentUser.value && authStore.isAuthenticated) {
-    await authStore.getUser();
-  }
-
-  loading.value = false;
-});
 const showNameDialog = ref(false);
 const showEmailDialog = ref(false);
 const showPhoneDialog = ref(false);

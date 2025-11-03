@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-xs-12 col-md-8">
-      <q-card flat class="bg-transparent">
+      <q-card flat class="bg-transparent q-pa-none q-ma-none">
         <q-card-section v-if="group.image">
           <img :src="getImageUrl(group.image)"
             style="width: 100%; height: 300px; object-fit: cover; border-radius: 4px;" />

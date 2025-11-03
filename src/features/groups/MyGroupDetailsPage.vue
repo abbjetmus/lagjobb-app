@@ -20,12 +20,12 @@
         <q-space />
       </div>
 
-      <div class="q-pa-md">
+      <div :class="{ 'q-pa-md': $q.screen.gt.xs }">
         <group-details :group="group" :show-status="true" />
       </div>
 
       <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">
-        <q-btn fab icon="edit" color="primary" :to="`/redigera-grupp/${group.id}`" />
+        <q-btn fab icon="more_vert" color="primary" @click="showBottomSheet" />
       </q-page-sticky>
     </div>
   </q-page>
@@ -51,6 +51,32 @@ const loading = ref(true);
 const group = ref<(WithId<GroupsRecord> & { expand?: GroupsExpand }) | null>(null);
 
 const groupId = computed(() => route.params.id as string);
+
+const showBottomSheet = () => {
+  $q.bottomSheet({
+    actions: [
+      {
+        label: 'Redigera',
+        icon: 'edit',
+        color: 'primary',
+        id: 'edit'
+      },
+      {},
+      {
+        label: 'Radera grupp',
+        icon: 'delete',
+        color: 'negative',
+        id: 'delete'
+      }
+    ]
+  }).onOk(action => {
+    if (action.id === 'edit') {
+      void router.push(`/redigera-grupp/${groupId.value}`);
+    } else if (action.id === 'delete') {
+      confirmDelete();
+    }
+  });
+};
 
 const confirmDelete = () => {
   void $q.dialog({

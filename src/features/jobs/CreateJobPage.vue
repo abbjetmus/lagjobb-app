@@ -402,7 +402,7 @@ const onSubmit = async () => {
         type: 'positive',
         message: isEdit.value ? 'Uppdraget har uppdaterats!' : 'Uppdraget har skapats!',
       });
-      await router.push('/mina-uppdrag');
+      await router.replace('/skapade-uppdrag');
     } else {
       $q.notify({
         type: 'negative',
