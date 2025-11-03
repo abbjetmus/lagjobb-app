@@ -17,7 +17,7 @@
           </div>
           <div class="text-body1 text-grey-7 row items-center q-gutter-sm q-mt-xs">
             <q-chip v-if="showStatus && props.group.publicationStatus"
-              :color="getStatusColor(props.group.publicationStatus)" text-color="white" size="sm">
+              :color="getGroupStatusColor(props.group.publicationStatus)" text-color="white" size="sm">
               {{ props.group.publicationStatus }}
             </q-chip>
             <span v-if="showStatus && props.group.publicationStatus && props.group.verified"
@@ -47,8 +47,9 @@ import { useQuasar } from 'quasar';
 import { computed } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
-import type { GroupsRecord, GroupsPublicationStatusOptions } from 'app/pocketbase-types';
+import type { GroupsRecord } from 'app/pocketbase-types';
 import type { GroupsExpand } from 'app/expanded-pocketbase-types';
+import { getGroupStatusColor } from 'src/utils/enumUtils';
 
 interface Props {
   group: WithId<GroupsRecord, GroupsExpand>;
@@ -78,19 +79,4 @@ const imageStyle = computed(() => {
     ? { width: '320px', height: '220px' }
     : { width: '100%', height: '180px' };
 });
-
-const getStatusColor = (status?: GroupsPublicationStatusOptions) => {
-  switch (status) {
-    case 'Publicerad':
-      return 'positive';
-    case 'Granskning':
-      return 'warning';
-    case 'Uppdatering':
-      return 'info';
-    case 'Nekad':
-      return 'negative';
-    default:
-      return 'grey';
-  }
-};
 </script>

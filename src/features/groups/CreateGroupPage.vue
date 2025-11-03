@@ -220,6 +220,8 @@ const onSubmit = async () => {
 
   loading.value = true;
   try {
+    group.value.publicationStatus = GroupsPublicationStatusOptions.Granskning;
+
     let success = false;
 
     if (isEdit.value) {

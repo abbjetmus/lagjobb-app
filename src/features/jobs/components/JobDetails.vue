@@ -5,7 +5,7 @@
         <q-card-section>
           <div class="text-h4">{{ job.title }}</div>
           <div class="row items-center q-mt-sm q-gutter-sm">
-            <q-chip v-if="showStatus && job.publicationStatus" :color="getStatusColor(job.publicationStatus)"
+            <q-chip v-if="showStatus && job.publicationStatus" :color="getJobStatusColor(job.publicationStatus)"
               text-color="white" size="sm">
               {{ job.publicationStatus }}
             </q-chip>
@@ -97,7 +97,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import { useAuth } from 'src/features/auth/authStore';
-import type { JobsRecord, JobsPublicationStatusOptions } from 'app/pocketbase-types';
+import type { JobsRecord } from 'app/pocketbase-types';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import { useQuasar } from 'quasar';
 import type { WithId } from 'src/models/withIdType';
@@ -108,6 +108,7 @@ import { formatDateTime } from 'src/utils/dateUtils';
 import SendInterestDialog from './SendInterestDialog.vue';
 import { useGroups } from 'src/features/groups/groupsStore';
 import type { GroupsRecord } from 'app/pocketbase-types';
+import { getJobStatusColor } from 'src/utils/enumUtils';
 
 const authStore = useAuth();
 const groupsStore = useGroups();
@@ -141,21 +142,6 @@ const showSendInterestDialog = () => {
       groups: userGroups.value,
     },
   });
-};
-
-const getStatusColor = (status?: JobsPublicationStatusOptions) => {
-  switch (status) {
-    case 'Publicerad':
-      return 'positive';
-    case 'Granskning':
-      return 'warning';
-    case 'Uppdatering':
-      return 'info';
-    case 'Nekad':
-      return 'negative';
-    default:
-      return 'grey';
-  }
 };
 
 onMounted(async () => {

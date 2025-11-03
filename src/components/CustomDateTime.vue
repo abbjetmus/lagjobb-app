@@ -28,19 +28,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 
 const selectedDateTime = ref<string | undefined>()
 
 const model = defineModel({ required: false, type: String });
 defineProps<{ label: string, errorMessage: string, error: boolean }>()
 
-onMounted(() => {
-  if (model.value) {
-    const date = new Date(model.value);
-    selectedDateTime.value = date.toISOString().slice(0, 16);
-  }
-})
+watch(
+  () => model.value,
+  (val) => {
+    if (val && !selectedDateTime.value) {
+      const date = new Date(val);
+      selectedDateTime.value = date.toISOString().slice(0, 16).replace('T', ' ');
+    }
+  },
+  { immediate: true }
+);
 
 watch(
   selectedDateTime,
@@ -48,7 +52,6 @@ watch(
     if (val) {
       model.value = new Date(val).toISOString()
     }
-  },
-  { immediate: true }
+  }
 );
 </script>

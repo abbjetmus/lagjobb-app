@@ -14,8 +14,9 @@ var Collections = {
   Cities: "cities",
   Counties: "counties",
   Groups: "groups",
+  InterestRequests: "interestRequests",
+  InterestRequestsJobsView: "interestRequestsJobsView",
   JobCategories: "jobCategories",
-  JobLocations: "jobLocations",
   JobSubcategories: "jobSubcategories",
   Jobs: "jobs",
   Users: "users",
@@ -23,17 +24,47 @@ var Collections = {
 
 // GroupsGroupTypeOptions enum as ES5 object
 var GroupsGroupTypeOptions = {
-  "Skolklass": "Skolklass",
-  "Sportförening": "Sportförening",
+  "Lag": "Lag",
+  "Klass": "Klass",
+  "Förening": "Förening",
+  "Organisation": "Organisation",
 };
 
-// JobsStatusOptions enum as ES5 object
-var JobsStatusOptions = {
-  "Klar": "Klar",
+// GroupsPublicationStatusOptions enum as ES5 object
+var GroupsPublicationStatusOptions = {
+  "Granskning": "Granskning",
+  "Publicerad": "Publicerad",
+  "Uppdatering": "Uppdatering",
+  "Nekad": "Nekad",
 };
 
-// UsersUserTypeOptions enum as ES5 object
-var UsersUserTypeOptions = {
+// InterestRequestsStatusOptions enum as ES5 object
+var InterestRequestsStatusOptions = {
+  "Godkänd": "Godkänd",
+  "Betald": "Betald",
+  "Utförd": "Utförd",
+  "Nekad": "Nekad",
+  "Förfrågan": "Förfrågan",
+};
+
+// InterestRequestsJobsViewStatusOptions enum as ES5 object
+var InterestRequestsJobsViewStatusOptions = {
+  "Granskning": "Granskning",
+  "Publicerad": "Publicerad",
+  "Nekad": "Nekad",
+  "Uppdatering": "Uppdatering",
+};
+
+// JobsPublicationStatusOptions enum as ES5 object
+var JobsPublicationStatusOptions = {
+  "Granskning": "Granskning",
+  "Publicerad": "Publicerad",
+  "Nekad": "Nekad",
+  "Uppdatering": "Uppdatering",
+};
+
+// UsersUserAccountTypeOptions enum as ES5 object
+var UsersUserAccountTypeOptions = {
   "Uppdragsgivare": "Uppdragsgivare",
   "Uppdragsutförare": "Uppdragsutförare",
 };
@@ -92,16 +123,37 @@ if (typeof global !== 'undefined') {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports.JobsStatusOptions = JobsStatusOptions;
+  module.exports.GroupsPublicationStatusOptions = GroupsPublicationStatusOptions;
 }
 if (typeof global !== 'undefined') {
-  global.PocketBaseTypes.JobsStatusOptions = JobsStatusOptions;
+  global.PocketBaseTypes.GroupsPublicationStatusOptions = GroupsPublicationStatusOptions;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports.UsersUserTypeOptions = UsersUserTypeOptions;
+  module.exports.InterestRequestsStatusOptions = InterestRequestsStatusOptions;
 }
 if (typeof global !== 'undefined') {
-  global.PocketBaseTypes.UsersUserTypeOptions = UsersUserTypeOptions;
+  global.PocketBaseTypes.InterestRequestsStatusOptions = InterestRequestsStatusOptions;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.InterestRequestsJobsViewStatusOptions = InterestRequestsJobsViewStatusOptions;
+}
+if (typeof global !== 'undefined') {
+  global.PocketBaseTypes.InterestRequestsJobsViewStatusOptions = InterestRequestsJobsViewStatusOptions;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.JobsPublicationStatusOptions = JobsPublicationStatusOptions;
+}
+if (typeof global !== 'undefined') {
+  global.PocketBaseTypes.JobsPublicationStatusOptions = JobsPublicationStatusOptions;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.UsersUserAccountTypeOptions = UsersUserAccountTypeOptions;
+}
+if (typeof global !== 'undefined') {
+  global.PocketBaseTypes.UsersUserAccountTypeOptions = UsersUserAccountTypeOptions;
 }
 

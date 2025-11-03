@@ -33,7 +33,7 @@
         <q-slide-transition appear>
           <div v-if="isApproved" v-show="step > 1">
             <span class="block">Du kan nu hålla kontakt med {{ groupName }} på numret {{ groupPhone
-            }}.</span>
+              }}.</span>
             <span class="block" v-if="step === 2">
               Klick på knappen utfört när uppdraget är utfört.
             </span>
@@ -56,19 +56,19 @@
         <q-slide-transition appear>
           <div v-show="step > 3">
             <div v-show="step === 4">
-              <span class="block">Lämna gärna omdöme på utförda arbetet med stjärnorna och en kommentar.</span>
-              <q-rating class="q-mb-sm" v-model="rating" max="5" size="2em" color="yellow" icon="star_border"
+              <span class="block">Lämna gärna omdöme på gruppen med stjärnorna och en kommentar.</span>
+              <q-rating class="q-mb-sm" v-model="groupRating" max="5" size="2em" color="yellow" icon="star_border"
                 icon-selected="star" icon-half="star_half" no-dimming />
               <q-chat-message sent size="12">
-                <q-input type="textarea" v-model="reviewMessage" dense borderless no-error-icon hide-bottom-space
+                <q-input type="textarea" v-model="groupRatingMessage" dense borderless no-error-icon hide-bottom-space
                   lazy-rules bg-color="grey-2" class="col-12 q-mb-xs" outlined />
               </q-chat-message>
             </div>
-            <q-chat-message sent v-show="step > 4" name="Ditt omdöme" bg-color="green-4"
+            <q-chat-message sent v-show="step > 4" name="Ditt omdöme på gruppen" bg-color="green-4"
               :stamp="formatDateTime(new Date(interestRequest.doneAt || interestRequest.updated))">
               <div>
-                <span class="block">{{ reviewMessage }}</span>
-                <q-rating class="q-mb-sm" v-model="rating" max="5" size="1.6em" color="yellow" icon="star_border"
+                <span class="block">{{ groupRatingMessage }}</span>
+                <q-rating class="q-mb-sm" v-model="groupRating" max="5" size="1.6em" color="yellow" icon="star_border"
                   icon-selected="star" icon-half="star_half" no-dimming readonly />
               </div>
             </q-chat-message>
@@ -90,6 +90,7 @@ import type { WithId } from 'src/models/withIdType';
 import { useQuasar } from 'quasar';
 import GroupDetailsDialog from 'src/features/groups/components/GroupDetailsDialog.vue';
 import type { JobsExpand, GroupsExpand } from 'app/expanded-pocketbase-types';
+import { useInterestRequestNotifications } from 'src/composables/useInterestRequestNotifications';
 
 interface Props {
   interestRequestId: string;
@@ -99,11 +100,12 @@ interface Props {
 const props = defineProps<Props>();
 const $q = useQuasar();
 const interestRequestsStore = useInterestRequests();
+const { sendNotification } = useInterestRequestNotifications();
 
 const interestRequest = ref<WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord, GroupsExpand>; job?: WithId<JobsRecord> & { expand?: JobsExpand } } } | null>(null);
 const responseMessage = ref('');
-const reviewMessage = ref('');
-const rating = ref(0);
+const groupRatingMessage = ref('');
+const groupRating = ref(0);
 
 const step = computed(() => {
   if (!interestRequest.value) return 1;
@@ -180,6 +182,12 @@ const loadInterestRequest = async () => {
     if (interestRequest.value?.responseMessage) {
       responseMessage.value = interestRequest.value.responseMessage;
     }
+    if (interestRequest.value?.groupRatingMessage) {
+      groupRatingMessage.value = interestRequest.value.groupRatingMessage;
+    }
+    if (interestRequest.value?.groupRating) {
+      groupRating.value = interestRequest.value.groupRating;
+    }
   }
 };
 
@@ -193,6 +201,10 @@ const accept = async () => {
   });
   if (success) {
     await loadInterestRequest();
+    await sendNotification({
+      interestRequestId: interestRequest.value.id,
+      action: 'approved',
+    });
   }
 };
 
@@ -205,6 +217,10 @@ const decline = async () => {
   });
   if (success) {
     await loadInterestRequest();
+    await sendNotification({
+      interestRequestId: interestRequest.value.id,
+      action: 'declined',
+    });
   }
 };
 
@@ -215,6 +231,10 @@ const completed = async () => {
   });
   if (success) {
     await loadInterestRequest();
+    await sendNotification({
+      interestRequestId: interestRequest.value.id,
+      action: 'completed',
+    });
   }
 };
 
@@ -225,6 +245,10 @@ const pay = async () => {
   });
   if (success) {
     await loadInterestRequest();
+    await sendNotification({
+      interestRequestId: interestRequest.value.id,
+      action: 'paid',
+    });
   }
 };
 
@@ -232,9 +256,15 @@ const done = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     doneAt: new Date().toISOString(),
+    groupRating: groupRating.value,
+    groupRatingMessage: groupRatingMessage.value,
   });
   if (success) {
     await loadInterestRequest();
+    await sendNotification({
+      interestRequestId: interestRequest.value.id,
+      action: 'done',
+    });
   }
 };
 

@@ -16,7 +16,7 @@
             {{ truncate(job.description, 100) }}
           </div>
           <div class="text-body1 text-grey-7 row items-center q-gutter-sm q-mt-xs">
-            <q-chip v-if="showStatus && job.publicationStatus" :color="getStatusColor(job.publicationStatus)"
+            <q-chip v-if="showStatus && job.publicationStatus" :color="getJobStatusColor(job.publicationStatus)"
               text-color="white" size="sm">
               {{ job.publicationStatus }}
             </q-chip>
@@ -46,9 +46,10 @@ import { useQuasar } from 'quasar';
 import { computed } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
-import type { JobsRecord, JobsPublicationStatusOptions } from 'app/pocketbase-types';
+import type { JobsRecord } from 'app/pocketbase-types';
 import type { JobsExpand } from 'app/expanded-pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
+import { getJobStatusColor } from 'src/utils/enumUtils';
 
 interface Props {
   job: WithId<JobsRecord, JobsExpand>;
@@ -74,19 +75,4 @@ const imageStyle = computed(() => {
     ? { width: '320px', height: '220px' }
     : { width: '100%', height: '180px' };
 });
-
-const getStatusColor = (status?: JobsPublicationStatusOptions) => {
-  switch (status) {
-    case 'Publicerad':
-      return 'positive';
-    case 'Granskning':
-      return 'warning';
-    case 'Uppdatering':
-      return 'info';
-    case 'Nekad':
-      return 'negative';
-    default:
-      return 'grey';
-  }
-};
 </script>

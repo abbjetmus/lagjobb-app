@@ -129,9 +129,9 @@ export enum GroupsGroupTypeOptions {
 
 export enum GroupsPublicationStatusOptions {
 	"Granskning" = "Granskning",
-	"Publicerad" = "Publicerad",
 	"Uppdatering" = "Uppdatering",
 	"Nekad" = "Nekad",
+	"Publicerad" = "Publicerad",
 }
 export type GroupsRecord = {
 	city: RecordIdString
@@ -164,8 +164,12 @@ export type InterestRequestsRecord = {
 	created: IsoAutoDateString
 	doneAt?: IsoDateString
 	group: RecordIdString
+	groupRating?: number
+	groupRatingMessage?: string
 	id: string
 	job: RecordIdString
+	jobCreatorRating?: number
+	jobCreatorRatingMessage?: string
 	payedAt?: IsoDateString
 	requestMessage?: string
 	responseAt?: IsoDateString
@@ -176,7 +180,7 @@ export type InterestRequestsRecord = {
 
 export enum InterestRequestsJobsViewStatusOptions {
 	"Granskning" = "Granskning",
-	"Publicerad" = "Publicerad",
+	"Godkänd" = "Godkänd",
 	"Nekad" = "Nekad",
 	"Uppdatering" = "Uppdatering",
 }
@@ -224,9 +228,9 @@ export type JobSubcategoriesRecord = {
 
 export enum JobsPublicationStatusOptions {
 	"Granskning" = "Granskning",
-	"Publicerad" = "Publicerad",
 	"Nekad" = "Nekad",
 	"Uppdatering" = "Uppdatering",
+	"Publicerad" = "Publicerad",
 }
 export type JobsRecord = {
 	assignedGroup?: RecordIdString

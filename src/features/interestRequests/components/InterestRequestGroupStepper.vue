@@ -46,20 +46,20 @@
         <q-slide-transition appear>
           <div v-show="step > 3">
             <div v-show="step === 4">
-              <span class="block">Lämna gärna omdöme på uppdragsgivaren</span>
-              <q-rating class="block q-mb-sm" v-model="rating" max="5" size="2em" color="yellow" icon="star_border"
-                icon-selected="star" icon-half="star_half" no-dimming />
+              <span class="block">Lämna gärna omdöme på uppdragsgivaren med stjärnorna och en kommentar.</span>
+              <q-rating class="block q-mb-sm" v-model="jobCreatorRating" max="5" size="2em" color="yellow"
+                icon="star_border" icon-selected="star" icon-half="star_half" no-dimming />
               <q-chat-message sent size="12">
-                <q-input type="textarea" v-model="reviewMessage" dense borderless no-error-icon hide-bottom-space
-                  lazy-rules bg-color="grey-2" class="col-12 q-mb-xs" outlined />
+                <q-input type="textarea" v-model="jobCreatorRatingMessage" dense borderless no-error-icon
+                  hide-bottom-space lazy-rules bg-color="grey-2" class="col-12 q-mb-xs" outlined />
               </q-chat-message>
             </div>
-            <q-chat-message sent v-show="step > 4" name="Ditt omdöme" bg-color="green-4"
+            <q-chat-message sent v-show="step > 4" name="Ditt omdöme på uppdragsgivaren" bg-color="green-4"
               :stamp="formatDateTime(new Date(interestRequest.doneAt || interestRequest.updated))">
               <div>
-                <span class="block">{{ reviewMessage }}</span>
-                <q-rating class="block q-mb-sm" v-model="rating" max="5" size="1.6em" color="yellow" icon="star_border"
-                  icon-selected="star" icon-half="star_half" no-dimming readonly />
+                <span class="block">{{ jobCreatorRatingMessage }}</span>
+                <q-rating class="block q-mb-sm" v-model="jobCreatorRating" max="5" size="1.6em" color="yellow"
+                  icon="star_border" icon-selected="star" icon-half="star_half" no-dimming readonly />
               </div>
             </q-chat-message>
             <q-btn v-show="step === 4" color="green" label="Klart" @click="done" no-caps unelevated />
@@ -91,8 +91,8 @@ const groupsStore = useGroups();
 const authStore = useAuth();
 
 const interestRequest = ref<WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord>; job?: WithId<JobsRecord> & { expand?: JobsExpand } } } | null>(null);
-const reviewMessage = ref('');
-const rating = ref(0);
+const jobCreatorRatingMessage = ref('');
+const jobCreatorRating = ref(0);
 
 const step = computed(() => {
   if (!interestRequest.value) return 1;
@@ -183,6 +183,12 @@ const loadInterestRequest = async () => {
     const request = await interestRequestsStore.getInterestRequestForJobAndGroup(props.jobId, group.id);
     if (request) {
       interestRequest.value = request as WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord>; job?: WithId<JobsRecord> & { expand?: JobsExpand } } };
+      if (interestRequest.value?.jobCreatorRatingMessage) {
+        jobCreatorRatingMessage.value = interestRequest.value.jobCreatorRatingMessage;
+      }
+      if (interestRequest.value?.jobCreatorRating) {
+        jobCreatorRating.value = interestRequest.value.jobCreatorRating;
+      }
       break;
     }
   }
@@ -202,6 +208,8 @@ const done = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     doneAt: new Date().toISOString(),
+    jobCreatorRating: jobCreatorRating.value,
+    jobCreatorRatingMessage: jobCreatorRatingMessage.value,
   });
   if (success) {
     await loadInterestRequest();

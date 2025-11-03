@@ -10,7 +10,7 @@
         <q-card-section>
           <div class="text-h4">{{ group.groupName }}</div>
           <div class="row items-center q-mt-sm q-gutter-sm">
-            <q-chip v-if="showStatus && group.publicationStatus" :color="getStatusColor(group.publicationStatus)"
+            <q-chip v-if="showStatus && group.publicationStatus" :color="getGroupStatusColor(group.publicationStatus)"
               text-color="white" size="sm">
               {{ group.publicationStatus }}
             </q-chip>
@@ -64,9 +64,10 @@
 <script setup lang="ts">
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
-import type { GroupsRecord, GroupsPublicationStatusOptions } from 'app/pocketbase-types';
+import type { GroupsRecord } from 'app/pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
 import type { GroupsExpand } from 'app/expanded-pocketbase-types';
+import { getGroupStatusColor } from 'src/utils/enumUtils';
 
 const props = withDefaults(defineProps<{
   group: WithId<GroupsRecord, GroupsExpand>;
@@ -77,20 +78,5 @@ const props = withDefaults(defineProps<{
 
 const getImageUrl = (imageName: string) => {
   return pb.files.getURL(props.group, imageName);
-};
-
-const getStatusColor = (status?: GroupsPublicationStatusOptions) => {
-  switch (status) {
-    case 'Publicerad':
-      return 'positive';
-    case 'Granskning':
-      return 'warning';
-    case 'Uppdatering':
-      return 'info';
-    case 'Nekad':
-      return 'negative';
-    default:
-      return 'grey';
-  }
 };
 </script>

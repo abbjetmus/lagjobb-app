@@ -4,6 +4,7 @@ import type { InterestRequestsRecord } from 'app/pocketbase-types';
 import { Collections } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import type { InterestRequestWithExpand } from 'app/expanded-pocketbase-types';
+import { useInterestRequestNotifications } from 'src/composables/useInterestRequestNotifications';
 
 interface InterestRequestsState {
   interestRequests: WithId<InterestRequestsRecord>[];
@@ -67,7 +68,12 @@ export const useInterestRequests = defineStore('interest-requests-module', {
       return pb
         .collection(Collections.InterestRequests)
         .create(interestRequest)
-        .then(() => {
+        .then(async (createdRequest) => {
+          const { sendNotification } = useInterestRequestNotifications();
+          await sendNotification({
+            interestRequestId: createdRequest.id,
+            action: 'new_request',
+          });
           return true;
         })
         .catch((e) => {

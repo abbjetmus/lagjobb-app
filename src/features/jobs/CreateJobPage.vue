@@ -16,8 +16,8 @@
         <q-input v-model.number="job.price" type="number" label="Pris (kr)" outlined bg-color="secondary" no-error-icon
           :error="r$.price.$error" error-message="Pris är obligatoriskt" />
 
-        <custom-date-time v-model="job.desiredAt" label="Önskat datum" :error="r$.desiredAt.$error"
-          error-message="Önskat datum är obligatoriskt" class="q-mb-md" bg-color="secondary" />
+        <custom-date-time v-model="job.desiredAt" label="Önskat datum och tid" :error="r$.desiredAt.$error"
+          error-message="Önskat datum och tid är obligatoriskt" class="q-mb-md" bg-color="secondary" />
 
         <q-input v-model.number="job.desiredNumberOfPeople" type="number" label="Önskad minst antal personer" outlined
           bg-color="secondary" no-error-icon :error="r$.desiredNumberOfPeople.$error"
@@ -46,9 +46,6 @@
         </q-select>
 
         <div class="text-h6">Kontaktinformation</div>
-
-        <q-checkbox v-model="job.hidePhone" label="Dölj mitt telefonnummer - numret som du anger i inställningar"
-          class="q-mb-md" bg-color="secondary" />
         <div>Önskar bli kontaktad mellan tiderna</div>
         <div class="row q-gutter-md">
           <div class="col">
@@ -354,6 +351,7 @@ onBeforeMount(async () => {
 
   if (isEdit.value) {
     const jobData = await jobsStore.getJobById(route.params.id as string);
+    console.log('jobData', jobData);
     if (jobData) {
       job.value = jobData;
 
@@ -389,6 +387,8 @@ const onSubmit = async () => {
 
   loading.value = true;
   try {
+    job.value.publicationStatus = JobsPublicationStatusOptions.Granskning;
+
     let success = false;
 
     if (isEdit.value) {

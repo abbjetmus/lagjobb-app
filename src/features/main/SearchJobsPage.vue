@@ -6,10 +6,6 @@
           <div class="row items-center">
             <div class="col-xs-0 col-1"></div>
             <div class="col-xs-12 col-10">
-              <div class="text-center text-h6 text-md-h4 q-my-md text-secondary">
-                Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar
-              </div>
-
               <div class="row">
                 <q-select ref="jobsRef" style="min-width: 300px;" v-model="selectedSubcategories"
                   :options="filterJobsOptions" use-chips use-input multiple outlined @filter="filterJobsFn"
