@@ -1,7 +1,7 @@
 <template>
   <q-page class="page-background-pattern">
-    <div class="bg-image">
-      <div class="search-container q-pa-sm" style="border-bottom: 2px solid var(--q-primary)">
+    <div class="bg-image" style="border-bottom: 2px solid var(--q-primary)">
+      <div class="search-container q-pa-sm">
         <div class="text-grey-3">
           <div class="text-center text-h6 text-md-h4 q-my-md">
             Registrerade lag, klasser och föreningar

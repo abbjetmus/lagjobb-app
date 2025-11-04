@@ -83,13 +83,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useInterestRequests } from 'src/features/interestRequests/interestRequestsStore';
-import type { GroupsRecord, InterestRequestsRecord, JobsRecord } from 'app/pocketbase-types';
+import type { InterestRequestsRecord } from 'app/pocketbase-types';
 import { InterestRequestsStatusOptions } from 'app/pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
 import type { WithId } from 'src/models/withIdType';
 import { useQuasar } from 'quasar';
 import GroupDetailsDialog from 'src/features/groups/components/GroupDetailsDialog.vue';
-import type { JobsExpand, GroupsExpand } from 'app/expanded-pocketbase-types';
+import type { InterestRequestWithExpand } from 'app/expanded-pocketbase-types';
 import { useInterestRequestNotifications } from 'src/composables/useInterestRequestNotifications';
 
 interface Props {
@@ -102,7 +102,7 @@ const $q = useQuasar();
 const interestRequestsStore = useInterestRequests();
 const { sendNotification } = useInterestRequestNotifications();
 
-const interestRequest = ref<WithId<InterestRequestsRecord> & { expand?: { group?: WithId<GroupsRecord, GroupsExpand>; job?: WithId<JobsRecord> & { expand?: JobsExpand } } } | null>(null);
+const interestRequest = ref<InterestRequestWithExpand | null>(null);
 const responseMessage = ref('');
 const groupRatingMessage = ref('');
 const groupRating = ref(0);
@@ -191,7 +191,47 @@ const loadInterestRequest = async () => {
   }
 };
 
+const checkForExistingApproval = async (): Promise<WithId<InterestRequestsRecord> | null> => {
+  const allRequests = await interestRequestsStore.getInterestRequestsForJob(props.jobId);
+  const approvedRequest = allRequests.find(
+    (req) => req.id !== interestRequest.value?.id && req.approvedAt && req.status === InterestRequestsStatusOptions.Godkänd
+  );
+  return approvedRequest || null;
+};
+
 const accept = async () => {
+  if (!interestRequest.value) return;
+
+  const existingApproval = await checkForExistingApproval();
+  if (existingApproval) {
+    $q.dialog({
+      title: 'Varning',
+      message: 'Du har redan godkänt en annan förfrågan för detta uppdrag. Vill du godkänna denna istället? Den tidigare godkända förfrågan kommer att nekad.',
+      cancel: {
+        label: 'Avbryt',
+        color: 'grey',
+        flat: true,
+      },
+      ok: {
+        label: 'Godkänn',
+        color: 'green',
+        unelevated: true,
+      },
+      persistent: true,
+    }).onOk(() => {
+      void interestRequestsStore.updateInterestRequest(existingApproval.id, {
+        status: InterestRequestsStatusOptions.Nekad,
+        approvedAt: '',
+      }).then(() => {
+        void performAccept();
+      });
+    });
+  } else {
+    await performAccept();
+  }
+};
+
+const performAccept = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     status: InterestRequestsStatusOptions.Godkänd,
@@ -274,6 +314,8 @@ const showGroupDialog = () => {
     component: GroupDetailsDialog,
     componentProps: {
       group: interestRequest.value.expand.group,
+      createdBy: interestRequest.value.expand.group.expand?.createdBy,
+      city: interestRequest.value.expand.group.expand?.city,
     },
   });
 };

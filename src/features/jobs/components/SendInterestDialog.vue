@@ -7,8 +7,8 @@
 
       <q-card-section>
         <q-select bg-color="secondary" v-model="selectedGroupId" :options="groupOptions" label="Välj grupp" outlined
-          class="q-mb-md" emit-value map-options :rules="[val => !!val || 'Du måste välja en grupp']"
-          ref="groupSelectRef" no-error-icon>
+          emit-value map-options :rules="[val => !!val || 'Du måste välja en grupp']" ref="groupSelectRef" no-error-icon
+          @update:model-value="checkExistingRequest">
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
               <q-item-section>
@@ -18,13 +18,21 @@
             </q-item>
           </template>
         </q-select>
+
+        <q-banner v-if="hasExistingRequest" class="bg-warning text-white q-mb-md q-mt-none" rounded dense>
+          <template v-slot:avatar>
+            <q-icon name="warning" color="white" />
+          </template>
+          Denna grupp har redan skickat en intresseanmälan för detta jobb.
+        </q-banner>
+
         <q-input bg-color="secondary" v-model="interestMessage" type="textarea" label="Meddelande" outlined rows="5"
           no-error-icon />
       </q-card-section>
 
       <q-card-actions class="row justify-between q-pa-md">
         <q-btn unelevated label="Skicka" color="primary" @click="sendInterest" :loading="sendingInterest"
-          :disable="!selectedGroupId" />
+          :disable="!selectedGroupId || hasExistingRequest" />
         <q-btn flat label="Avbryt" color="primary" @click="cancel" />
       </q-card-actions>
     </q-card>
@@ -54,6 +62,7 @@ const props = defineProps<{
 const interestMessage = ref('');
 const selectedGroupId = ref<string>('');
 const sendingInterest = ref(false);
+const hasExistingRequest = ref(false);
 
 const groupOptions = computed(() =>
   props.groups.map(group => ({
@@ -62,6 +71,20 @@ const groupOptions = computed(() =>
     caption: group.groupType
   }))
 );
+
+const checkExistingRequest = async (groupId: string) => {
+  if (!groupId) {
+    hasExistingRequest.value = false;
+    return;
+  }
+
+  const existingRequest = await interestRequestsStore.getInterestRequestForJobAndGroup(
+    props.job.id,
+    groupId
+  );
+
+  hasExistingRequest.value = existingRequest !== null;
+};
 
 const cancel = () => {
   onDialogCancel();

@@ -178,11 +178,11 @@ export type InterestRequestsRecord = {
 	updated: IsoAutoDateString
 }
 
-export enum InterestRequestsJobsViewStatusOptions {
+export enum InterestRequestsJobsViewPublicationStatusOptions {
 	"Granskning" = "Granskning",
-	"Godkänd" = "Godkänd",
 	"Nekad" = "Nekad",
 	"Uppdatering" = "Uppdatering",
+	"Publicerad" = "Publicerad",
 }
 export type InterestRequestsJobsViewRecord = {
 	assignedGroup?: RecordIdString
@@ -197,11 +197,12 @@ export type InterestRequestsJobsViewRecord = {
 	groupCreatedBy: RecordIdString
 	hidePhone?: boolean
 	id: string
+	images?: FileNameString[]
 	jobSubcategories?: RecordIdString[]
 	latitude?: number
 	longitude?: number
 	price?: number
-	status?: InterestRequestsJobsViewStatusOptions
+	publicationStatus?: InterestRequestsJobsViewPublicationStatusOptions
 	street: string
 	title?: string
 	updated: IsoAutoDateString

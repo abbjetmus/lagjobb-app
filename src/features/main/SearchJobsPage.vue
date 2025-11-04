@@ -69,7 +69,7 @@
     </div>
 
     <q-list v-else separator class="q-pa-md">
-      <job-list-item v-for="item in uppdrag" :key="item.id" :job="item" @click="goToUppdrag(item)" />
+      <job-list-item v-for="item in uppdrag" :key="item.id" :job="item" :to="`/uppdrag/${item.id}`" />
     </q-list>
 
     <q-page-sticky v-if="!loading && uppdrag.length > 0" position="bottom" :offset="[0, 18]">
@@ -88,14 +88,10 @@ import JobListItem from 'src/features/jobs/components/JobListItem.vue';
 import type { WithId } from 'src/models/withIdType';
 import type { JobsRecord } from 'app/pocketbase-types';
 import { QSelect } from 'quasar';
-import { useAuth } from 'src/features/auth/authStore';
-import { storeToRefs } from 'pinia';
 import type { JobsExpand } from 'app/expanded-pocketbase-types';
 const router = useRouter();
 const route = useRoute();
 const jobsStore = useJobs();
-const authStore = useAuth();
-const { currentUser } = storeToRefs(authStore);
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);
 const uppdrag = ref<(WithId<JobsRecord> & { expand?: JobsExpand })[]>([]);
@@ -283,14 +279,6 @@ const clearFilters = () => {
   selectedCities.value = [];
   current.value = 1;
   updateQueryParams();
-};
-
-const goToUppdrag = async (job: WithId<JobsRecord> & { expand?: JobsExpand }) => {
-  if (currentUser.value?.id === job.expand?.createdBy?.id) {
-    await router.push(`/skapade-uppdrag/${job.id}`);
-  } else {
-    await router.push(`/uppdrag/${job.id}`);
-  }
 };
 
 const filterCityFn = (val: string, update: (fn: () => void) => void) => {

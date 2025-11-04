@@ -18,9 +18,6 @@
           <!-- <q-rating v-if="group?.rating" :model-value="group.rating" max="5" size="1.2em" color="yellow"
             icon="star_border" icon-selected="star" icon-half="star_half" no-dimming readonly /> -->
         </div>
-        <div v-if="group?.image" class="lt-sm-none">
-          <img height="80px" width="100px" style="object-fit: contain;" :src="getImageUrl(group.image)" />
-        </div>
       </q-item-label>
     </q-item-section>
     <q-item-section v-if="group?.image" side class="q-pa-none q-ma-none lt-sm-none">

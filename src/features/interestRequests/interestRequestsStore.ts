@@ -21,7 +21,7 @@ export const useInterestRequests = defineStore('interest-requests-module', {
       return pb
         .collection(Collections.InterestRequests)
         .getOne(id, {
-          expand: 'group,group.createdBy,job,job.createdBy',
+          expand: 'group.createdBy,group.city,job.createdBy',
         })
         .then((res) => {
           return res as unknown as InterestRequestWithExpand;

@@ -1,7 +1,15 @@
 <template>
   <div class="q-pa-md">
     <q-list separator bordered class="rounded-borders">
-      <q-expansion-item expand-separator label="Godkänt">
+      <q-expansion-item expand-separator>
+        <template v-slot:header>
+          <q-item-section>
+            Godkänt
+          </q-item-section>
+          <q-item-section side>
+            <q-badge color="primary" :label="approvedRequests.length" />
+          </q-item-section>
+        </template>
         <q-card>
           <q-card-section class="q-pa-none q-ma-none">
             <q-list separator>
@@ -13,7 +21,15 @@
         </q-card>
       </q-expansion-item>
 
-      <q-expansion-item expand-separator label="Ej besvarade">
+      <q-expansion-item expand-separator>
+        <template v-slot:header>
+          <q-item-section>
+            Ej besvarade
+          </q-item-section>
+          <q-item-section side>
+            <q-badge color="primary" :label="noResponseRequests.length" />
+          </q-item-section>
+        </template>
         <q-card>
           <q-card-section class="q-pa-none q-ma-none">
             <q-list separator>
@@ -25,7 +41,15 @@
         </q-card>
       </q-expansion-item>
 
-      <q-expansion-item expand-separator label="Nekade">
+      <q-expansion-item expand-separator>
+        <template v-slot:header>
+          <q-item-section>
+            Nekade
+          </q-item-section>
+          <q-item-section side>
+            <q-badge color="primary" :label="declinedRequests.length" />
+          </q-item-section>
+        </template>
         <q-card>
           <q-card-section class="q-pa-none q-ma-none">
             <q-list separator>

@@ -16,9 +16,12 @@
       </div>
     </div>
 
-    <q-list v-else class="q-ma-md">
-      <job-list-item v-for="item in myJobs" :key="item.id" :job="item as any" :to="`/mina-uppdrag/${item.id}`" />
-    </q-list>
+    <div v-else>
+      <div class="text-h5 q-px-md q-pt-md q-pb-none">Mina Uppdrag</div>
+      <q-list separator class="q-pa-md">
+        <job-list-item v-for="item in myJobs" :key="item.id" :job="item as any" :to="`/mina-uppdrag/${item.id}`" />
+      </q-list>
+    </div>
   </q-page>
 </template>
 

@@ -20,9 +20,14 @@ export interface GroupsExpand {
   createdBy: WithId<UsersRecord>;
 }
 
+export interface InterestRequestsJobsViewExpand {
+  groupCreatedBy: WithId<UsersRecord>;
+  city: WithId<CitiesRecord>;
+}
+
 export type InterestRequestWithExpand = WithId<InterestRequestsRecord> & {
   expand?: {
-    group?: WithId<GroupsRecord, GroupsExpand>;
+    group?: WithId<GroupsRecord> & { expand?: GroupsExpand };
     job?: WithId<JobsRecord> & { expand?: JobsExpand };
   };
 };
