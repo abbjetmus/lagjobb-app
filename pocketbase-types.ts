@@ -162,12 +162,13 @@ export type InterestRequestsRecord = {
 	approvedAt?: IsoDateString
 	completedAt?: IsoDateString
 	created: IsoAutoDateString
-	doneAt?: IsoDateString
 	group: RecordIdString
+	groupDoneAt?: IsoDateString
 	groupRating?: number
 	groupRatingMessage?: string
 	id: string
 	job: RecordIdString
+	jobCreatorDoneAt?: IsoDateString
 	jobCreatorRating?: number
 	jobCreatorRatingMessage?: string
 	payedAt?: IsoDateString

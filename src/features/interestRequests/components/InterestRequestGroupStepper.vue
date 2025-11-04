@@ -24,8 +24,10 @@
         <q-slide-transition appear>
           <div v-if="isApproved" v-show="step > 1">
             <span>Grattis ni har fått uppdraget!</span>
-            <span class="block">Ni kan nu hålla kontakt med {{ jobCreatorName }} på numret {{ jobCreatorPhone }}.</span>
-            <span class="block" v-if="step === 2">
+            <span class="block">Ni kan nu hålla kontakt med {{ jobCreatorName }}:</span>
+            <span class="block" v-if="jobCreatorPhone">Telefon: {{ jobCreatorPhone }}</span>
+            <span class="block" v-if="jobCreatorEmail">E-post: {{ jobCreatorEmail }}</span>
+            <span class="block q-mt-sm" v-if="step === 2">
               Klick på knappen utfört när uppdraget är utfört.
             </span>
             <q-btn v-show="step === 2" @click="completed" color="green" unelevated label="Utfört" no-caps />
@@ -47,18 +49,18 @@
           <div v-show="step > 3">
             <div v-show="step === 4">
               <span class="block">Lämna gärna omdöme på uppdragsgivaren med stjärnorna och en kommentar.</span>
-              <q-rating class="block q-mb-sm" v-model="jobCreatorRating" max="5" size="2em" color="yellow"
-                icon="star_border" icon-selected="star" icon-half="star_half" no-dimming />
+              <q-rating class="q-mb-sm" v-model="jobCreatorRating" max="5" size="2em" color="yellow" icon="star_border"
+                icon-selected="star" icon-half="star_half" no-dimming />
               <q-chat-message sent size="12">
                 <q-input type="textarea" v-model="jobCreatorRatingMessage" dense borderless no-error-icon
                   hide-bottom-space lazy-rules bg-color="grey-2" class="col-12 q-mb-xs" outlined />
               </q-chat-message>
             </div>
             <q-chat-message sent v-show="step > 4" name="Ditt omdöme på uppdragsgivaren" bg-color="green-4"
-              :stamp="formatDateTime(new Date(interestRequest.doneAt || interestRequest.updated))">
+              :stamp="formatDateTime(new Date(interestRequest.groupDoneAt || interestRequest.updated))">
               <div>
                 <span class="block">{{ jobCreatorRatingMessage }}</span>
-                <q-rating class="block q-mb-sm" v-model="jobCreatorRating" max="5" size="1.6em" color="yellow"
+                <q-rating class="q-mb-sm" v-model="jobCreatorRating" max="5" size="1.6em" color="yellow"
                   icon="star_border" icon-selected="star" icon-half="star_half" no-dimming readonly />
               </div>
             </q-chat-message>
@@ -96,8 +98,8 @@ const jobCreatorRating = ref(0);
 
 const step = computed(() => {
   if (!interestRequest.value) return 1;
-  if (interestRequest.value.doneAt) return 5;
-  if (interestRequest.value.payedAt) return 4;
+  if (interestRequest.value.groupDoneAt) return 5;
+  if (interestRequest.value.payedAt && !interestRequest.value.groupDoneAt) return 4;
   if (interestRequest.value.completedAt) return 3;
   if (interestRequest.value.responseAt) return 2;
   return 1;
@@ -122,6 +124,11 @@ const jobCreatorName = computed(() => {
 const jobCreatorPhone = computed(() => {
   const job = interestRequest.value?.expand?.job;
   return job?.expand?.createdBy?.phone || '';
+});
+
+const jobCreatorEmail = computed(() => {
+  const job = interestRequest.value?.expand?.job;
+  return job?.expand?.createdBy?.email || '';
 });
 
 const requestMessage = computed(() => {
@@ -166,7 +173,7 @@ const payedSubTitle = computed(() => {
 });
 
 const doneColor = computed(() => {
-  if (step.value > 4 && interestRequest.value?.doneAt) return 'green';
+  if (step.value > 4 && interestRequest.value?.groupDoneAt) return 'green';
   if (step.value === 4 && interestRequest.value?.payedAt) return 'blue';
   return 'grey';
 });
@@ -198,6 +205,7 @@ const completed = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     completedAt: new Date().toISOString(),
+    status: InterestRequestsStatusOptions.Utförd,
   });
   if (success) {
     await loadInterestRequest();
@@ -207,7 +215,7 @@ const completed = async () => {
 const done = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
-    doneAt: new Date().toISOString(),
+    groupDoneAt: new Date().toISOString(),
     jobCreatorRating: jobCreatorRating.value,
     jobCreatorRatingMessage: jobCreatorRatingMessage.value,
   });

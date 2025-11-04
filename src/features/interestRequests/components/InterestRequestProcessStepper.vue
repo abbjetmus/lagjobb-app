@@ -32,9 +32,10 @@
         class="gt-sm-step-icon">
         <q-slide-transition appear>
           <div v-if="isApproved" v-show="step > 1">
-            <span class="block">Du kan nu hålla kontakt med {{ groupName }} på numret {{ groupPhone
-              }}.</span>
-            <span class="block" v-if="step === 2">
+            <span class="block">Du kan nu hålla kontakt med {{ groupName }}:</span>
+            <span class="block" v-if="groupPhone">Telefon: {{ groupPhone }}</span>
+            <span class="block" v-if="groupEmail">E-post: {{ groupEmail }}</span>
+            <span class="block q-mt-sm" v-if="step === 2">
               Klick på knappen utfört när uppdraget är utfört.
             </span>
             <q-btn v-show="step === 2" @click="completed" color="green" unelevated label="Utfört" no-caps />
@@ -46,8 +47,8 @@
         class="gt-sm-step-icon">
         <q-slide-transition appear>
           <div v-show="step > 2">
-            <span class="block">När du har betalat för uppdraget kan du klicka på knappen betala.</span>
-            <q-btn v-show="step === 3" color="green" label="Betala" @click="pay" no-caps unelevated />
+            <span class="block">När du har betalat för uppdraget kan du klicka på knappen betalat.</span>
+            <q-btn v-show="step === 3" color="green" label="Betalat" @click="pay" no-caps unelevated />
           </div>
         </q-slide-transition>
       </q-timeline-entry>
@@ -65,7 +66,7 @@
               </q-chat-message>
             </div>
             <q-chat-message sent v-show="step > 4" name="Ditt omdöme på gruppen" bg-color="green-4"
-              :stamp="formatDateTime(new Date(interestRequest.doneAt || interestRequest.updated))">
+              :stamp="formatDateTime(new Date(interestRequest.jobCreatorDoneAt || interestRequest.updated))">
               <div>
                 <span class="block">{{ groupRatingMessage }}</span>
                 <q-rating class="q-mb-sm" v-model="groupRating" max="5" size="1.6em" color="yellow" icon="star_border"
@@ -109,8 +110,8 @@ const groupRating = ref(0);
 
 const step = computed(() => {
   if (!interestRequest.value) return 1;
-  if (interestRequest.value.doneAt) return 5;
-  if (interestRequest.value.payedAt) return 4;
+  if (interestRequest.value.jobCreatorDoneAt) return 5;
+  if (interestRequest.value.payedAt && !interestRequest.value.jobCreatorDoneAt) return 4;
   if (interestRequest.value.completedAt) return 3;
   if (interestRequest.value.responseAt) return 2;
   return 1;
@@ -126,6 +127,10 @@ const groupName = computed(() => {
 
 const groupPhone = computed(() => {
   return interestRequest.value?.expand?.group?.expand?.createdBy?.phone || '';
+});
+
+const groupEmail = computed(() => {
+  return interestRequest.value?.expand?.group?.expand?.createdBy?.email || '';
 });
 
 const requestMessage = computed(() => {
@@ -170,7 +175,7 @@ const payedSubTitle = computed(() => {
 });
 
 const doneColor = computed(() => {
-  if (step.value > 4 && interestRequest.value?.doneAt) return 'green';
+  if (step.value > 4 && interestRequest.value?.jobCreatorDoneAt) return 'green';
   if (step.value === 4 && interestRequest.value?.payedAt) return 'blue';
   return 'grey';
 });
@@ -204,6 +209,21 @@ const accept = async () => {
 
   const existingApproval = await checkForExistingApproval();
   if (existingApproval) {
+    if (existingApproval.status === InterestRequestsStatusOptions.Utförd ||
+      existingApproval.status === InterestRequestsStatusOptions.Betald) {
+      $q.dialog({
+        title: 'Ej möjligt',
+        message: 'Du kan inte ändra tilldelningen av uppdraget eftersom det redan är utfört.',
+        ok: {
+          label: 'OK',
+          color: 'primary',
+          unelevated: true,
+        },
+        persistent: true,
+      });
+      return;
+    }
+
     $q.dialog({
       title: 'Varning',
       message: 'Du har redan godkänt en annan förfrågan för detta uppdrag. Vill du godkänna denna istället? Den tidigare godkända förfrågan kommer att nekad.',
@@ -268,6 +288,7 @@ const completed = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     completedAt: new Date().toISOString(),
+    status: InterestRequestsStatusOptions.Utförd,
   });
   if (success) {
     await loadInterestRequest();
@@ -282,6 +303,7 @@ const pay = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
     payedAt: new Date().toISOString(),
+    status: InterestRequestsStatusOptions.Betald,
   });
   if (success) {
     await loadInterestRequest();
@@ -295,7 +317,7 @@ const pay = async () => {
 const done = async () => {
   if (!interestRequest.value) return;
   const success = await interestRequestsStore.updateInterestRequest(interestRequest.value.id, {
-    doneAt: new Date().toISOString(),
+    jobCreatorDoneAt: new Date().toISOString(),
     groupRating: groupRating.value,
     groupRatingMessage: groupRatingMessage.value,
   });

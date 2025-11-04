@@ -54,7 +54,7 @@ export const useInterestRequests = defineStore('interest-requests-module', {
       return pb
         .collection(Collections.InterestRequests)
         .getFirstListItem(`job="${jobId}" && group="${groupId}"`, {
-          expand: 'group,job',
+          expand: 'group,job.createdBy',
         })
         .then((res) => {
           return res as unknown as WithId<InterestRequestsRecord>;
