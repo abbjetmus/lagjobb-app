@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="bg-image">
-      <q-page class="flex flex-center q-pa-sm" style="border-bottom: 2px solid var(--q-primary)">
+    <div class="bg-image" style="border-bottom: 2px solid var(--q-primary)">
+      <q-page class="flex flex-center q-pa-sm">
         <div>
           <div class="row items-center">
             <div class="col-xs-0 col-1"></div>
