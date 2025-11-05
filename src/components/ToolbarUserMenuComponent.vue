@@ -50,7 +50,6 @@ import { useRouter } from 'vue-router';
 import { useAuth } from 'src/features/auth/authStore';
 import { UsersUserAccountTypeOptions } from 'app/pocketbase-types';
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
 
 const router = useRouter();
 const authStore = useAuth();
@@ -81,9 +80,4 @@ const logout = async () => {
   authStore.signOut();
   await router.push('/');
 };
-
-onMounted(() => {
-  console.log('🔵 [ToolbarUserMenuComponent] currentUser:', currentUser.value);
-  console.log('🔵 [ToolbarUserMenuComponent] currentUser.userAccountType:', currentUser.value?.userAccountType);
-});
 </script>

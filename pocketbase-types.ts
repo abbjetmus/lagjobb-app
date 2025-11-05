@@ -13,12 +13,14 @@ export enum Collections {
 	Superusers = "_superusers",
 	Cities = "cities",
 	Counties = "counties",
+	CreatedJobsView = "createdJobsView",
 	Groups = "groups",
 	InterestRequests = "interestRequests",
-	InterestRequestsJobsView = "interestRequestsJobsView",
 	JobCategories = "jobCategories",
 	JobSubcategories = "jobSubcategories",
 	Jobs = "jobs",
+	MyGroupsJobsView = "myGroupsJobsView",
+	SearchJobsView = "searchJobsView",
 	Users = "users",
 }
 
@@ -120,6 +122,39 @@ export type CountiesRecord = {
 	updated: IsoAutoDateString
 }
 
+export enum CreatedJobsViewPublicationStatusOptions {
+	"Granskning" = "Granskning",
+	"Nekad" = "Nekad",
+	"Uppdatering" = "Uppdatering",
+	"Publicerad" = "Publicerad",
+}
+export type CreatedJobsViewRecord<TjobCreatorDoneAt = unknown, Tstatus = unknown> = {
+	assignedGroup?: RecordIdString
+	city: RecordIdString
+	cityTitle: string
+	contactHours?: string
+	created: IsoAutoDateString
+	createdBy?: RecordIdString
+	description?: string
+	desiredAt?: IsoDateString
+	desiredNumberOfPeople?: number
+	estimatedHours?: number
+	hidePhone?: boolean
+	id: string
+	images?: FileNameString[]
+	jobCreatorDoneAt?: null | TjobCreatorDoneAt
+	jobSubcategories?: RecordIdString[]
+	latitude?: number
+	longitude?: number
+	price?: number
+	publicationStatus?: CreatedJobsViewPublicationStatusOptions
+	status?: null | Tstatus
+	street: string
+	title?: string
+	updated: IsoAutoDateString
+	zipcode?: string
+}
+
 export enum GroupsGroupTypeOptions {
 	"Lag" = "Lag",
 	"Klass" = "Klass",
@@ -179,37 +214,6 @@ export type InterestRequestsRecord = {
 	updated: IsoAutoDateString
 }
 
-export enum InterestRequestsJobsViewPublicationStatusOptions {
-	"Granskning" = "Granskning",
-	"Nekad" = "Nekad",
-	"Uppdatering" = "Uppdatering",
-	"Publicerad" = "Publicerad",
-}
-export type InterestRequestsJobsViewRecord = {
-	assignedGroup?: RecordIdString
-	city: RecordIdString
-	contactHours?: string
-	created: IsoAutoDateString
-	createdBy?: RecordIdString
-	description?: string
-	desiredAt?: IsoDateString
-	desiredNumberOfPeople?: number
-	estimatedHours?: number
-	groupCreatedBy: RecordIdString
-	hidePhone?: boolean
-	id: string
-	images?: FileNameString[]
-	jobSubcategories?: RecordIdString[]
-	latitude?: number
-	longitude?: number
-	price?: number
-	publicationStatus?: InterestRequestsJobsViewPublicationStatusOptions
-	street: string
-	title?: string
-	updated: IsoAutoDateString
-	zipcode?: string
-}
-
 export type JobCategoriesRecord = {
 	color: string
 	created: IsoAutoDateString
@@ -258,6 +262,79 @@ export type JobsRecord = {
 	zipcode?: string
 }
 
+export enum MyGroupsJobsViewPublicationStatusOptions {
+	"Granskning" = "Granskning",
+	"Nekad" = "Nekad",
+	"Uppdatering" = "Uppdatering",
+	"Publicerad" = "Publicerad",
+}
+
+export enum MyGroupsJobsViewStatusOptions {
+	"Godkänd" = "Godkänd",
+	"Betald" = "Betald",
+	"Utförd" = "Utförd",
+	"Nekad" = "Nekad",
+	"Förfrågan" = "Förfrågan",
+}
+export type MyGroupsJobsViewRecord = {
+	assignedGroup?: RecordIdString
+	city: RecordIdString
+	cityTitle: string
+	contactHours?: string
+	created: IsoAutoDateString
+	createdBy?: RecordIdString
+	description?: string
+	desiredAt?: IsoDateString
+	desiredNumberOfPeople?: number
+	estimatedHours?: number
+	groupCreatedBy: RecordIdString
+	groupDoneAt?: IsoDateString
+	hidePhone?: boolean
+	id: string
+	images?: FileNameString[]
+	jobSubcategories?: RecordIdString[]
+	latitude?: number
+	longitude?: number
+	price?: number
+	publicationStatus?: MyGroupsJobsViewPublicationStatusOptions
+	status: MyGroupsJobsViewStatusOptions
+	street: string
+	title?: string
+	updated: IsoAutoDateString
+	zipcode?: string
+}
+
+export enum SearchJobsViewPublicationStatusOptions {
+	"Granskning" = "Granskning",
+	"Nekad" = "Nekad",
+	"Uppdatering" = "Uppdatering",
+	"Publicerad" = "Publicerad",
+}
+export type SearchJobsViewRecord = {
+	assignedGroup?: RecordIdString
+	city: RecordIdString
+	cityTitle: string
+	contactHours?: string
+	created: IsoAutoDateString
+	createdBy?: RecordIdString
+	description?: string
+	desiredAt?: IsoDateString
+	desiredNumberOfPeople?: number
+	estimatedHours?: number
+	hidePhone?: boolean
+	id: string
+	images?: FileNameString[]
+	jobSubcategories?: RecordIdString[]
+	latitude?: number
+	longitude?: number
+	price?: number
+	publicationStatus?: SearchJobsViewPublicationStatusOptions
+	street: string
+	title?: string
+	updated: IsoAutoDateString
+	zipcode?: string
+}
+
 export enum UsersUserAccountTypeOptions {
 	"Uppdragsgivare" = "Uppdragsgivare",
 	"Uppdragsutförare" = "Uppdragsutförare",
@@ -285,12 +362,14 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type CitiesResponse<Texpand = unknown> = Required<CitiesRecord> & BaseSystemFields<Texpand>
 export type CountiesResponse<Texpand = unknown> = Required<CountiesRecord> & BaseSystemFields<Texpand>
+export type CreatedJobsViewResponse<TjobCreatorDoneAt = unknown, Tstatus = unknown, Texpand = unknown> = Required<CreatedJobsViewRecord<TjobCreatorDoneAt, Tstatus>> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type InterestRequestsResponse<Texpand = unknown> = Required<InterestRequestsRecord> & BaseSystemFields<Texpand>
-export type InterestRequestsJobsViewResponse<Texpand = unknown> = Required<InterestRequestsJobsViewRecord> & BaseSystemFields<Texpand>
 export type JobCategoriesResponse<Texpand = unknown> = Required<JobCategoriesRecord> & BaseSystemFields<Texpand>
 export type JobSubcategoriesResponse<Texpand = unknown> = Required<JobSubcategoriesRecord> & BaseSystemFields<Texpand>
 export type JobsResponse<Texpand = unknown> = Required<JobsRecord> & BaseSystemFields<Texpand>
+export type MyGroupsJobsViewResponse<Texpand = unknown> = Required<MyGroupsJobsViewRecord> & BaseSystemFields<Texpand>
+export type SearchJobsViewResponse<Texpand = unknown> = Required<SearchJobsViewRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -303,12 +382,14 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	cities: CitiesRecord
 	counties: CountiesRecord
+	createdJobsView: CreatedJobsViewRecord
 	groups: GroupsRecord
 	interestRequests: InterestRequestsRecord
-	interestRequestsJobsView: InterestRequestsJobsViewRecord
 	jobCategories: JobCategoriesRecord
 	jobSubcategories: JobSubcategoriesRecord
 	jobs: JobsRecord
+	myGroupsJobsView: MyGroupsJobsViewRecord
+	searchJobsView: SearchJobsViewRecord
 	users: UsersRecord
 }
 
@@ -320,12 +401,14 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	cities: CitiesResponse
 	counties: CountiesResponse
+	createdJobsView: CreatedJobsViewResponse
 	groups: GroupsResponse
 	interestRequests: InterestRequestsResponse
-	interestRequestsJobsView: InterestRequestsJobsViewResponse
 	jobCategories: JobCategoriesResponse
 	jobSubcategories: JobSubcategoriesResponse
 	jobs: JobsResponse
+	myGroupsJobsView: MyGroupsJobsViewResponse
+	searchJobsView: SearchJobsViewResponse
 	users: UsersResponse
 }
 

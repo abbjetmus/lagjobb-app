@@ -21,7 +21,7 @@
         </q-btn>
         <q-space />
       </div>
-      <div class="q-pa-md">
+      <div :class="{ 'q-pa-md': $q.screen.gt.xs }">
         <job-details :job="job" :show-status="true" />
       </div>
       <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">
