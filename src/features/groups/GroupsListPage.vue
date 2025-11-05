@@ -54,7 +54,7 @@
       </div>
     </div>
 
-    <q-list v-else separator class="q-pa-md">
+    <q-list v-else class="q-pa-md">
       <group-list-item v-for="group in groups" :key="group.id" :group="group" @click="goToGroup(group.id as string)" />
     </q-list>
   </q-page>

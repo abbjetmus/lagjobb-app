@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <q-list v-else separator class="q-pa-md">
+    <q-list v-else class="q-pa-md">
       <search-job-list-item v-for="item in uppdrag" :key="item.id" :job="item" :to="`/uppdrag/${item.id}`" />
     </q-list>
   </q-page>
