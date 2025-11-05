@@ -49,7 +49,6 @@
 import { ref, computed, onBeforeMount } from 'vue';
 import type { Component } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { pb } from 'src/boot/pocketbase';
 import { useQuasar } from 'quasar';
 import { useRegle } from '@regle/core';
 import { required } from '@regle/rules';
@@ -57,7 +56,7 @@ import TeamGroupForm from './components/TeamGroupForm.vue';
 import ClassGroupForm from './components/ClassGroupForm.vue';
 import AssociationGroupForm from './components/AssociationGroupForm.vue';
 import OrganizationGroupForm from './components/OrganizationGroupForm.vue';
-import { GroupsGroupTypeOptions, GroupsPublicationStatusOptions, Collections, type GroupsRecord } from 'app/pocketbase-types';
+import { GroupsGroupTypeOptions, GroupsPublicationStatusOptions, type GroupsRecord } from 'app/pocketbase-types';
 import ImageThumbnail from 'src/components/ImageThumbnail.vue';
 import { useGroups } from 'src/features/groups/groupsStore';
 import { useJobs } from 'src/features/jobs/jobsStore';
@@ -199,10 +198,14 @@ onBeforeMount(async () => {
   if (isEdit.value) {
     const id = route.params.id as string;
     try {
-      group.value = await pb.collection(Collections.Groups).getOne<GroupsRecord>(id) as unknown as GroupsRecord;
+      const loadedGroup = await groupsStore.getGroupById(id);
+      if (!loadedGroup) {
+        throw new Error('Group not found');
+      }
+      group.value = loadedGroup;
 
       if (group.value.image) {
-        currentImageUrl.value = pb.files.getURL(group.value, group.value.image);
+        currentImageUrl.value = groupsStore.getFileUrl(loadedGroup, group.value.image);
       }
     } catch (error) {
       console.error('Load group error:', error);
@@ -235,7 +238,7 @@ const onSubmit = async () => {
           type: 'positive',
           message: 'Grupp uppdaterad!',
         });
-        void router.push('/mina-grupper-lista');
+        void router.push('/mina-grupper');
       } else {
         $q.notify({
           type: 'negative',
@@ -249,7 +252,7 @@ const onSubmit = async () => {
           type: 'positive',
           message: 'Grupp skapad!',
         });
-        void router.push('/mina-grupper-lista');
+        void router.push('/mina-grupper');
       } else {
         $q.notify({
           type: 'negative',

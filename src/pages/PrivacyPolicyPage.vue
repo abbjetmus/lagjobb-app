@@ -1,6 +1,6 @@
 <template>
-  <q-page class="q-pa-md page-background-pattern">
-    <div class="row justify-center">
+  <q-page :class="{ 'q-pa-md': $q.screen.gt.xs }" class="page-background-pattern">
+    <div class="row justify-center q-my-xl">
       <div class="col-12" style="max-width: 800px;">
         <div class="text-center">
           <p class="text-primary text-h5">Användarvillkor och Integritetspolicy</p>

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md page-background-pattern">
+  <q-page :class="{ 'q-pa-md': $q.screen.gt.xs }" class="page-background-pattern">
     <div class="row justify-center">
       <div class="col-12" style="max-width: 800px;">
         <div class="text-center">

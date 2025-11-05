@@ -63,7 +63,7 @@
 
     <div class="text-center q-py-xl q-px-md bg-grey-2">
       <span class="block text-h5 text-md-h4">
-        250 registrerade lag, klasser och föreningar redo att hjälpa dig
+        Registrerade lag, klasser och föreningar redo att hjälpa dig
       </span>
       <span class="text-center block q-mb-xl text-subtitle1 text-sm-h5">
         Klicka på kategori för ett se vilka de är
@@ -93,12 +93,63 @@
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useJobs } from 'src/features/jobs/jobsStore';
-import { useQuasar, QSelect } from 'quasar';
+import { useQuasar, QSelect, useMeta } from 'quasar';
 import FooterComponent from 'src/components/FooterComponent.vue';
 
 const router = useRouter();
 const jobsStore = useJobs();
 const $q = useQuasar();
+
+const getAbsoluteUrl = (path: string) => {
+  if (typeof window === 'undefined') return path;
+  return `${window.location.origin}${path}`;
+};
+
+useMeta(() => ({
+  title: 'Lagjobb - Hitta uppdrag för ditt lag, klass eller förening',
+  meta: {
+    description: {
+      name: 'description',
+      content: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.'
+    },
+    ogTitle: {
+      property: 'og:title',
+      content: 'Lagjobb - Hitta uppdrag för ditt lag, klass eller förening'
+    },
+    ogDescription: {
+      property: 'og:description',
+      content: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.'
+    },
+    ogImage: {
+      property: 'og:image',
+      content: getAbsoluteUrl('/soccer-team.jpg')
+    },
+    ogUrl: {
+      property: 'og:url',
+      content: getAbsoluteUrl('/')
+    },
+    ogType: {
+      property: 'og:type',
+      content: 'website'
+    },
+    twitterCard: {
+      name: 'twitter:card',
+      content: 'summary_large_image'
+    },
+    twitterImage: {
+      name: 'twitter:image',
+      content: getAbsoluteUrl('/soccer-team.jpg')
+    },
+    twitterTitle: {
+      name: 'twitter:title',
+      content: 'Lagjobb - Hitta uppdrag för ditt lag, klass eller förening'
+    },
+    twitterDescription: {
+      name: 'twitter:description',
+      content: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.'
+    }
+  }
+}));
 
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);

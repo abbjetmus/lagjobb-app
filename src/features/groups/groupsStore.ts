@@ -80,6 +80,9 @@ export const useGroups = defineStore('groups-module', {
         console.error('Delete group error:', e)
         return false
       })
+    },
+    getFileUrl(group: WithId<GroupsRecord> | Omit<GroupsRecord, 'created' | 'updated'>, imageName: string): string {
+      return pb.files.getURL(group as WithId<GroupsRecord>, imageName);
     }
   }
 })
