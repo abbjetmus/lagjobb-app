@@ -9,7 +9,7 @@
               <p class="text-center text-h5 text-md-h4 text-white">
                 Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar
               </p>
-              <p class="text-center text-subtitle1 text-sm-h5 text-white">Sök bland tusentals intressanta uppdrag</p>
+              <p class="text-center text-subtitle1 text-sm-h5 text-white">Sök bland intressanta uppdrag</p>
 
               <div class="row">
                 <q-select ref="jobsRef" v-model="selectedSubcategories" :options="filterJobsOptions" use-chips use-input

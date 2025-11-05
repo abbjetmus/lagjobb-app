@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { pb } from 'src/boot/pocketbase'
-import type { CountiesRecord, InterestRequestsRecord, JobCategoriesRecord, InterestRequestsJobsViewRecord } from 'app/pocketbase-types';
+import type { CountiesRecord, InterestRequestsRecord, JobCategoriesRecord, SearchJobsViewRecord, CreatedJobsViewRecord, MyGroupsJobsViewRecord } from 'app/pocketbase-types';
 import { Collections, type JobsRecord } from 'app/pocketbase-types';
 import type { WithId } from 'src/models/withIdType';
 import type { CountiesExpand, JobCategoriesExpand, JobsExpand } from 'app/expanded-pocketbase-types';
@@ -10,11 +10,11 @@ import { FileAction } from 'src/models/enums';
 
 interface JobsState {
   jobs: WithId<JobsRecord>[],
-  myJobs: (WithId<InterestRequestsJobsViewRecord>)[],
+  myJobs: Array<Omit<MyGroupsJobsViewRecord, never> & { expand?: JobsExpand }>,
   savedJobs: WithId<JobsRecord>[],
   categories: (WithId<JobCategoriesRecord> & { expand?: JobCategoriesExpand })[],
   counties: (WithId<CountiesRecord> & { expand?: CountiesExpand })[],
-  createdJobs: (WithId<JobsRecord> & { expand?: JobsExpand })[],
+  createdJobs: Array<Omit<CreatedJobsViewRecord<string>, never> & { expand?: JobsExpand }>,
 }
 
 export const useJobs = defineStore('jobs-module', {
@@ -100,12 +100,12 @@ export const useJobs = defineStore('jobs-module', {
     },
     async getMyJobs(): Promise<boolean> {
       const authStore = useAuth();
-      return pb.collection(Collections.InterestRequestsJobsView).getFullList({
+      return pb.collection(Collections.MyGroupsJobsView).getFullList({
         filter: `groupCreatedBy="${authStore.currentUser?.id}"`,
-        sort: '-created',
+        sort: '-desiredAt',
       }).then(res => {
         console.log(res)
-        this.myJobs = res as unknown as (WithId<InterestRequestsJobsViewRecord>)[]
+        this.myJobs = res as unknown as (Omit<MyGroupsJobsViewRecord, never> & { expand?: JobsExpand })[]
         return true
       }).catch(e => {
         console.error('Load my jobs error:', e)
@@ -114,17 +114,24 @@ export const useJobs = defineStore('jobs-module', {
     },
     async getCreatedJobs(): Promise<boolean> {
       const authStore = useAuth();
-      return pb.collection(Collections.Jobs).getFullList({
-        filter: `createdBy="${authStore.currentUser?.id}"`,
-        sort: '-created',
-        expand: 'city',
-      }).then(res => {
-        this.createdJobs = res as unknown as (WithId<JobsRecord> & { expand?: JobsExpand })[]
-        return true
-      }).catch(e => {
-        console.error('Load created jobs error:', e)
-        return false
-      })
+      if (!authStore.currentUser?.id) {
+        return false;
+      }
+
+      try {
+        const jobs = await pb.collection(Collections.CreatedJobsView).getFullList({
+          filter: `createdBy="${authStore.currentUser.id}"`,
+          sort: '-desiredAt',
+          expand: 'city',
+        });
+
+        this.createdJobs = jobs as unknown as (Omit<CreatedJobsViewRecord<string>, never> & { expand?: JobsExpand })[];
+
+        return true;
+      } catch (e) {
+        console.error('Load created jobs error:', e);
+        return false;
+      }
     },
     async sendInterestRequest(interestRequest: InterestRequestsRecord): Promise<boolean> {
       return pb.collection(Collections.InterestRequests).create(interestRequest).then(() => {
@@ -168,12 +175,8 @@ export const useJobs = defineStore('jobs-module', {
     async searchJobs(options: {
       subcategoryIds?: string[];
       cityIds?: string[];
-      page?: number;
-      pageSize?: number;
-    }): Promise<{ items: (WithId<JobsRecord> & { expand?: JobsExpand })[]; totalPages: number; page: number; perPage: number; totalItems: number }> {
+    }): Promise<{ items: WithId<SearchJobsViewRecord>[]; totalPages: number; page: number; perPage: number; totalItems: number }> {
       const filters: string[] = [];
-
-      filters.push('publicationStatus = "Publicerad"');
 
       if (options.subcategoryIds && options.subcategoryIds.length > 0) {
         const subcategoryFilters = options.subcategoryIds.map(id => `jobSubcategories ~ "${id}"`).join(' || ');
@@ -185,33 +188,30 @@ export const useJobs = defineStore('jobs-module', {
         filters.push(`(${cityFilters})`);
       }
 
-      const filterString = filters.join(' && ');
+      const queryOptions: { filter?: string; sort: string } = {
+        sort: '-desiredAt',
+      };
 
-      const page = options.page || 1;
-      const pageSize = options.pageSize || 50;
+      if (filters.length > 0) {
+        queryOptions.filter = filters.join(' && ');
+      }
 
-      console.log('Search jobs filter:', filterString);
-
-      return pb.collection(Collections.Jobs).getList(page, pageSize, {
-        filter: filterString,
-        sort: '-created',
-        expand: 'city',
-      }).then(res => {
-        console.log('Search jobs result:', res.items.length, 'items');
+      return pb.collection(Collections.SearchJobsView).getFullList(queryOptions).then(res => {
         return {
-          items: res.items as unknown as (WithId<JobsRecord> & { expand?: JobsExpand })[],
-          totalPages: res.totalPages,
-          page: res.page,
-          perPage: res.perPage,
-          totalItems: res.totalItems,
+          items: res as unknown as WithId<SearchJobsViewRecord>[],
+          totalPages: 1,
+          page: 1,
+          perPage: res.length,
+          totalItems: res.length,
         }
       }).catch(e => {
-        console.error('Search jobs error:', e)
+        console.error('Search jobs error:', e);
+        console.error('Search jobs error details:', JSON.stringify(e, null, 2));
         return {
           items: [],
           totalPages: 1,
           page: 1,
-          perPage: pageSize,
+          perPage: 0,
           totalItems: 0,
         }
       })

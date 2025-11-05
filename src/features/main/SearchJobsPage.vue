@@ -69,14 +69,8 @@
     </div>
 
     <q-list v-else separator class="q-pa-md">
-      <job-list-item v-for="item in uppdrag" :key="item.id" :job="item" :to="`/uppdrag/${item.id}`" />
+      <search-job-list-item v-for="item in uppdrag" :key="item.id" :job="item" :to="`/uppdrag/${item.id}`" />
     </q-list>
-
-    <q-page-sticky v-if="!loading && uppdrag.length > 0" position="bottom" :offset="[0, 18]">
-      <q-pagination v-model="current" :max="totalPages" direction-links boundary-links icon-first="skip_previous"
-        icon-last="skip_next" icon-prev="fast_rewind" icon-next="fast_forward" color="primary"
-        class="q-pa-sm rounded-borders" />
-    </q-page-sticky>
   </q-page>
 </template>
 
@@ -84,22 +78,19 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useJobs } from 'src/features/jobs/jobsStore';
-import JobListItem from 'src/features/jobs/components/JobListItem.vue';
+import SearchJobListItem from 'src/features/jobs/components/SearchJobListItem.vue';
 import type { WithId } from 'src/models/withIdType';
-import type { JobsRecord } from 'app/pocketbase-types';
+import type { SearchJobsViewRecord } from 'app/pocketbase-types';
 import { QSelect } from 'quasar';
-import type { JobsExpand } from 'app/expanded-pocketbase-types';
 const router = useRouter();
 const route = useRoute();
 const jobsStore = useJobs();
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);
-const uppdrag = ref<(WithId<JobsRecord> & { expand?: JobsExpand })[]>([]);
+const uppdrag = ref<WithId<SearchJobsViewRecord>[]>([]);
 const loading = ref(false);
 const selectedSubcategories = ref<string[]>([]);
 const selectedCities = ref<string[]>([]);
-const current = ref(1);
-const totalPages = ref(1);
 const isUpdatingQuery = ref(false);
 const isInitializing = ref(true);
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -163,7 +154,6 @@ watch(allJobSubcategories, (subcategories) => {
 
 watch([selectedCities, selectedSubcategories], () => {
   if (!isUpdatingQuery.value && !isInitializing.value) {
-    current.value = 1;
     updateQueryParams();
     debouncedSearch();
   }
@@ -180,10 +170,6 @@ watch(() => route.query, (newQuery) => {
 
 const updateQueryParams = () => {
   const filters: Record<string, string> = {};
-
-  if (current.value > 1) {
-    filters.page = current.value.toString();
-  }
 
   selectedCities.value.forEach(cityId => {
     const city = allCities.value.find(c => c.id === cityId);
@@ -225,11 +211,6 @@ const loadFromQueryParams = (query: Record<string, string | string[] | null>) =>
       if (sub && !subcategoryIds.includes(id)) {
         subcategoryIds.push(id);
       }
-    } else if (key === 'page') {
-      const page = Number(value);
-      if (!isNaN(page) && page > 0) {
-        current.value = page;
-      }
     }
   }
 
@@ -256,12 +237,9 @@ const searchUppdrag = async () => {
     const result = await jobsStore.searchJobs({
       subcategoryIds: selectedSubcategories.value,
       cityIds: selectedCities.value,
-      page: current.value,
-      pageSize: 50,
     });
 
     uppdrag.value = result.items;
-    totalPages.value = result.totalPages;
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'message' in error &&
       (error.message === 'signal is aborted without reason' || error.message?.toString().includes('autocancelled'))) {
@@ -277,7 +255,6 @@ const searchUppdrag = async () => {
 const clearFilters = () => {
   selectedSubcategories.value = [];
   selectedCities.value = [];
-  current.value = 1;
   updateQueryParams();
 };
 
@@ -306,13 +283,6 @@ const filterJobsFn = (val: string, update: (fn: () => void) => void) => {
     }
   });
 };
-
-watch(current, () => {
-  if (!isInitializing.value) {
-    updateQueryParams();
-    debouncedSearch();
-  }
-});
 
 onMounted(async () => {
   try {

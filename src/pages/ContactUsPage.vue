@@ -9,12 +9,18 @@
 
         <div class="q-mt-lg">
           <p class="text-body1 q-mb-md">
-            Har du frågor om hur plattformen fungerar eller behöver du hjälp? Kontakta oss så svarar vi
-            så snart vi kan, vanligtvis inom 24 timmar på vardagar.
+            Har du frågor om hur plattformen fungerar, behöver du hjälp med din registrering, eller har du problem med
+            ett uppdrag?
+            Kontakta oss så svarar vi så snart vi kan, vanligtvis inom 24 timmar på vardagar.
           </p>
           <p class="text-body1 q-mb-md">
-            Kom ihåg att plattformen är helt gratis att använda. Det kostar ingenting att registrera sig eller
-            skapa uppdrag.
+            <b>Kom ihåg att plattformen är helt gratis att använda.</b> Det kostar ingenting att registrera sig, skapa
+            uppdrag
+            eller söka efter uppdrag. Ingen månadsavgift, inga dolda kostnader.
+          </p>
+          <p class="text-body1 q-mb-md">
+            Om du har frågor om ett specifikt uppdrag eller en grupp, rekommenderar vi att du kontakterar dem direkt via
+            de kontaktuppgifter som delas när en intresseanmälning är godkänd.
           </p>
 
           <q-list>

@@ -16,23 +16,18 @@
             {{ truncate(job.description, 100) }}
           </div>
           <div class="text-body1 text-grey-7 row items-center q-gutter-sm q-mt-xs">
-            <q-chip v-if="showStatus && job.publicationStatus" :color="getJobStatusColor(job.publicationStatus)"
-              text-color="white" size="sm">
-              {{ job.publicationStatus }}
-            </q-chip>
-            <span v-if="showStatus && job.publicationStatus && job.price" class="text-grey-5">•</span>
             <span v-if="job.price" class="inline-flex items-center text-bold text-green">
               {{ job.price }} kr
             </span>
-            <span v-if="job.price && (job.estimatedHours || job.expand?.city?.title)" class="text-grey-5">•</span>
+            <span v-if="job.price && (job.estimatedHours || job.cityTitle)" class="text-grey-5">•</span>
             <span v-if="job.estimatedHours" class="inline-flex items-center">
               <q-icon name="schedule" size="sm" />
               {{ job.estimatedHours }}h
             </span>
-            <span v-if="job.estimatedHours && job.expand?.city?.title" class="text-grey-5">•</span>
-            <span v-if="job.expand?.city?.title" class="inline-flex items-center">
+            <span v-if="job.estimatedHours && job.cityTitle" class="text-grey-5">•</span>
+            <span v-if="job.cityTitle" class="inline-flex items-center">
               <q-icon name="location_on" size="sm" />
-              {{ job.expand.city.title }}
+              {{ job.cityTitle }}
             </span>
           </div>
         </q-card-section>
@@ -46,19 +41,14 @@ import { useQuasar } from 'quasar';
 import { computed } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import type { WithId } from 'src/models/withIdType';
-import type { JobsRecord } from 'app/pocketbase-types';
-import type { JobsExpand } from 'app/expanded-pocketbase-types';
+import type { SearchJobsViewRecord } from 'app/pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
-import { getJobStatusColor } from 'src/utils/enumUtils';
 
 interface Props {
-  job: WithId<JobsRecord, JobsExpand>;
-  showStatus?: boolean;
+  job: WithId<SearchJobsViewRecord>;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  showStatus: false,
-});
+const props = defineProps<Props>();
 const $q = useQuasar();
 
 const getImageUrl = (imageName: string) => {

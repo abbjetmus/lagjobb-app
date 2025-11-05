@@ -23,7 +23,8 @@
               <q-item-section>
                 <q-item-label class="text-body1">Är ni ett <u>lag</u>, <u>klass</u>, <u>grupp</u> eller en
                   <u>förening</u>? Registrera er grupp gratis och sök efter uppdrag i närheten.
-                  Ni betalar ingenting för att använda plattformen.</q-item-label>
+                  Filtrera efter ort och kategori för att hitta uppdrag som passar er. <b>Ni betalar ingenting för att
+                    använda plattformen.</b></q-item-label>
               </q-item-section>
             </q-item>
 
@@ -32,9 +33,10 @@
                 <q-avatar color="primary" text-color="white">2</q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-body1">Visa intresse för uppdrag som passar er genom att skicka ett
-                  meddelande
-                  till uppdragsgivaren. De får en notifikation och kan välja den grupp som passar bäst.</q-item-label>
+                <q-item-label class="text-body1">Visa intresse för uppdrag genom att skicka ett meddelande till
+                  uppdragsgivaren.
+                  De får en notifikation och kan godkänna eller neka er förfrågan. När ni är godkända kan ni börja
+                  planera uppdraget.</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -43,9 +45,20 @@
                 <q-avatar color="primary" text-color="white">3</q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-body1">Genomför uppdraget och få betalt direkt från uppdragsgivaren.
-                  Pengarna går till er grupp som ni kan använda till vad ni vill. <b>Plattformen är gratis - ni
-                    behåller allt ni tjänar.</b></q-item-label>
+                <q-item-label class="text-body1">Genomför uppdraget enligt överenskommelsen. När ni är klara markerar ni
+                  uppdraget som utfört
+                  och uppdragsgivaren bekräftar och betalar. Ni kan lämna omdöme om varandra efteråt.</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item>
+              <q-item-section avatar>
+                <q-avatar color="primary" text-color="white">4</q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-body1">Pengarna går till er grupp som ni kan använda till vad ni vill.
+                  <b>Plattformen är helt gratis - ni behåller allt ni tjänar.</b> Uppdragsgivaren betalar endast det
+                  pris ni kommit överens om.</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -64,11 +77,10 @@
                 <q-avatar color="primary" text-color="white">1</q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-body1">Har du ett jobb som behöver göras? Registrera dig gratis och skapa
-                  ditt
-                  uppdrag. Det kostar ingenting att använda plattformen - inte när du registrerar dig, inte när du
-                  skapar
-                  uppdrag och ingen månadsavgift.</q-item-label>
+                <q-item-label class="text-body1">Har du ett jobb som behöver göras? Registrera dig gratis och skapa ditt
+                  uppdrag.
+                  <b>Det kostar ingenting att använda plattformen - inte när du registrerar dig, inte när du skapar
+                    uppdrag och ingen månadsavgift.</b></q-item-label>
               </q-item-section>
             </q-item>
 
@@ -77,11 +89,10 @@
                 <q-avatar color="primary" text-color="white">2</q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-body1">Fyll i beskrivning, pris och datum. Ladda upp bilder och markera
-                  platsen
-                  på kartan. Använd taggar så att rätt grupper hittar ditt uppdrag. <b>Allt är helt gratis - ingen
-                    avgift
-                    någonsin.</b></q-item-label>
+                <q-item-label class="text-body1">Fyll i beskrivning, pris och önskat datum. Ladda upp bilder och markera
+                  platsen på kartan.
+                  Välj kategorier så att rätt grupper hittar ditt uppdrag. Efter granskning publiceras ditt uppdrag
+                  automatiskt.</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -90,9 +101,10 @@
                 <q-avatar color="primary" text-color="white">3</q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-body1">På din <b>Skapade Uppdrag</b> sida kan du läsa meddelanden från
-                  intresserade grupper, välja den som passar bäst och hantera hela uppdraget på ett
-                  ställe.</q-item-label>
+                <q-item-label class="text-body1">På din <b>Skapade Uppdrag</b> sida får du meddelanden från intresserade
+                  grupper.
+                  Läs deras förfrågningar och välja den grupp som passar bäst. Du kan godkänna eller neka
+                  förfrågningar.</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -101,10 +113,9 @@
                 <q-avatar color="primary" text-color="white">4</q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-body1">Ditt uppdrag är synligt i 30 dagar, men du kan när som helst
-                  förlänga,
-                  redigera eller ta bort det. När uppdraget är klart kan du lämna ett omdöme om
-                  gruppen.</q-item-label>
+                <q-item-label class="text-body1">När gruppen har utfört uppdraget bekräftar du och betalar. Du kan lämna
+                  omdöme om gruppen.
+                  Uppdrag som inte är tilldelade eller där datumet har passerat markeras automatiskt.</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>

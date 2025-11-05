@@ -26,9 +26,17 @@
 
           <div class="text-h6 q-mt-lg q-mb-sm text-primary">Hur det funkar</div>
           <p class="text-body1 q-mb-md">
-            Skapa ett konto, publicera ditt uppdrag och få intresseanmälningar från grupper. Eller registrera din
-            grupp
-            och sök efter uppdrag i närheten. Allt samlat på ett ställe.
+            <b>För uppdragsskapare:</b> Skapa ett konto, publicera ditt uppdrag med beskrivning, pris och datum. 
+            Få intresseanmälningar från grupper, välj den som passar bäst och hantera hela processen från godkännande till betalning.
+          </p>
+          <p class="text-body1 q-mb-md">
+            <b>För grupper:</b> Registrera er grupp (lag, klass, förening eller organisation), sök efter uppdrag i närheten 
+            med filter för ort och kategori. Skicka intresseanmälningar, få godkännande och utför uppdraget. 
+            Få betalt direkt och använd pengarna till gruppens aktiviteter.
+          </p>
+          <p class="text-body1 q-mb-md">
+            Allt samlat på ett ställe med tydlig kommunikation, betalningshantering och omdömen. 
+            <b>Helt gratis att använda - alltid.</b>
           </p>
         </div>
       </div>
