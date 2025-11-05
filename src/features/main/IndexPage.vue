@@ -93,63 +93,51 @@
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useJobs } from 'src/features/jobs/jobsStore';
-import { useQuasar, QSelect, useMeta } from 'quasar';
+import { useQuasar, QSelect } from 'quasar';
 import FooterComponent from 'src/components/FooterComponent.vue';
+import { useSEO } from 'src/composables/useSEO';
 
 const router = useRouter();
 const jobsStore = useJobs();
 const $q = useQuasar();
 
 const getAbsoluteUrl = (path: string) => {
-  if (typeof window === 'undefined') return path;
+  if (typeof window === 'undefined') {
+    const baseUrl = process.env.APP_URL || 'https://lagjobb.se';
+    return `${baseUrl}${path}`;
+  }
   return `${window.location.origin}${path}`;
 };
 
-useMeta(() => ({
+useSEO({
   title: 'Lagjobb - Hitta uppdrag för ditt lag, klass eller förening',
-  meta: {
-    description: {
-      name: 'description',
-      content: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.'
+  description: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.',
+  image: '/soccer-team.jpg',
+  url: getAbsoluteUrl('/'),
+  structuredData: {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Lagjobb',
+    description: 'Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig!',
+    url: getAbsoluteUrl('/'),
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${getAbsoluteUrl('/sok-uppdrag')}?q={search_term_string}`
+      },
+      'query-input': 'required name=search_term_string'
     },
-    ogTitle: {
-      property: 'og:title',
-      content: 'Lagjobb - Hitta uppdrag för ditt lag, klass eller förening'
-    },
-    ogDescription: {
-      property: 'og:description',
-      content: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.'
-    },
-    ogImage: {
-      property: 'og:image',
-      content: getAbsoluteUrl('/soccer-team.jpg')
-    },
-    ogUrl: {
-      property: 'og:url',
-      content: getAbsoluteUrl('/')
-    },
-    ogType: {
-      property: 'og:type',
-      content: 'website'
-    },
-    twitterCard: {
-      name: 'twitter:card',
-      content: 'summary_large_image'
-    },
-    twitterImage: {
-      name: 'twitter:image',
-      content: getAbsoluteUrl('/soccer-team.jpg')
-    },
-    twitterTitle: {
-      name: 'twitter:title',
-      content: 'Lagjobb - Hitta uppdrag för ditt lag, klass eller förening'
-    },
-    twitterDescription: {
-      name: 'twitter:description',
-      content: 'Lagjobb - Vi hjälper Sveriges föreningar genom att låta dem hjälpa dig! Hitta uppdrag som ditt lag, klass eller förening kan utföra för att tjäna pengar.'
+    publisher: {
+      '@type': 'Organization',
+      name: 'Lagjobb',
+      logo: {
+        '@type': 'ImageObject',
+        url: getAbsoluteUrl('/soccer-team.jpg')
+      }
     }
   }
-}));
+});
 
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);

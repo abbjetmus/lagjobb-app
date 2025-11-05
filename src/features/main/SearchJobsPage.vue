@@ -82,9 +82,32 @@ import SearchJobListItem from 'src/features/jobs/components/SearchJobListItem.vu
 import type { WithId } from 'src/models/withIdType';
 import type { SearchJobsViewRecord } from 'app/pocketbase-types';
 import { QSelect } from 'quasar';
+import { useSEO } from 'src/composables/useSEO';
+
 const router = useRouter();
 const route = useRoute();
 const jobsStore = useJobs();
+
+const getAbsoluteUrl = (path: string) => {
+  if (typeof window === 'undefined') {
+    const baseUrl = process.env.APP_URL || 'https://lagjobb.se';
+    return `${baseUrl}${path}`;
+  }
+  return `${window.location.origin}${path}`;
+};
+
+useSEO({
+  title: 'Sök uppdrag - Lagjobb',
+  description: 'Sök efter uppdrag som ditt lag, klass eller förening kan utföra. Hitta intressanta uppdrag i din stad eller region.',
+  url: getAbsoluteUrl('/sok-uppdrag'),
+  structuredData: {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Sök uppdrag',
+    description: 'Sök efter uppdrag som ditt lag, klass eller förening kan utföra',
+    url: getAbsoluteUrl('/sok-uppdrag')
+  }
+});
 const jobsRef = ref<QSelect | null>(null);
 const cityRef = ref<QSelect | null>(null);
 const uppdrag = ref<WithId<SearchJobsViewRecord>[]>([]);

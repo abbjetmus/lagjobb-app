@@ -47,7 +47,7 @@ export default defineConfig((/* ctx */) => {
         // extendTsConfig (tsConfig) {}
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
 
       env: {
         PB_URL: env?.PB_URL || process.env.PB_URL || 'http://localhost:8090',
