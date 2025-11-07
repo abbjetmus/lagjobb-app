@@ -68,14 +68,18 @@
           </div>
         </q-card-section>
 
-        <q-card-actions v-if="authStore.isAuthenticated && isUppdragsutforare">
-          <q-btn unelevated color="green-6" label="Skicka förfrågan" @click="showSendInterestDialog"
-            :disable="!hasGroups" class="full-width" />
+        <q-card-actions v-if="!authStore.isAuthenticated">
+          <q-btn unelevated color="green-6" label="Skicka förfrågan" @click="handleSendInterest" class="full-width" />
         </q-card-actions>
-        <div v-if="authStore.isAuthenticated && isUppdragsutforare && !hasGroups"
-          class="text-caption text-grey q-px-md q-pb-md text-center">
-          Du måste ha skapat en grupp (lag, klass, förening, etc.) för att kunna skicka förfrågan.
-        </div>
+        <template v-else-if="authStore.isAuthenticated && isUppdragsutforare">
+          <q-card-actions>
+            <q-btn unelevated color="green-6" label="Skicka förfrågan" @click="handleSendInterest" :disable="!hasGroups"
+              class="full-width" />
+          </q-card-actions>
+          <div v-if="!hasGroups" class="text-caption text-grey q-px-md q-pb-md text-center">
+            Du måste ha skapat en grupp (lag, klass, förening, etc.) för att kunna skicka förfrågan.
+          </div>
+        </template>
       </q-card>
 
       <q-card flat class="col bg-transparent" v-if="job.latitude && job.longitude">
@@ -91,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { pb } from 'src/boot/pocketbase';
 import { useAuth } from 'src/features/auth/authStore';
 import type { JobsRecord } from 'app/pocketbase-types';
@@ -103,6 +107,7 @@ import ImageGallery from 'src/components/ImageGallery.vue';
 import LeafletMap from 'src/components/LeafletMap.vue';
 import { formatDateTime } from 'src/utils/dateUtils';
 import SendInterestDialog from './SendInterestDialog.vue';
+import SignInSignUpDialog from 'src/features/auth/components/SignInSignUpDialog.vue';
 import { useGroups } from 'src/features/groups/groupsStore';
 import type { GroupsRecord } from 'app/pocketbase-types';
 import { getJobStatusColor } from 'src/utils/enumUtils';
@@ -131,6 +136,31 @@ const isUppdragsutforare = computed(() =>
 
 const hasGroups = computed(() => userGroups.value.length > 0);
 
+const handleSendInterest = () => {
+  if (!authStore.isAuthenticated) {
+    $q.dialog({
+      component: SignInSignUpDialog,
+      persistent: true,
+    }).onOk(() => {
+      // After successful login, load groups if user is uppdragsutförare
+      void (async () => {
+        if (authStore.isAuthenticated && isUppdragsutforare.value) {
+          await groupsStore.getMyGroups();
+          userGroups.value = groupsStore.myGroups;
+          if (hasGroups.value) {
+            showSendInterestDialog();
+          }
+        }
+      })();
+    });
+    return;
+  }
+
+  if (isUppdragsutforare.value) {
+    showSendInterestDialog();
+  }
+};
+
 const showSendInterestDialog = () => {
   $q.dialog({
     component: SendInterestDialog,
@@ -141,10 +171,22 @@ const showSendInterestDialog = () => {
   });
 };
 
-onMounted(async () => {
+const loadGroupsIfNeeded = async () => {
   if (authStore.isAuthenticated && isUppdragsutforare.value) {
     await groupsStore.getMyGroups();
     userGroups.value = groupsStore.myGroups;
   }
+};
+
+watch(() => authStore.isAuthenticated, async (isAuthenticated) => {
+  if (isAuthenticated) {
+    await loadGroupsIfNeeded();
+  } else {
+    userGroups.value = [];
+  }
+}, { immediate: true });
+
+onMounted(async () => {
+  await loadGroupsIfNeeded();
 });
 </script>

@@ -61,6 +61,22 @@ export function useSEO(config: SEOConfig) {
         property: 'og:image',
         content: ogImage.value
       },
+      ogImageSecure: {
+        property: 'og:image:secure_url',
+        content: ogImage.value
+      },
+      ogImageWidth: {
+        property: 'og:image:width',
+        content: '1300'
+      },
+      ogImageHeight: {
+        property: 'og:image:height',
+        content: '867'
+      },
+      ogImageAlt: {
+        property: 'og:image:alt',
+        content: title.value
+      },
       ogUrl: {
         property: 'og:url',
         content: canonicalUrl.value
