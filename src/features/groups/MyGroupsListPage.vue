@@ -24,9 +24,9 @@
       </div>
     </div>
 
-    <q-list v-else class="q-ma-md">
+    <q-list v-else :class="$q.screen.gt.xs ? 'q-ma-md' : 'q-pa-sm'">
       <group-list-item v-for="group in myGroups" :key="group.id" :group="group" :show-status="true"
-        :to="`/mina-grupper/${group.id}`" />
+        :to="`/mina-grupper/${group.id}`" :class="$q.screen.gt.xs ? 'q-mb-md' : 'q-mb-sm'" />
     </q-list>
 
     <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-right" :offset="[20, 20]">

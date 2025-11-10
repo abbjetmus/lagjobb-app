@@ -54,8 +54,9 @@
       </div>
     </div>
 
-    <q-list v-else class="q-pa-md">
-      <group-list-item v-for="group in groups" :key="group.id" :group="group" @click="goToGroup(group.id as string)" />
+    <q-list v-else :class="$q.screen.gt.xs ? 'q-pa-md' : 'q-pa-sm'">
+      <group-list-item v-for="group in groups" :key="group.id" :group="group" @click="goToGroup(group.id as string)"
+        :class="$q.screen.gt.xs ? 'q-mb-md' : 'q-mb-sm'" />
     </q-list>
   </q-page>
 </template>

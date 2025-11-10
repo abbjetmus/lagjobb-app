@@ -30,9 +30,9 @@
         <q-toggle v-model="showCompleted" label="Klara uppdrag eller datumet passerat" color="primary" />
       </div>
 
-      <q-list class="q-ma-md" style="flex: 1;">
+      <q-list :class="$q.screen.gt.xs ? 'q-ma-md' : 'q-pa-sm'" style="flex: 1;">
         <created-jobs-list-item v-for="item in filteredJobs" :key="item.id" :job="item" :show-status="true"
-          :to="`/skapade-uppdrag/${item.id}`" />
+          :to="`/skapade-uppdrag/${item.id}`" :class="$q.screen.gt.xs ? 'q-mb-md' : 'q-mb-sm'" />
       </q-list>
     </div>
 

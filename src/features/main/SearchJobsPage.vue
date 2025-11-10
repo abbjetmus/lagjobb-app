@@ -68,8 +68,9 @@
       </div>
     </div>
 
-    <q-list v-else class="q-pa-md">
-      <search-job-list-item v-for="item in uppdrag" :key="item.id" :job="item" :to="`/uppdrag/${item.id}`" />
+    <q-list v-else :class="$q.screen.gt.xs ? 'q-pa-md' : 'q-pa-sm'">
+      <search-job-list-item v-for="item in uppdrag" :key="item.id" :job="item" :to="`/uppdrag/${item.id}`"
+        :class="$q.screen.gt.xs ? 'q-mb-md' : 'q-mb-sm'" />
     </q-list>
   </q-page>
 </template>

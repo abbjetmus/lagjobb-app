@@ -22,8 +22,9 @@
         <q-toggle v-model="showCompleted" label="Klara uppdrag eller datumet passerat" color="primary" />
       </div>
       <div class="text-h5 q-px-md q-pt-md q-pb-none">Mina Uppdrag</div>
-      <q-list separator class="q-pa-md">
-        <my-jobs-list-item v-for="item in filteredJobs" :key="item.id" :job="item" :to="`/mina-uppdrag/${item.id}`" />
+      <q-list separator :class="$q.screen.gt.xs ? 'q-pa-md' : 'q-pa-sm'">
+        <my-jobs-list-item v-for="item in filteredJobs" :key="item.id" :job="item" :to="`/mina-uppdrag/${item.id}`"
+          :class="$q.screen.gt.xs ? 'q-mb-md' : 'q-mb-sm'" />
       </q-list>
     </div>
   </q-page>
