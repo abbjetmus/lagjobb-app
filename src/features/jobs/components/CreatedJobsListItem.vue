@@ -6,9 +6,9 @@
           :style="imageStyle">
           <img class="full-width full-height" style="object-fit: cover;" :src="getImageUrl(job.images[0]!)" />
           <div class="absolute-bottom-right q-pa-sm" style="z-index: 1;">
-            <q-badge v-if="showStatus && getPublicationStatus() === 'Publicerad'" color="positive" rounded
+            <q-badge :color="getJobStatusColor(props.job.publicationStatus)" rounded
               style="font-size: 0.875rem; font-weight: 600; padding: 6px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
-              Publicerad
+              {{ props.job.publicationStatus }}
             </q-badge>
             <q-badge v-if="getStatus()" color="grey-9" rounded
               style="font-size: 0.875rem; font-weight: 600; padding: 6px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"
@@ -55,16 +55,14 @@ import { pb } from 'src/boot/pocketbase';
 import type { CreatedJobsViewRecord } from 'app/pocketbase-types';
 import type { JobsExpand } from 'app/expanded-pocketbase-types';
 import { formatDateTime } from 'src/utils/dateUtils';
+import type { WithId } from 'src/models/withIdType';
+import { getJobStatusColor } from 'src/utils/enumUtils';
 
-interface Props {
-  job: Omit<CreatedJobsViewRecord<string>, never> & { expand?: JobsExpand; images?: string[] };
-  showStatus?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  showStatus: false,
-});
 const $q = useQuasar();
+
+const props = defineProps<{
+  job: WithId<CreatedJobsViewRecord<string>, JobsExpand & { images?: string[] }>;
+}>();
 
 const getImageUrl = (imageName: string) => {
   return pb.files.getURL(props.job, imageName);
@@ -73,10 +71,6 @@ const getImageUrl = (imageName: string) => {
 const getStatus = (): string | null => {
   if (!props.job.status || typeof props.job.status !== 'string') return null;
   return props.job.status;
-};
-
-const getPublicationStatus = (): string | null => {
-  return props.job.publicationStatus ?? null;
 };
 
 const truncate = (text: string, length: number) => {

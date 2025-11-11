@@ -31,7 +31,7 @@
       </div>
 
       <q-list :class="$q.screen.gt.xs ? 'q-ma-md' : 'q-pa-sm'" style="flex: 1;">
-        <created-jobs-list-item v-for="item in filteredJobs" :key="item.id" :job="item" :show-status="true"
+        <created-jobs-list-item v-for="item in filteredJobs" :key="item.id" :job="item"
           :to="`/skapade-uppdrag/${item.id}`" :class="$q.screen.gt.xs ? 'q-mb-md' : 'q-mb-sm'" />
       </q-list>
     </div>
