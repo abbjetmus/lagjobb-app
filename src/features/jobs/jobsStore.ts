@@ -102,7 +102,7 @@ export const useJobs = defineStore('jobs-module', {
       const authStore = useAuth();
       return pb.collection(Collections.MyGroupsJobsView).getFullList({
         filter: `groupCreatedBy="${authStore.currentUser?.id}"`,
-        sort: '-desiredAt',
+        sort: 'desiredAt',
       }).then(res => {
         console.log(res)
         this.myJobs = res as unknown as (Omit<MyGroupsJobsViewRecord, never> & { expand?: JobsExpand })[]
@@ -121,7 +121,7 @@ export const useJobs = defineStore('jobs-module', {
       try {
         const jobs = await pb.collection(Collections.CreatedJobsView).getFullList({
           filter: `createdBy="${authStore.currentUser.id}"`,
-          sort: '-desiredAt',
+          sort: 'desiredAt',
           expand: 'city',
         });
 
@@ -189,7 +189,7 @@ export const useJobs = defineStore('jobs-module', {
       }
 
       const queryOptions: { filter?: string; sort: string } = {
-        sort: '-desiredAt',
+        sort: 'desiredAt',
       };
 
       if (filters.length > 0) {

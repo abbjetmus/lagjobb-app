@@ -8,7 +8,8 @@
         </q-card-section>
 
         <q-card-section>
-          <div class="text-h4">{{ group.groupName }}</div>
+          <div class="text-h4"><span>{{ group.groupName }}</span> <span v-if="group.sectionName"> - {{
+            group.sectionName }}</span></div>
           <div class="row items-center q-mt-sm q-gutter-sm">
             <q-chip v-if="showStatus && group.publicationStatus" :color="getGroupStatusColor(group.publicationStatus)"
               text-color="white" size="sm">

@@ -7,7 +7,8 @@
         </div>
         <q-card-section class="column justify-center">
           <div class="text-h6 text-weight-regular" style="line-height: 1.2;">
-            {{ props.group.groupName }}
+            <span>{{ props.group.groupName }}</span> <span v-if="props.group.sectionName"> - {{
+              props.group.sectionName }}</span>
           </div>
           <div class="text-caption text-grey q-mt-xs">
             {{ formatDate(props.group.created || '') }}
